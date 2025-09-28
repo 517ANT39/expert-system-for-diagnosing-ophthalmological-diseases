@@ -33,7 +33,7 @@ jobs:
         run: |
           cd guide/_tools/mdbook-drawio
           cargo build --release
-          sudo cp guide/target/release/mdbook-drawio /usr/local/bin/
+          sudo cp target/release/mdbook-drawio /usr/local/bin/
 
       - name: Build Book
         run: |
