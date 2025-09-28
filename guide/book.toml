@@ -1,0 +1,16 @@
+[book]
+authors = ["Anton"]
+language = "ru"
+src = "src"
+title = "guide"
+
+[build]
+build-dir = "book"
+create-missing = true
+
+[preprocessor.drawio]
+command = "mdbook-drawio"
+
+[output.html]
+additional-css = ["src/_assets/custom.css"]
+additional-js = []
