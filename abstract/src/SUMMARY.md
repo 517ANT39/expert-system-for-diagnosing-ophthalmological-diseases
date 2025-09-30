@@ -1,3 +1,5 @@
 # Summary
 
-- [Chapter 1](./chapter_1.md)
+- [Введение](./introduction.md)
+- [Функциональные требования](./functional-requirements.md)
+- [Архитектура](./architecture.md)
