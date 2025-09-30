@@ -27,7 +27,7 @@ jobs:
 
       - uses: Swatinem/rust-cache@v2
         with:
-          workspaces: "guide/_tools/mdbook-drawio -> target"
+          workspaces: "abstract/_tools/mdbook-drawio -> target"
 
       - name: Build Drawio Preprocessor
         run: |
@@ -45,4 +45,4 @@ jobs:
         if: ${{ github.ref == 'refs/heads/main' }}
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./guide/book
+          publish_dir: ./abstract/book
