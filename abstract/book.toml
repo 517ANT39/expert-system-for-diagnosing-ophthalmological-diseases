@@ -2,7 +2,7 @@
 authors = ["Anton"]
 language = "ru"
 src = "src"
-title = "guide"
+title = "abstract"
 
 [build]
 build-dir = "book"
