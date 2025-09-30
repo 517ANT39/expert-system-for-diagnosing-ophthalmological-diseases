@@ -27,17 +27,17 @@ jobs:
 
       - uses: Swatinem/rust-cache@v2
         with:
-          workspaces: "guide/_tools/mdbook-drawio -> target"
+          workspaces: "abstract/_tools/mdbook-drawio -> target"
 
       - name: Build Drawio Preprocessor
         run: |
-          cd guide/_tools/mdbook-drawio
+          cd abstract/_tools/mdbook-drawio
           cargo build --release
-          sudo cp guide/target/release/mdbook-drawio /usr/local/bin/
+          sudo cp target/release/mdbook-drawio /usr/local/bin/
 
       - name: Build Book
         run: |
-          cd guide
+          cd abstract
           mdbook build
 
       - name: Deploy
@@ -45,4 +45,4 @@ jobs:
         if: ${{ github.ref == 'refs/heads/main' }}
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./guide/book
+          publish_dir: ./abstract/book
