@@ -1,7 +1,7 @@
 # Архитектура приложения
 
 ## Статус 
-Принято
+**Принято**
 
 ## Контекст
 
@@ -22,7 +22,7 @@
 
 Диаграмма архитектуры:
 
-@drawio{https://github.com/517ant39/mdb/blob/main/abstract/diagrams/arch.drawio}
+@drawio{https://github.com/517ANT39/expert-system-for-diagnosing-ophthalmological-diseases/blob/main/abstract/diagrams/arch.drawio}
 
 ## Последствия
 **Положительные:**

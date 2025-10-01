@@ -8,4 +8,4 @@
 - Экспорт консультаций
 
 Рассмотрим use case - диаграмму:
-@drawio{https://github.com/517ant39/mdb/blob/main/abstract/diagrams/usecase.drawio}
+@drawio{https://github.com/517ANT39/expert-system-for-diagnosing-ophthalmological-diseases/blob/main/abstract/diagrams/usecase.drawio}
