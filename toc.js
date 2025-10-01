@@ -8,7 +8,7 @@ class MDBookSidebarScrollbox extends HTMLElement {
         super();
     }
     connectedCallback() {
-        this.innerHTML = '<ol class="chapter"><li class="chapter-item expanded "><a href="chapter_1.html"><strong aria-hidden="true">1.</strong> Chapter 1</a></li></ol>';
+        this.innerHTML = '<ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Введение</a></li><li class="chapter-item expanded "><a href="functional-requirements.html"><strong aria-hidden="true">2.</strong> Функциональные требования</a></li><li class="chapter-item expanded "><a href="architecture.html"><strong aria-hidden="true">3.</strong> Архитектура приложения</a></li><li class="chapter-item expanded "><a href="architecture-intelligent-system.html"><strong aria-hidden="true">4.</strong> Архитектура интелектуальной системы</a></li><li class="chapter-item expanded "><a href="select-db-app.html"><strong aria-hidden="true">5.</strong> Выбор базы данных приложения</a></li><li class="chapter-item expanded "><a href="select-db-intelligent-system.html"><strong aria-hidden="true">6.</strong> Выбор хранилища данных для базы знаний</a></li><li class="chapter-item expanded "><a href="select-technology.html"><strong aria-hidden="true">7.</strong> Выбор технологий разработки</a></li><li class="chapter-item expanded "><a href="conclusion.html"><strong aria-hidden="true">8.</strong> Вывод</a></li></ol>';
         // Set the current, active page, and reveal it if it's hidden
         let current_page = document.location.href.toString().split("#")[0].split("?")[0];
         if (current_page.endsWith("/")) {

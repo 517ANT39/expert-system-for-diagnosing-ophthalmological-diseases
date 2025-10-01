@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Введение - abstract</title>
+        <title>Архитектура приложения - abstract</title>
 
 
         <!-- Custom HTML head -->
@@ -176,19 +176,52 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="Введение"><a class="header" href="#Введение">Введение</a></h1>
-<p>Разрабатываемая экспертная система представляет собой интеллектуальную информационную платформу поддержки принятия врачебных решений в офтальмологии. Система предназначена для использования в условиях ограниченного доступа к специализированному диагностическому оборудованию.</p>
-<h2 id="Цель"><a class="header" href="#Цель">Цель</a></h2>
-<p>Помочь начинающим врачам быстро ориентироваться при первичной консультации по офтальмологии в условиях, где отсутствует полный набор инструментов (аппаратуры OCT, расширенное обследование и т.п.), и снизить риск серьёзной патологии,обнаружив ее проявление.</p>
-<h2 id="Целевая-группа-пользователей"><a class="header" href="#Целевая-группа-пользователей">Целевая группа пользователей</a></h2>
-<p>Целевая группа разрабатываемой экспертной системы включает, начинающих врачей-офтальмологов, а также врачей общей практики и терапевтов, которые оказывают первичную медицинскую помощь в условиях ограниченного доступа к специализированному диагностическому оборудованию.</p>
+                        <h1 id="Архитектура-приложения"><a class="header" href="#Архитектура-приложения">Архитектура приложения</a></h1>
+<h2 id="Статус"><a class="header" href="#Статус">Статус</a></h2>
+<p>Принято</p>
+<h2 id="Контекст"><a class="header" href="#Контекст">Контекст</a></h2>
+<p>При проектировании экспертной системы для дифференциальной диагностики офтальмологических заболеваний необходимо обеспечить одновременную работу с двумя типами данных:</p>
+<ul>
+<li>данные приложения (учётные записи пользователей, истории консультаций, протоколы осмотров и действия врачей);</li>
+<li>знания в виде диагностической модели, представляющей взаимосвязи между симптомами, признаками и заболеваниями.</li>
+</ul>
+<p>Использование единой базы данных для обеих задач усложняет модель данных и затрудняет эффективную работу с разнородной информацией. Это мотивирует архитектурное разделение прикладных данных и базы знаний.</p>
+<h2 id="Решение"><a class="header" href="#Решение">Решение</a></h2>
+<p>Принято архитектурное решение использовать модель MVC (Model–View–Controller), в которой:</p>
+<ul>
+<li>Model разделена на два уровня:
+<ul>
+<li>База данных приложения для хранения пользовательских и транзакционных данных,</li>
+<li>База знаний для хранения предметной области в виде взаимосвязей симптомов, признаков и заболеваний.</li>
+</ul>
+</li>
+<li>View отвечает за взаимодействие с врачом: интерфейс для сбора клинической информации, представления результатов диагностики и объяснений;</li>
+<li>Controller реализует управляемую бизнес-логику: маршрутизацию запросов от интерфейса к моделям данных, обработку диагностического вывода и возврат результатов врачу.</li>
+</ul>
+<p>Диаграмма архитектуры:</p>
+<iframe class="drawio-viewer" src="https://viewer.diagrams.net/?highlight=0000ff&edit=_blank&layers=1&nav=1&title=diagram&url=https://raw.githubusercontent.com/517ant39/mdb/main/abstract/diagrams/arch.drawio"></iframe>
+<h2 id="Последствия"><a class="header" href="#Последствия">Последствия</a></h2>
+<p><strong>Положительные:</strong></p>
+<ul>
+<li>Разделение данных на прикладные и экспертные делает систему более прозрачной и удобной для сопровождения;</li>
+<li>Архитектурный паттерн MVC обеспечивает модульность: можно независимо развивать интерфейс, бизнес-логику и модель данных;</li>
+<li>Повышается масштабируемость: базы можно развивать и оптимизировать под свои задачи без взаимных ограничений.</li>
+</ul>
+<p><strong>Отрицательные:</strong></p>
+<ul>
+<li>Увеличивается сложность инфраструктуры, так как приходится работать сразу с двумя логически разными хранилищами</li>
+<li>Сложность изменения бизнес-логики</li>
+</ul>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="functional-requirements.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
 
-                            <a rel="next prefetch" href="functional-requirements.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="architecture-intelligent-system.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -198,8 +231,11 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="functional-requirements.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
 
-                    <a rel="next prefetch" href="functional-requirements.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="architecture-intelligent-system.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>

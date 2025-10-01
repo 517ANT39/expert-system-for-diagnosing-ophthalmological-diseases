@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Введение - abstract</title>
+        <title>Выбор базы данных приложения - abstract</title>
 
 
         <!-- Custom HTML head -->
@@ -176,19 +176,51 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="Введение"><a class="header" href="#Введение">Введение</a></h1>
-<p>Разрабатываемая экспертная система представляет собой интеллектуальную информационную платформу поддержки принятия врачебных решений в офтальмологии. Система предназначена для использования в условиях ограниченного доступа к специализированному диагностическому оборудованию.</p>
-<h2 id="Цель"><a class="header" href="#Цель">Цель</a></h2>
-<p>Помочь начинающим врачам быстро ориентироваться при первичной консультации по офтальмологии в условиях, где отсутствует полный набор инструментов (аппаратуры OCT, расширенное обследование и т.п.), и снизить риск серьёзной патологии,обнаружив ее проявление.</p>
-<h2 id="Целевая-группа-пользователей"><a class="header" href="#Целевая-группа-пользователей">Целевая группа пользователей</a></h2>
-<p>Целевая группа разрабатываемой экспертной системы включает, начинающих врачей-офтальмологов, а также врачей общей практики и терапевтов, которые оказывают первичную медицинскую помощь в условиях ограниченного доступа к специализированному диагностическому оборудованию.</p>
+                        <h1 id="Выбор-базы-данных-приложения"><a class="header" href="#Выбор-базы-данных-приложения">Выбор базы данных приложения</a></h1>
+<h2 id="Статус"><a class="header" href="#Статус">Статус</a></h2>
+<p>Принято</p>
+<h2 id="Контекст"><a class="header" href="#Контекст">Контекст</a></h2>
+<p>Приложение экспертной системы должно хранить структурированные данные: учетные записи пользователей, истории обследований и результаты диагностики.
+Требуется надежное, масштабируемое и поддерживаемое решение для работы с реляционными данными, обеспечивающее целостность и возможность сложных запросов.</p>
+<h2 id="Драйверы-принятия-решений"><a class="header" href="#Драйверы-принятия-решений">Драйверы принятия решений</a></h2>
+<ul>
+<li>Обеспечение транзакционной целостности и соответствие ACID.</li>
+<li>Возможность работы с гибкими типами данных (например, JSON, массивы).</li>
+<li>Эффективная обработка сложных выборок и агрегированных запросов.</li>
+<li>Масштабируемость и возможность расширения функционала системы.</li>
+</ul>
+<h2 id="Рассмотренные-варианты"><a class="header" href="#Рассмотренные-варианты">Рассмотренные варианты</a></h2>
+<ul>
+<li><strong>SQLite</strong>: Легковесная встроенная СУБД, подходит для прототипов, но не для многопользовательских систем и сложных транзакций.</li>
+<li><strong>MySQL</strong>: Популярная реляционная СУБД, оптимизированная для чтения, ограниченная поддержка сложных типов данных и транзакций.</li>
+<li><strong>PostgreSQL</strong>: Объектно-реляционная СУБД с полной поддержкой ACID, сложных типов данных и расширенных транзакций.</li>
+</ul>
+<h2 id="Результат-решения"><a class="header" href="#Результат-решения">Результат решения</a></h2>
+<p><strong>Выбор сделан:</strong> "PostgreSQL", поскольку это единственный вариант, который полностью удовлетворяет критическим требованиям к целостности транзакций, поддержке сложных типов данных и эффективной обработке сложных запросов, обеспечивая при этом масштабируемость для будущего роста.</p>
+<h2 id="Последствия"><a class="header" href="#Последствия">Последствия</a></h2>
+<p><strong>Положительные</strong></p>
+<ul>
+<li>Обеспечение надежного и корректного хранения структурированных данных пользователей и историй пациентов.</li>
+<li>Поддержка расширяемых и гибких схем данных (JSON, массивы).</li>
+<li>Возможность обработки сложных выборок и агрегированных данных без потери производительности.</li>
+<li>Масштабируемость системы при увеличении нагрузки.</li>
+</ul>
+<p><strong>Отрицательные</strong></p>
+<ul>
+<li>Требует отдельного серверного процесса и администрирования.</li>
+<li>Не предназначена для хранения графовых структур, которые используются для модели принятия решений (для этого потребуется Neo4j).</li>
+<li>Повышенные требования к ресурсам по сравнению с легковесными СУБД, такими как SQLite.</li>
+</ul>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="architecture-intelligent-system.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
 
-                            <a rel="next prefetch" href="functional-requirements.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="select-db-intelligent-system.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -198,8 +230,11 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="architecture-intelligent-system.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
 
-                    <a rel="next prefetch" href="functional-requirements.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="select-db-intelligent-system.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>

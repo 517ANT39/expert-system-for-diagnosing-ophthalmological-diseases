@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Chapter 1 - abstract</title>
+        <title>Архитектура интелектуальной системы - abstract</title>
 
 
         <!-- Custom HTML head -->
@@ -176,13 +176,44 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="chapter-1"><a class="header" href="#chapter-1">Chapter 1</a></h1>
+                        <h1 id="Архитектура-интелектуальной-системы"><a class="header" href="#Архитектура-интелектуальной-системы">Архитектура интелектуальной системы</a></h1>
+<h2 id="Статус"><a class="header" href="#Статус">Статус</a></h2>
+<p>Принято</p>
+<h2 id="Контекст"><a class="header" href="#Контекст">Контекст</a></h2>
+<p>Дифференциальная диагностика требует систематического анализа симптомов с учётом множества заболеваний. Вероятностные модели или методы машинного обучения сложны для реализации в условиях ограниченных данных и неочевидны для интерпретации начинающими специалистами.
+Необходима структура, позволяющая формализовать процесс принятия решений на основе простых бинарных ответов, обеспечивая прозрачность и предсказуемость результата.</p>
+<h2 id="Решение"><a class="header" href="#Решение">Решение</a></h2>
+<p>Использовать граф принятия решений как основу интеллектуальной системы:</p>
+<ul>
+<li>Вершины графа представляют диагностические вопросы или промежуточные состояния;</li>
+<li>Рёбра соответствуют переходам в зависимости от ответа "Да" или "Нет;</li>
+<li>Алгоритмы обхода графа (DFS, BFS) позволяют последовательно вести пользователя от начального вопроса к финальному диагнозу;</li>
+<li>Такой подход обеспечивает явное и проверяемое логическое дерево решений, без необходимости работы с вероятностями или статистическими моделями.</li>
+</ul>
+<h2 id="Последствия"><a class="header" href="#Последствия">Последствия</a></h2>
+<p><strong>Положительные:</strong></p>
+<ul>
+<li>Прозрачность и интерпретируемость логики принятия решений;</li>
+<li>Простота модификации и расширения правил;</li>
+<li>Подходит для использования с ограниченными исходными данными.</li>
+</ul>
+<p><strong>Отрицательные:</strong></p>
+<ul>
+<li>Не учитывает вероятности или неопределённость симптомов;</li>
+<li>Масштабирование на очень большое количество заболеваний может потребовать оптимизации структуры графа.</li>
+</ul>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="architecture.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
 
+                            <a rel="next prefetch" href="select-db-app.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
 
                         <div style="clear: both"></div>
                     </nav>
@@ -190,7 +221,13 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="architecture.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
 
+                    <a rel="next prefetch" href="select-db-app.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
             </nav>
 
         </div>
