@@ -9,9 +9,13 @@ services:
       - "7687:7687"
     volumes:
       - ./neo4j/init:/init
+      - knowledge_base:/data
     entrypoint: ["/bin/bash","/init/init.sh"]
     networks:
       app_net:
 
 networks:
   app_net:
+
+volumes:
+  knowledge_base:
