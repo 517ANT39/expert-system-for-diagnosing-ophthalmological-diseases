@@ -183,39 +183,39 @@
 <li>данные приложения (учётные записи пользователей, истории консультаций, протоколы осмотров и действия врачей);</li>
 <li>знания в виде диагностической модели, представляющей взаимосвязи между симптомами, признаками и заболеваниями.</li>
 </ul>
-<p>Использование единой базы данных для обеих задач усложняет модель данных и затрудняет эффективную работу с разнородной информацией. Это мотивирует архитектурное разделение прикладных данных и базы знаний.</p>
+<p>Использование единой базы данных для обеих задач усложняет модель данных и затрудняет эффективную работу с разнородной информацией. Это мотивирует архитектурное разделение прикладных данных и базы знаний [<a href="./sources.html#ref1">1</a>].</p>
 <h2 id="Решение"><a class="header" href="#Решение">Решение</a></h2>
-<p>Принято архитектурное решение использовать модель MVC (Model–View–Controller), в которой:</p>
+<p>Принято архитектурное решение использовать модель <strong>MVC (Model–View–Controller)</strong> [<a href="./sources.html#ref2">2</a>], в которой:</p>
 <ul>
-<li>Model разделена на два уровня:
+<li><strong>Model</strong> разделена на два уровня:
 <ul>
-<li>База данных приложения для хранения пользовательских и транзакционных данных,</li>
-<li>База знаний для хранения предметной области в виде взаимосвязей симптомов, признаков и заболеваний.</li>
+<li>база данных приложения для хранения пользовательских и транзакционных данных,</li>
+<li>база знаний для хранения предметной области в виде взаимосвязей симптомов, признаков и заболеваний;</li>
 </ul>
 </li>
-<li>View отвечает за взаимодействие с врачом: интерфейс для сбора клинической информации, представления результатов диагностики и объяснений;</li>
-<li>Controller реализует управляемую бизнес-логику: маршрутизацию запросов от интерфейса к моделям данных, обработку диагностического вывода и возврат результатов врачу.</li>
+<li><strong>View</strong> отвечает за взаимодействие с врачом: интерфейс для сбора клинической информации, представления результатов диагностики и объяснений;</li>
+<li><strong>Controller</strong> реализует управляемую бизнес-логику: маршрутизацию запросов от интерфейса к моделям данных, обработку диагностического вывода и возврат результатов врачу [<a href="./sources.html#ref3">3</a>].</li>
 </ul>
 <p>Диаграмма архитектуры:</p>
 <iframe class="drawio-viewer" src="https://viewer.diagrams.net/?highlight=0000ff&edit=_blank&layers=1&nav=1&title=diagram&url=https://raw.githubusercontent.com/517ANT39/expert-system-for-diagnosing-ophthalmological-diseases/main/abstract/diagrams/arch.drawio"></iframe>
 <h2 id="Последствия"><a class="header" href="#Последствия">Последствия</a></h2>
 <p><strong>Положительные:</strong></p>
 <ul>
-<li>Разделение данных на прикладные и экспертные делает систему более прозрачной и удобной для сопровождения;</li>
-<li>Архитектурный паттерн MVC обеспечивает модульность: можно независимо развивать интерфейс, бизнес-логику и модель данных;</li>
+<li>Разделение данных на прикладные и экспертные делает систему более прозрачной и удобной для сопровождения [<a href="./sources.html#ref4">4</a>];</li>
+<li>Архитектурный паттерн MVC обеспечивает модульность: можно независимо развивать интерфейс, бизнес-логику и модель данных [<a href="./sources.html#ref4">4</a>];</li>
 <li>Повышается масштабируемость: базы можно развивать и оптимизировать под свои задачи без взаимных ограничений.</li>
 </ul>
 <p><strong>Отрицательные:</strong></p>
 <ul>
-<li>Увеличивается сложность инфраструктуры, так как приходится работать сразу с двумя логически разными хранилищами</li>
-<li>Сложность изменения бизнес-логики</li>
+<li>Увеличивается сложность инфраструктуры, так как приходится работать сразу с двумя логически разными хранилищами;</li>
+<li>Повышается сложность изменения бизнес-логики.</li>
 </ul>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="functional-requirements.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="nofunctinal-requirements.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
@@ -229,7 +229,7 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="functional-requirements.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="nofunctinal-requirements.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
 
