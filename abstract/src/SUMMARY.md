@@ -2,6 +2,7 @@
 
 - [Введение](./introduction.md)
 - [Функциональные требования](./functional-requirements.md)
+- [Нефункциональные требования](./nofunctinal-requirements.md)
 - [Архитектура приложения](./architecture.md)
 - [Архитектура интелектуальной системы](./architecture-intelligent-system.md)
 - [Выбор базы данных приложения](./select-db-app.md)
