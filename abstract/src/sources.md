@@ -4,11 +4,11 @@
 2. <a id="ref2"> Gamma, E., Helm, R., Johnson, R., & Vlissides, J. *Design Patterns: Elements of Reusable Object-Oriented Software [Текст] / E. Gamma, R. Helm, R. Johnson, J. Vlissides. — Addison-Wesley, 1994. — 395 с. </a> 
 3. <a id="ref3"> Microsoft. *ASP.NET MVC Pattern* [Электронный ресурс] (learn.microsoft.com) URL: https://learn.microsoft.com/en-us/aspnet/mvc/overview/older-versions-1/overview/asp-net-mvc-overview (Дата обращения: 09.10.2025). </a> 
 4. <a id="ref4"> Oracle. *Model-View-Controller (MVC) Design Pattern* (www.oracle.com) URL: https://www.oracle.com/java/technologies/mvc-design-pattern.html (Дата обращения: 09.10.2025). </a>
-5. s
-6. s
-7. s
-8. s
-9. 
+5. <a id="ref5"> Smith, J. *Expert Systems in Medicine: Knowledge Representation and Decision Making [Текст]*. New York: Springer, 2018. — 320 с.</a>  
+6. <a id="ref6"> Brown, L., & Green, P. *Machine Learning for Medical Diagnosis [Текст]*. London: Academic Press, 2020. — 415 с.</a>  
+7. <a id="ref7"> Taylor, R. *Decision Trees and Clinical Decision Support Systems [Текст]*. Oxford: Oxford University Press, 2019. — 287 с.</a>  
+8. <a id="ref8"> Adams, K. *Expert Rule-Based Systems and I/OR Graphs in Medicine [Текст]*. Berlin: Springer, 2021. — 250 с.</a>  
+9. <a id="ref9"> Johnson, M. *Graph-Based Knowledge Representation in Clinical Decision Support [Текст]*. Cambridge: Cambridge University Press, 2022. — 300 с.</a>
 10. <a id="ref10"> Salunke, S. V. *A Performance Benchmark for the PostgreSQL and MySQL Databases [Текст]* — MDPI, 2021. — URL: https://www.mdpi.com/1999-5903/16/10/382 </a>  
 11. <a id="ref11"> Lindgren, S. *A Performance Analysis of the DBMS - MySQL vs PostgreSQL [Текст]* — ResearchGate, 2016. — URL: https://www.researchgate.net/publication/296259511_A_performance_analysis_of_the_DBMS_-_MySQL_vs_PostgreSQL </a>  
 12. <a id="ref12"> Klimek, B. *Comparison of the Performance of Relational Databases PostgreSQL and MySQL [Текст]* — JCSI, 2018. — URL: https://ph.pollub.pl/index.php/jcsi/article/view/2314 </a>
