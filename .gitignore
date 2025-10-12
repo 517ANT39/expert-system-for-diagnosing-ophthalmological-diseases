@@ -116,7 +116,6 @@ ipython_config.py
 #pdm.toml
 .pdm-python
 .pdm-build/
-
 # pixi
 #   Similar to Pipfile.lock, it is generally recommended to include pixi.lock in version control.
 #pixi.lock
@@ -135,6 +134,7 @@ celerybeat.pid
 *.sage.py
 
 # Environments
+!example.env
 .env
 .envrc
 .venv
