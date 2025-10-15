@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ОфтальмоЭксперт - Экспертная система диагностики</title>
-    <link rel="stylesheet" href="css/main.css">
-    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
 </head>
 <body>
     <!-- Hero Section -->
@@ -20,7 +19,7 @@
                     <div class="nav-links">
                         <a href="#features" class="nav-link">Возможности</a>
                         <a href="#about" class="nav-link">О системе</a>
-                        <a href="login.html" class="btn btn-primary">Войти в систему</a>
+                        <a href="{{ url_for('login') }}" class="btn btn-primary">Войти в систему</a>
                     </div>
                 </div>
             </div>
@@ -35,7 +34,7 @@
                         Оказывайте качественную помощь даже в условиях ограниченного диагностического оборудования.
                     </p>
                     <div class="hero-actions">
-                        <a href="login.html" class="btn btn-primary btn-lg">Начать работу</a>
+                        <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg">Начать работу</a>
                         <a href="#features" class="btn btn-secondary btn-lg">Узнать больше</a>
                     </div>
                 </div>
@@ -151,7 +150,7 @@
             <div class="cta-content">
                 <h2>Готовы начать работу?</h2>
                 <p>Присоединяйтесь к сообществу врачей, использующих современные технологии для улучшения качества медицинской помощи</p>
-                <a href="login.html" class="btn btn-primary btn-lg">Войти в систему</a>
+                <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg">Войти в систему</a>
             </div>
         </div>
     </section>
@@ -170,7 +169,7 @@
                 <div class="footer-links">
                     <div class="footer-column">
                         <h4>Система</h4>
-                        <a href="login.html">Вход</a>
+                        <a href="{{ url_for('login') }}">Вход</a>
                         <a href="#features">Возможности</a>
                         <a href="#about">Технологии</a>
                     </div>
@@ -183,7 +182,7 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2024 ОфтальмоЭксперт. Все права защищены.</p>
+                <p>&copy; 2025 ОфтальмоЭксперт. Все права защищены.</p>
             </div>
         </div>
     </footer>
