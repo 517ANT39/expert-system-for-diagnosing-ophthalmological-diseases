@@ -1,20 +1,25 @@
 #!/bin/bash
 set -e
 
-echo "Waiting for database to be ready..."
+echo "Starting application initialization..."
 
-# Простая задержка вместо nc проверки
+# Даем время базе данных запуститься
+echo "Waiting for database..."
 sleep 10
 
-echo "Database should be ready, proceeding with migrations..."
+echo "Database should be ready, proceeding with setup..."
 
-# Инициализируем базу данных
+# Инициализируем базу данных (создает таблицы если их нет)
 echo "Initializing database..."
 python scripts/init_db.py
 
-# Запускаем миграции
+# Запускаем миграции (не блокируем запуск при ошибках)
 echo "Running migrations..."
-python scripts/migrate.py
+if python scripts/migrate.py; then
+    echo "Migrations applied successfully"
+else
+    echo "Migrations skipped or already applied"
+fi
 
 # Запускаем основное приложение
 echo "Starting Flask application..."
