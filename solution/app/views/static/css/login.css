@@ -1,15 +1,24 @@
+/* Login Page Specific Styles */
 .login-page {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    background: var(--background-color);
     min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.login-section {
+    flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: var(--spacing-md);
+    padding: var(--spacing-2xl) 0;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    min-height: 80vh;
 }
 
 .login-container {
     width: 100%;
-    max-width: 400px;
+    max-width: 440px;
 }
 
 .login-card {
@@ -19,6 +28,9 @@
     padding: var(--spacing-2xl);
     position: relative;
     overflow: hidden;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+    width: 100%;
 }
 
 .login-card::before {
@@ -31,30 +43,67 @@
     background: linear-gradient(90deg, var(--primary-color), var(--success-color));
 }
 
+.login-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    border: 2px solid var(--primary-color);
+}
+
 .login-header {
     text-align: center;
     margin-bottom: var(--spacing-2xl);
+    padding-bottom: var(--spacing-lg);
+    border-bottom: 1px solid var(--border-color);
 }
 
-.login-header .logo {
-    justify-content: center;
-    margin-bottom: var(--spacing-lg);
-    font-size: var(--font-size-xl);
-}
-
-.logo-icon {
+.login-header h2 {
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-sm);
     font-size: var(--font-size-2xl);
+    font-weight: 700;
 }
 
 .login-form {
     margin-bottom: var(--spacing-xl);
 }
 
+.login-form .form-group {
+    margin-bottom: var(--spacing-xl);
+    display: flex;
+    flex-direction: column;
+}
+
+.login-form .form-label {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-sm);
+    font-size: var(--font-size-sm);
+    text-align: left;
+}
+
+.login-form .form-control {
+    padding: 1rem;
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-size: var(--font-size-base);
+    transition: all 0.3s ease;
+    background: var(--surface-color);
+    width: 100%;
+}
+
+.login-form .form-control:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    transform: translateY(-1px);
+}
+
 .form-options {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+    width: 100%;
 }
 
 .checkbox-label {
@@ -63,6 +112,7 @@
     gap: var(--spacing-sm);
     cursor: pointer;
     font-size: var(--font-size-sm);
+    font-weight: 500;
 }
 
 .checkbox-label input[type="checkbox"] {
@@ -78,6 +128,7 @@
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease-in-out;
+    flex-shrink: 0;
 }
 
 .checkbox-label input[type="checkbox"]:checked + .checkmark {
@@ -89,16 +140,21 @@
     content: '✓';
     color: white;
     font-size: var(--font-size-xs);
+    font-weight: bold;
 }
 
 .forgot-password {
     color: var(--primary-color);
     text-decoration: none;
     font-size: var(--font-size-sm);
+    font-weight: 500;
+    transition: all 0.2s ease;
+    white-space: nowrap;
 }
 
 .forgot-password:hover {
     text-decoration: underline;
+    color: var(--primary-dark);
 }
 
 .w-100 {
@@ -115,34 +171,49 @@
 .register-link {
     color: var(--primary-color);
     text-decoration: none;
-    font-weight: 500;
+    font-weight: 600;
+    transition: all 0.2s ease;
 }
 
 .register-link:hover {
     text-decoration: underline;
+    color: var(--primary-dark);
 }
 
 .text-center {
     text-align: center;
 }
 
-/* Стили для ссылок в тексте */
-.link {
-    color: var(--primary-color);
-    text-decoration: none;
+/* Login page hero section - только навигация */
+.login-page .hero {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    color: white;
+    padding: var(--spacing-lg) 0;
+    min-height: auto;
 }
 
-.link:hover {
-    text-decoration: underline;
+.login-page .hero .navbar {
+    background: transparent;
+    box-shadow: none;
+    position: relative;
 }
 
-.login-footer {
-    border-top: 1px solid var(--border-color);
-    padding-top: var(--spacing-lg);
+.login-page .hero .nav-link {
+    color: rgba(255, 255, 255, 0.8);
 }
 
-/* Responsive */
-@media (max-width: 480px) {
+.login-page .hero .nav-link:hover {
+    color: white;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Responsive for login page */
+@media (max-width: 768px) {
+    .login-container {
+        max-width: 100%;
+        padding: 0 var(--spacing-sm);
+    }
+    
     .login-card {
         padding: var(--spacing-xl);
     }
@@ -152,10 +223,19 @@
         gap: var(--spacing-md);
         align-items: flex-start;
     }
+    
+    .login-page .hero .navbar-content {
+        flex-direction: column;
+        gap: var(--spacing-md);
+    }
+    
+    .login-page .hero .nav-links {
+        margin-left: 0;
+        justify-content: center;
+    }
 }
 
-/* Для страницы регистрации увеличиваем максимальную ширину */
-@media (min-width: 481px) {
+@media (min-width: 769px) {
     .login-container {
         max-width: 440px;
     }
