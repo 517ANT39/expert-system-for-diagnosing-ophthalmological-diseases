@@ -240,3 +240,46 @@
         max-width: 440px;
     }
 }
+/* Registration page specific styles */
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+}
+
+.form-row .form-group {
+    margin-bottom: 0;
+}
+
+/* Link styles */
+.link {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.link:hover {
+    text-decoration: underline;
+    color: var(--primary-dark);
+}
+
+/* Responsive for registration page */
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-xl);
+        margin-bottom: var(--spacing-xl);
+    }
+    
+    .form-row .form-group {
+        margin-bottom: 0;
+    }
+}
+
+@media (min-width: 769px) {
+    .login-container {
+        max-width: 480px;
+    }
+}
