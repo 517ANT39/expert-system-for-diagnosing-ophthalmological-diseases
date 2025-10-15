@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профиль врача - ОфтальмоЭксперт</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/profile.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-content">
+                <a href="dashboard.html" class="logo">
+                    <span class="logo-icon">👁️</span>
+                    <span class="logo-text">ОфтальмоЭксперт</span>
+                </a>
+                <div class="nav-links">
+                    <a href="dashboard.html" class="nav-link">Главная</a>
+                    <a href="patients.html" class="nav-link">Пациенты</a>
+                    <a href="consultation.html" class="nav-link">Консультации</a>
+                    <div class="user-menu">
+                        <a href="profile.html" class="user-name">Доктор Иванов</a>
+                        <a href="login.html" class="btn btn-sm btn-secondary">Выйти</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div>
+                <h1>Профиль врача</h1>
+                <p class="text-muted">Личная информация и настройки аккаунта</p>
+            </div>
+            <div class="header-actions">
+                <a href="edit-profile.html" class="btn btn-primary">
+                    ✏️ Редактировать профиль
+                </a>
+            </div>
+        </div>
+
+        <!-- Profile Info -->
+        <div class="grid grid-2">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Основная информация</h2>
+                </div>
+                <div class="card-body">
+                    <div class="profile-info">
+                        <div class="info-item">
+                            <label>ФИО врача:</label>
+                            <span class="info-value">Иванов Алексей Петрович</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Email:</label>
+                            <span class="info-value">a.ivanov@ophthalmexpert.ru</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Номер телефона:</label>
+                            <span class="info-value">+7(800)555-35-35</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Дата регистрации:</label>
+                            <span class="info-value">15.01.2024</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="display:none">
+                <div class="card-header">
+                    <h2>Статистика</h2>
+                </div>
+                <div class="card-body">
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-number">24</div>
+                            <div class="stat-label">Пациентов</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">47</div>
+                            <div class="stat-label">Консультаций</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">89%</div>
+                            <div class="stat-label">Успешных диагнозов</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="card">
+            <div class="card-header">
+                <h2>Последняя активность</h2>
+            </div>
+            <div class="card-body">
+                <div class="activity-list">
+                    <div class="activity-item">
+                        <div class="activity-icon">👁️</div>
+                        <div class="activity-content">
+                            <div class="activity-title">Проведена консультация</div>
+                            <div class="activity-desc">Пациент: Петров Иван Сергеевич</div>
+                            <div class="activity-time">20.01.2024, 14:30</div>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon">👥</div>
+                        <div class="activity-content">
+                            <div class="activity-title">Добавлен новый пациент</div>
+                            <div class="activity-desc">Сидорова Мария Петровна</div>
+                            <div class="activity-time">19.01.2024, 11:15</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

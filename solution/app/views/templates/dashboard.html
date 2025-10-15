@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панель управления - ОфтальмоЭксперт</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-content">
+                <a href="dashboard.html" class="logo">
+                    <span class="logo-icon">👁️</span>
+                    <span class="logo-text">ОфтальмоЭксперт</span>
+                </a>
+                <div class="nav-links">
+                    <a href="dashboard.html" class="nav-link active">Главная</a>
+                    <a href="patients.html" class="nav-link">Пациенты</a>
+                    <a href="consultation.html" class="nav-link">Консультации</a>
+                    <div class="user-menu">
+                        <a href="profile.html" class="user-name">Доктор Иванов</a>
+                        <a href="login.html" class="btn btn-sm btn-secondary">Выйти</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div>
+                <h1>Панель управления</h1>
+                <p class="text-muted">Добро пожаловать, Доктор Иванов</p>
+            </div>
+            <div class="header-actions">
+                <a href="consultation.html" class="btn btn-primary">
+                    🆕 Новая консультация
+                </a>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="grid grid-2">
+            <div class="action-card">
+                <div class="action-icon">👥</div>
+                <h3>Новый пациент</h3>
+                <p class="text-muted">Добавить нового пациента в базу данных</p>
+                <a href="patient-form.html" class="btn btn-secondary">Добавить пациента</a>
+            </div>
+            
+            <!-- Убран блок "Статистика" с помощью display:none -->
+            <div class="action-card" style="display:none">
+                <div class="action-icon">📊</div>
+                <h3>Статистика</h3>
+                <p class="text-muted">Просмотр статистики и отчетов</p>
+                <button class="btn btn-secondary">Открыть статистику</button>
+            </div>
+        </div>
+
+        <!-- Recent Consultations -->
+        <div class="card">
+            <div class="card-header">
+                <h2>Последние консультации</h2>
+            </div>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Дата</th>
+                            <th>Пациент</th>
+                            <th>Симптомы</th>
+                            <th>Диагноз</th>
+                            <th>Статус</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>20.01.2024</td>
+                            <td>Петров Иван Сергеевич</td>
+                            <td>Боль, покраснение</td>
+                            <td>Острый конъюнктивит</td>
+                            <td><span class="status-badge status-completed">Завершена</span></td>
+                            <td>
+                                <a href="consultation-result.html" class="btn btn-sm btn-secondary">Просмотр</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>19.01.2024</td>
+                            <td>Сидорова Мария Петровна</td>
+                            <td>Ухудшение зрения</td>
+                            <td>Миопия</td>
+                            <td><span class="status-badge status-completed">Завершена</span></td>
+                            <td>
+                                <a href="consultation-result.html" class="btn btn-sm btn-secondary">Просмотр</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

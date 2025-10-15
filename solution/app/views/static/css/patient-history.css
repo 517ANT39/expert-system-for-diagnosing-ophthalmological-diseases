@@ -1,0 +1,306 @@
+/* Patient History specific styles */
+.patient-header {
+    margin-bottom: var(--spacing-xl);
+}
+
+.patient-basic-info {
+    display: flex;
+    gap: var(--spacing-lg);
+    align-items: flex-start;
+}
+
+.patient-avatar {
+    flex-shrink: 0;
+}
+
+.avatar-placeholder {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: var(--background-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    border: 3px solid var(--border-color);
+}
+
+.patient-details h1 {
+    margin-bottom: var(--spacing-sm);
+    color: var(--text-primary);
+}
+
+.patient-meta {
+    display: flex;
+    gap: var(--spacing-lg);
+    flex-wrap: wrap;
+    margin-bottom: var(--spacing-sm);
+}
+
+.meta-item {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+}
+
+.patient-contact {
+    display: flex;
+    gap: var(--spacing-lg);
+    flex-wrap: wrap;
+}
+
+.contact-item {
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+}
+
+.patient-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    flex-shrink: 0;
+}
+
+/* Medical Summary */
+.medical-summary {
+    margin-bottom: var(--spacing-xl);
+}
+
+.summary-card {
+    background: var(--surface-color);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-lg);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-lg);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border-color);
+}
+
+.summary-icon {
+    font-size: 2.5rem;
+    opacity: 0.8;
+}
+
+.summary-content {
+    flex: 1;
+}
+
+.summary-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: var(--spacing-xs);
+}
+
+.summary-label {
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+}
+
+/* Timeline */
+.consultations-timeline {
+    position: relative;
+    padding: var(--spacing-lg) 0;
+}
+
+.consultations-timeline::before {
+    content: '';
+    position: absolute;
+    left: 20px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--border-color);
+}
+
+.timeline-item {
+    display: flex;
+    margin-bottom: var(--spacing-xl);
+    position: relative;
+}
+
+.timeline-marker {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    border: 3px solid var(--surface-color);
+    margin-right: var(--spacing-lg);
+    flex-shrink: 0;
+    position: relative;
+    z-index: 2;
+}
+
+.timeline-content {
+    flex: 1;
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+.consultation-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--spacing-md);
+}
+
+.consultation-date {
+    display: flex;
+    flex-direction: column;
+}
+
+.consultation-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+.consultation-diagnosis {
+    margin-bottom: var(--spacing-sm);
+    font-weight: 500;
+}
+
+.consultation-symptoms {
+    margin-bottom: var(--spacing-sm);
+    color: var(--text-secondary);
+}
+
+.consultation-notes {
+    color: var(--text-muted);
+    font-size: var(--font-size-sm);
+}
+
+/* View Options */
+.view-options {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+.view-options .btn.active {
+    background: var(--primary-color);
+    color: white;
+}
+
+/* Medications */
+.medications-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+
+.medication-item {
+    padding: var(--spacing-md);
+    background: var(--background-color);
+    border-radius: var(--border-radius);
+    border-left: 4px solid var(--success-color);
+}
+
+.medication-name {
+    font-weight: 600;
+    margin-bottom: var(--spacing-xs);
+    color: var(--text-primary);
+}
+
+.medication-dosage {
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-xs);
+}
+
+.medication-period {
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+}
+
+/* Medical Info */
+.medical-info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+
+.info-section h4 {
+    margin-bottom: var(--spacing-sm);
+    color: var(--text-primary);
+    font-size: var(--font-size-base);
+}
+
+.info-section p {
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 968px) {
+    .patient-basic-info {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .patient-actions {
+        justify-content: center;
+        width: 100%;
+    }
+    
+    .patient-meta,
+    .patient-contact {
+        justify-content: center;
+    }
+    
+    .consultation-header {
+        flex-direction: column;
+        gap: var(--spacing-md);
+    }
+    
+    .consultation-actions {
+        width: 100%;
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 768px) {
+    .medical-summary {
+        grid-template-columns: 1fr;
+    }
+    
+    .summary-card {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .timeline-content {
+        padding: var(--spacing-md);
+    }
+    
+    .view-options {
+        flex-direction: column;
+    }
+    
+    .consultations-timeline::before {
+        left: 15px;
+    }
+    
+    .timeline-marker {
+        margin-right: var(--spacing-md);
+    }
+}
+
+/* Print styles */
+@media print {
+    .navbar,
+    .patient-actions,
+    .view-options,
+    .consultation-actions {
+        display: none !important;
+    }
+    
+    .patient-header,
+    .card {
+        box-shadow: none !important;
+        border: 1px solid #ccc !important;
+    }
+    
+    .timeline-content {
+        break-inside: avoid;
+    }
+}

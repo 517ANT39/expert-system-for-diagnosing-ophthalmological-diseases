@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Результаты консультации - ОфтальмоЭксперт</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/consultation.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-content">
+                <a href="dashboard.html" class="logo">
+                    <span class="logo-icon">👁️</span>
+                    <span class="logo-text">ОфтальмоЭксперт</span>
+                </a>
+                <div class="nav-links">
+                    <a href="dashboard.html" class="nav-link">Главная</a>
+                    <a href="patients.html" class="nav-link">Пациенты</a>
+                    <a href="consultation.html" class="nav-link active">Консультации</a>
+                    <div class="user-menu">
+                        <span class="user-name">Доктор Иванов</span>
+                        <a href="login.html" class="btn btn-sm btn-secondary">Выйти</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="page-header">
+            <div>
+                <h1>Результаты диагностики</h1>
+                <p class="text-muted">Консультация от 20.01.2024</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-primary" onclick="exportToPDF()">
+                    📄 Экспорт в PDF
+                </button>
+            </div>
+        </div>
+
+        <!-- Patient Info -->
+        <div class="card patient-info-card">
+            <h3>Информация о пациенте</h3>
+            <div class="patient-details">
+                <div class="detail-item">
+                    <strong>ФИО:</strong> Петров Иван Сергеевич
+                </div>
+                <div class="detail-item">
+                    <strong>Дата рождения:</strong> 15.03.1985
+                </div>
+                <div class="detail-item">
+                    <strong>Пол:</strong> Мужской
+                </div>
+                <div class="detail-item">
+                    <strong>Дата консультации:</strong> 20.01.2024 14:30
+                </div>
+            </div>
+        </div>
+
+        <!-- Diagnosis Result -->
+        <div class="card diagnosis-card">
+            <div class="diagnosis-header">
+                <h2>🎯 Вероятный диагноз</h2>
+                <div class="confidence-badge">
+                    Уверенность: 85%
+                </div>
+            </div>
+            <div class="diagnosis-content">
+                <div class="primary-diagnosis">
+                    <h3>Острый конъюнктивит</h3>
+                    <p class="diagnosis-description">
+                        Воспаление конъюнктивы - слизистой оболочки, покрывающей 
+                        внутреннюю поверхность век и переднюю поверхность глазного яблока.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Explanation -->
+        <div class="card explanation-card">
+            <h3>Объяснение диагноза</h3>
+            <div class="explanation-content">
+                <p>
+                    Диагноз основан на следующих выявленных симптомах:
+                </p>
+                <ul class="symptoms-evidence">
+                    <li class="evidence-positive">✅ Покраснение глаза</li>
+                    <li class="evidence-positive">✅ Слезотечение</li>
+                    <li class="evidence-positive">✅ Боль в глазу</li>
+                    <li class="evidence-negative">❌ Отсутствие светобоязни</li>
+                    <li class="evidence-negative">❌ Отсутствие выделений</li>
+                </ul>
+                <p class="reasoning-text">
+                    Сочетание боли, покраснения и слезотечения при отсутствии светобоязни 
+                    и гнойных выделений характерно для острой формы конъюнктивита.
+                </p>
+            </div>
+        </div>
+
+        <!-- Recommendations -->
+        <div class="card recommendations-card">
+            <h3>Рекомендации</h3>
+            <div class="recommendations-content">
+                <div class="recommendation-category">
+                    <h4>💊 Медикаментозное лечение</h4>
+                    <ul>
+                        <li>Антибактериальные капли: Ципрофлоксацин 0.3% - по 1-2 капли 4 раза в день</li>
+                        <li>Противовоспалительные капли: Диклофенак 0.1% - по 1 капле 3 раза в день</li>
+                    </ul>
+                </div>
+                
+                <div class="recommendation-category">
+                    <h4>📋 Общие рекомендации</h4>
+                    <ul>
+                        <li>Избегать трения глаз</li>
+                        <li>Частое мытье рук</li>
+                        <li>Использование отдельного полотенца</li>
+                        <li>Отказ от контактных линз на период лечения</li>
+                    </ul>
+                </div>
+                
+                <div class="recommendation-category">
+                    <h4>📅 Наблюдение</h4>
+                    <ul>
+                        <li>Повторный осмотр через 3 дня</li>
+                        <li>Обратиться немедленно при ухудшении состояния</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Differential Diagnosis -->
+        <div class="card differential-card">
+            <h3>Дифференциальный диагноз</h3>
+            <div class="differential-list">
+                <div class="differential-item">
+                    <strong>Кератит</strong>
+                    <span class="probability">25%</span>
+                    <p class="diff-reason">Менее вероятен из-за отсутствия светобоязни</p>
+                </div>
+                <div class="differential-item">
+                    <strong>Иридоциклит</strong>
+                    <span class="probability">15%</span>
+                    <p class="diff-reason">Исключен из-за нормальной реакции зрачка</p>
+                </div>
+                <div class="differential-item">
+                    <strong>Синдром сухого глаза</strong>
+                    <span class="probability">10%</span>
+                    <p class="diff-reason">Менее вероятен из-за наличия слезотечения</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Doctor's Notes -->
+        <div class="card notes-card">
+            <h3>Заключение врача</h3>
+            <form class="doctor-notes-form">
+                <div class="form-group">
+                    <label for="finalDiagnosis" class="form-label">Окончательный диагноз</label>
+                    <input type="text" id="finalDiagnosis" class="form-control" 
+                           value="Острый конъюнктивит" placeholder="Введите окончательный диагноз">
+                </div>
+                
+                <div class="form-group">
+                    <label for="doctorNotes" class="form-label">Примечания и назначения</label>
+                    <textarea id="doctorNotes" class="form-control" rows="4" 
+                              placeholder="Дополнительные примечания и назначения...">
+Назначены антибактериальные капли. Рекомендован осмотр через 3 дня. Выдан больничный лист на 5 дней.
+                    </textarea>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="saveDraft()">
+                        💾 Сохранить черновик
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        ✅ Завершить консультацию
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <script src="js/consultation-result.js"></script>
+</body>
+</html>
