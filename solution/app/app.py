@@ -35,40 +35,45 @@ def dashboard():
 def profile():
     return render_template('profile.html')
 
+# Новый маршрут для редактирования профиля
+@app.route('/profile/edit')
+def edit_profile():
+    return render_template('edit-profile.html')
+
 # Консультации
 @app.route('/consultation')
 def consultation():
-    return render_template('consultation/consultation.html')
+    return render_template('consultation.html')
 
 @app.route('/consultation/result')
 def consultation_result():
-    return render_template('consultation/consultation-result.html')
+    return render_template('consultation-result.html')
 
 @app.route('/consultation/history')
 def consultation_history():
-    return render_template('consultation/history.html')
+    return render_template('consultation-history.html')
 
 # Пациенты
 @app.route('/patient')
 def patient_list():
-    return render_template('patient/patients.html')
+    return render_template('patients.html')
 
 @app.route('/patient/new')
 def patient_new():
-    return render_template('patient/patient-form.html')
+    return render_template('patient-form.html')
 
 @app.route('/patient/history')
 def patient_history():
-    return render_template('patient/patient-history.html')
+    return render_template('patient-history.html')
 
 # Диагностика
 @app.route('/diagnosis/questions')
 def diagnosis_questions():
-    return render_template('diagnosis/questions.html')
+    return render_template('questions.html')
 
 @app.route('/diagnosis/result')
 def diagnosis_result():
-    return render_template('diagnosis/result.html')
+    return render_template('diagnosis-result.html')
 
 @app.route('/health')
 def health():
