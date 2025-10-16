@@ -1,5 +1,6 @@
 from flask import Flask, render_template
 import os
+from datetime import datetime
 
 # В Docker рабочая директория /app, поэтому пути другие
 base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -43,28 +44,30 @@ def edit_profile():
 # Консультации
 @app.route('/consultation')
 def consultation():
-    return render_template('consultation.html')
+    return render_template('consultation/consultation.html')
 
 @app.route('/consultation/result')
 def consultation_result():
-    return render_template('consultation-result.html')
+    return render_template('consultation/consultation-result.html')
 
 @app.route('/consultation/history')
 def consultation_history():
-    return render_template('consultation-history.html')
+    return render_template('consultation/consultation-history.html')
 
 # Пациенты
 @app.route('/patient')
 def patient_list():
-    return render_template('patients.html')
+    return render_template('patient/patients.html')
 
 @app.route('/patient/new')
 def patient_new():
-    return render_template('patient-form.html')
+    # Передаем текущую дату для ограничения даты рождения
+    today = datetime.now().strftime('%Y-%m-%d')
+    return render_template('patient/patient-new.html', today=today)
 
 @app.route('/patient/history')
 def patient_history():
-    return render_template('patient-history.html')
+    return render_template(patient/'patient-history.html')
 
 # Диагностика
 @app.route('/diagnosis/questions')
@@ -89,8 +92,9 @@ def debug():
     <p>Static folder: {static_dir}</p>
     <p>Templates exist: {os.path.exists(template_dir)}</p>
     <p>Static exists: {os.path.exists(static_dir)}</p>
-    <p>CSS exists: {os.path.exists(os.path.join(static_dir, 'css', 'style.css'))}</p>
+    <p>CSS exists: {os.path.exists(os.path.join(static_dir, 'css', 'main.css'))}</p>
     <p>Index.html exists: {os.path.exists(os.path.join(template_dir, 'index.html'))}</p>
+    <p>Patient-new.html exists: {os.path.exists(os.path.join(template_dir, 'patient-new.html'))}</p>
     """
 
 if __name__ == '__main__':
@@ -100,6 +104,7 @@ if __name__ == '__main__':
     print(f"Static folder: {static_dir}")
     print(f"Templates exist: {os.path.exists(template_dir)}")
     print(f"Static exists: {os.path.exists(static_dir)}")
-    print(f"CSS exists: {os.path.exists(os.path.join(static_dir, 'css', 'style.css'))}")
+    print(f"CSS exists: {os.path.exists(os.path.join(static_dir, 'css', 'main.css'))}")
     print(f"Index.html exists: {os.path.exists(os.path.join(template_dir, 'index.html'))}")
+    print(f"Patient-new.html exists: {os.path.exists(os.path.join(template_dir, 'patient-new.html'))}")
     app.run(host='0.0.0.0', port=5000, debug=True)
