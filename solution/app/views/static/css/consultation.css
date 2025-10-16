@@ -1,13 +1,15 @@
+/* Consultation page specific styles - dashboard style */
+
 /* Consultation Progress */
-.consultation-progress {
+.consultation-progress-card {
     margin-bottom: var(--spacing-xl);
 }
 
-.progress-header {
+.consultation-progress-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: var(--spacing-lg);
+    width: 100%;
 }
 
 .patient-info {
@@ -15,18 +17,17 @@
     padding: var(--spacing-sm) var(--spacing-md);
     border-radius: var(--border-radius);
     border: 1px solid var(--border-color);
+    font-size: var(--font-size-sm);
 }
 
 .progress-bar-container {
-    margin-bottom: var(--spacing-lg);
+    margin-bottom: var(--spacing-sm);
 }
 
 .progress-labels {
     display: flex;
     justify-content: space-between;
     margin-bottom: var(--spacing-sm);
-    font-size: var(--font-size-sm);
-    color: var(--text-muted);
 }
 
 .progress-bar {
@@ -46,8 +47,6 @@
 
 .progress-text {
     text-align: center;
-    font-size: var(--font-size-sm);
-    color: var(--text-muted);
     font-weight: 500;
 }
 
@@ -60,9 +59,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: var(--spacing-xl);
-    padding-bottom: var(--spacing-md);
-    border-bottom: 1px solid var(--border-color);
+    width: 100%;
 }
 
 .question-number {
@@ -108,6 +105,24 @@
     transition: all 0.3s ease;
     font-size: var(--font-size-lg);
     font-weight: 600;
+    box-shadow: var(--shadow-md);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-answer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.btn-answer:hover::before {
+    left: 100%;
 }
 
 .btn-yes {
@@ -143,23 +158,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: var(--spacing-md);
-}
-
-.btn-toggle-symptoms {
-    background: none;
-    border: 1px solid var(--border-color);
-    padding: 0.5rem 1rem;
-    border-radius: var(--border-radius);
-    cursor: pointer;
-    font-size: var(--font-size-sm);
-    color: var(--text-muted);
-    transition: all 0.2s ease;
-}
-
-.btn-toggle-symptoms:hover {
-    background: var(--background-color);
-    color: var(--text-primary);
+    width: 100%;
 }
 
 .symptoms-list {
@@ -175,6 +174,7 @@
     padding: var(--spacing-sm) var(--spacing-md);
     border-radius: var(--border-radius);
     font-size: var(--font-size-sm);
+    font-weight: 500;
 }
 
 .symptom-positive {
@@ -198,13 +198,48 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-top: var(--spacing-lg);
+    padding: var(--spacing-lg) 0;
+    margin-top: var(--spacing-lg);
     border-top: 1px solid var(--border-color);
 }
 
-/* Responsive */
+.btn-danger {
+    background: linear-gradient(135deg, var(--warning-color), #EF4444);
+    color: white;
+    border: 2px solid transparent;
+}
+
+.btn-danger:hover:not(:disabled) {
+    background: linear-gradient(135deg, #EF4444, #DC2626);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+/* Keyboard shortcuts hint */
+.keyboard-hint {
+    margin-top: var(--spacing-lg);
+}
+
+.keyboard-shortcut {
+    display: inline-block;
+    background: var(--background-color);
+    border: 1px solid var(--border-color);
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--border-radius-sm);
+    margin: 0 0.25rem;
+    font-family: monospace;
+    font-size: var(--font-size-xs);
+}
+
+/* Responsive Design */
 @media (max-width: 768px) {
-    .progress-header {
+    .consultation-progress-header {
+        flex-direction: column;
+        gap: var(--spacing-md);
+        align-items: flex-start;
+    }
+    
+    .question-header {
         flex-direction: column;
         gap: var(--spacing-md);
         align-items: flex-start;
@@ -229,25 +264,53 @@
         gap: var(--spacing-md);
     }
     
+    .consultation-navigation .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
     .symptoms-list {
         grid-template-columns: 1fr;
     }
+    
+    .symptoms-header {
+        flex-direction: column;
+        gap: var(--spacing-md);
+        align-items: flex-start;
+    }
+    
+    .symptoms-header .btn {
+        align-self: flex-end;
+    }
 }
 
-/* Keyboard shortcuts hint */
-.keyboard-hint {
-    text-align: center;
-    margin-top: var(--spacing-lg);
-    font-size: var(--font-size-sm);
-    color: var(--text-muted);
+@media (min-width: 769px) and (max-width: 1024px) {
+    .answer-buttons {
+        gap: var(--spacing-md);
+    }
+    
+    .btn-answer {
+        width: 180px;
+        height: 180px;
+    }
+    
+    .symptoms-list {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
-.keyboard-shortcut {
-    display: inline-block;
-    background: var(--background-color);
-    border: 1px solid var(--border-color);
-    padding: 0.25rem 0.5rem;
-    border-radius: var(--border-radius-sm);
-    margin: 0 0.25rem;
-    font-family: monospace;
+/* Animation for new symptoms */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.symptom-item {
+    animation: slideIn 0.3s ease;
 }

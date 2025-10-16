@@ -4,101 +4,115 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Консультация - ОфтальмоЭксперт</title>
-    <link rel="stylesheet" href="css/main.css">
-    <link rel="stylesheet" href="css/consultation.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/consultation.css') }}">
 </head>
-<body>
+<body class="dashboard-page">
+    <!-- Navigation -->
     <nav class="navbar">
         <div class="container">
             <div class="navbar-content">
-                <a href="dashboard.html" class="logo">
+                <a href="{{ url_for('dashboard') }}" class="logo logo-link">
                     <span class="logo-icon">👁️</span>
                     <span class="logo-text">ОфтальмоЭксперт</span>
                 </a>
                 <div class="nav-links">
-                    <a href="dashboard.html" class="nav-link">Главная</a>
-                    <a href="patients.html" class="nav-link">Пациенты</a>
-                    <a href="consultation.html" class="nav-link active">Консультации</a>
+                    <a href="{{ url_for('dashboard') }}" class="nav-link">Главная</a>
+                    <a href="{{ url_for('patient_list') }}" class="nav-link">Пациенты</a>
+                    <a href="{{ url_for('consultation') }}" class="nav-link active">Консультации</a>
                     <div class="user-menu">
-                        <span class="user-name">Доктор Иванов</span>
-                        <a href="login.html" class="btn btn-sm btn-secondary">Выйти</a>
+                        <a href="{{ url_for('profile') }}" class="user-name">Доктор Иванов</a>
+                        <a href="{{ url_for('login') }}" class="btn btn-sm btn-secondary">Выйти</a>
                     </div>
                 </div>
             </div>
         </div>
     </nav>
 
-    <main class="container">
+    <!-- Main Content -->
+    <main class="container main-content">
         <!-- Progress Section -->
-        <div class="consultation-progress">
-            <div class="progress-header">
-                <h1>Диагностическая консультация</h1>
-                <div class="patient-info">
-                    <strong>Пациент:</strong> Петров Иван Сергеевич
+        <div class="card consultation-progress-card">
+            <div class="card-header">
+                <div class="consultation-progress-header">
+                    <h2>Диагностическая консультация</h2>
+                    <div class="patient-info">
+                        <strong>Пациент:</strong> Петров Иван Сергеевич
+                    </div>
                 </div>
             </div>
-            
-            <div class="progress-bar-container">
-                <div class="progress-labels">
-                    <span>Начало</span>
-                    <span>Завершено</span>
+            <div class="card-content">
+                <div class="progress-bar-container">
+                    <div class="progress-labels">
+                        <span class="text-sm text-muted">Начало</span>
+                        <span class="text-sm text-muted">Завершено</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 40%"></div>
+                    </div>
+                    <div class="progress-text text-muted">40% завершено</div>
                 </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: 40%"></div>
-                </div>
-                <div class="progress-text">40% завершено</div>
             </div>
         </div>
 
         <!-- Current Question -->
-        <div class="question-card card">
-            <div class="question-header">
-                <h2>Текущий вопрос</h2>
-                <div class="question-number">Вопрос 5 из 12</div>
+        <div class="card question-card">
+            <div class="card-header">
+                <div class="question-header">
+                    <h2>Текущий вопрос</h2>
+                    <div class="question-number">Вопрос 5 из 12</div>
+                </div>
             </div>
             
-            <div class="question-content">
-                <div class="question-text">
-                    ❓ Пациент жалуется на боль в глазу?
-                </div>
-                
-                <div class="answer-buttons">
-                    <button class="btn-answer btn-yes" data-answer="yes">
-                        <span class="answer-icon">✅</span>
-                        <span class="answer-text">ДА</span>
-                    </button>
-                    <button class="btn-answer btn-no" data-answer="no">
-                        <span class="answer-icon">❌</span>
-                        <span class="answer-text">НЕТ</span>
-                    </button>
+            <div class="card-content">
+                <div class="question-content">
+                    <div class="question-text">
+                        ❓ Пациент жалуется на боль в глазу?
+                    </div>
+                    
+                    <div class="answer-buttons">
+                        <button class="btn-answer btn-yes" data-answer="yes">
+                            <span class="answer-icon">✅</span>
+                            <span class="answer-text">ДА</span>
+                        </button>
+                        <button class="btn-answer btn-no" data-answer="no">
+                            <span class="answer-icon">❌</span>
+                            <span class="answer-text">НЕТ</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- Collected Symptoms -->
-        <div class="symptoms-card card">
-            <div class="symptoms-header">
-                <h3>Собранные симптомы</h3>
-                <button class="btn-toggle-symptoms" id="toggleSymptoms">
-                    Свернуть
-                </button>
+        <div class="card symptoms-card">
+            <div class="card-header">
+                <div class="symptoms-header">
+                    <h3>Собранные симптомы</h3>
+                    <button class="btn btn-sm btn-secondary" id="toggleSymptoms">
+                        Свернуть
+                    </button>
+                </div>
             </div>
-            <div class="symptoms-list" id="symptomsList">
-                <div class="symptom-item symptom-positive">
-                    <span class="symptom-icon">✓</span>
-                    <span class="symptom-text">Покраснение глаза - Да</span>
-                </div>
-                <div class="symptom-item symptom-negative">
-                    <span class="symptom-icon">✗</span>
-                    <span class="symptom-text">Выделения из глаза - Нет</span>
-                </div>
-                <div class="symptom-item symptom-positive">
-                    <span class="symptom-icon">✓</span>
-                    <span class="symptom-text">Слезотечение - Да</span>
-                </div>
-                <div class="symptom-item symptom-negative">
-                    <span class="symptom-icon">✗</span>
-                    <span class="symptom-text">Светобоязнь - Нет</span>
+            <div class="card-content">
+                <div class="symptoms-list" id="symptomsList">
+                    <div class="symptom-item symptom-positive">
+                        <span class="symptom-icon">✓</span>
+                        <span class="symptom-text">Покраснение глаза - Да</span>
+                    </div>
+                    <div class="symptom-item symptom-negative">
+                        <span class="symptom-icon">✗</span>
+                        <span class="symptom-text">Выделения из глаза - Нет</span>
+                    </div>
+                    <div class="symptom-item symptom-positive">
+                        <span class="symptom-icon">✓</span>
+                        <span class="symptom-text">Слезотечение - Да</span>
+                    </div>
+                    <div class="symptom-item symptom-negative">
+                        <span class="symptom-icon">✗</span>
+                        <span class="symptom-text">Светобоязнь - Нет</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -112,8 +126,15 @@
                 🗙 Отменить консультацию
             </button>
         </div>
+
+        <!-- Keyboard shortcuts hint -->
+        <div class="keyboard-hint text-muted text-sm text-center">
+            Подсказка: используйте клавиши 
+            <span class="keyboard-shortcut">Y</span> для "Да" и 
+            <span class="keyboard-shortcut">N</span> для "Нет"
+        </div>
     </main>
 
-    <script src="js/consultation.js"></script>
+    <script src="{{ url_for('static', filename='js/consultation.js') }}"></script>
 </body>
 </html>
