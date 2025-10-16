@@ -30,6 +30,17 @@ class Doctor(Base):
     
     # Связи
     consultations = relationship("Consultation", back_populates="doctor")
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'last_name': self.last_name,
+            'first_name': self.first_name,
+            'middle_name': self.middle_name,
+            'email': self.email,
+            'phone': self.phone,
+            'registered_at': self.registered_at.isoformat() if self.registered_at else None
+        }
 
 class Patient(Base):
     __tablename__ = 'patients'
