@@ -710,3 +710,24 @@ h3 {
         grid-template-columns: repeat(2, 1fr);
     }
 }
+
+/* Hero Section Logo Fix */
+.hero .logo {
+    color: white !important;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-md);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.hero .logo:hover {
+    color: white !important;
+    background: linear-gradient(135deg, var(--primary-dark), #1E40AF);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-lg);
+}
+
+.hero .logo .logo-text {
+    color: inherit;
+}
