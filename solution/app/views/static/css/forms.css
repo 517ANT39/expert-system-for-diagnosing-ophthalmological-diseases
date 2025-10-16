@@ -1,16 +1,57 @@
-/* Form specific styles */
+/* Form specific styles - dashboard style */
 .patient-form {
     max-width: 100%;
 }
 
 .form-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: var(--spacing-lg);
 }
 
 .form-group.full-width {
     grid-column: 1 / -1;
+}
+
+/* Medical information section - wider fields */
+.card:nth-child(3) .form-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-xl);
+}
+
+.card:nth-child(3) .form-group {
+    width: 100%;
+}
+
+.card:nth-child(3) textarea.form-control {
+    min-height: 120px;
+    font-size: var(--font-size-base);
+    line-height: 1.6;
+}
+
+/* Personal info section - wider fields */
+.card:nth-child(1) .form-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--spacing-lg);
+}
+
+/* Contact info section - wider fields */
+.card:nth-child(2) .form-grid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--spacing-lg);
+}
+
+.card:nth-child(2) .form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+/* Additional notes section - full width */
+.card:nth-child(4) .form-group {
+    width: 100%;
+}
+
+.card:nth-child(4) textarea.form-control {
+    min-height: 120px;
 }
 
 /* Required field indicator */
@@ -33,7 +74,19 @@
     align-items: center;
     gap: var(--spacing-sm);
     cursor: pointer;
-    padding: 0.5rem 0;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+    background: var(--surface-color);
+    min-width: 140px;
+}
+
+.radio-label:hover,
+.checkbox-label:hover {
+    border-color: var(--primary-color);
+    background: var(--background-color);
+    transform: translateY(-1px);
 }
 
 .radio-label input[type="radio"],
@@ -50,12 +103,18 @@
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
+    flex-shrink: 0;
 }
 
 .radio-label input[type="radio"]:checked + .radio-custom {
     border-color: var(--primary-color);
     background: var(--primary-color);
-    box-shadow: inset 0 0 0 3px white;
+    box-shadow: inset 0 0 0 3px white, 0 0 0 2px var(--primary-color);
+}
+
+.radio-label input[type="radio"]:checked ~ span {
+    color: var(--primary-color);
+    font-weight: 600;
 }
 
 .checkbox-custom {
@@ -67,6 +126,7 @@
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
+    flex-shrink: 0;
 }
 
 .checkbox-label input[type="checkbox"]:checked + .checkbox-custom {
@@ -79,6 +139,11 @@
     color: white;
     font-size: var(--font-size-sm);
     font-weight: bold;
+}
+
+.checkbox-label input[type="checkbox"]:checked ~ span {
+    color: var(--primary-color);
+    font-weight: 600;
 }
 
 /* Form actions */
@@ -147,11 +212,14 @@
     text-align: center;
     transition: all 0.3s ease;
     cursor: pointer;
+    background: var(--background-color);
 }
 
 .file-upload:hover {
     border-color: var(--primary-color);
-    background: var(--background-color);
+    background: var(--surface-color);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
 }
 
 .file-upload input[type="file"] {
@@ -188,9 +256,66 @@
     gap: var(--spacing-md);
 }
 
+/* Enhanced form controls */
+.form-control {
+    padding: 0.85rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-size: var(--font-size-base);
+    background: var(--surface-color);
+    transition: all 0.3s ease;
+    font-family: var(--font-family);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    transform: translateY(-1px);
+}
+
+.form-control::placeholder {
+    color: var(--text-muted);
+}
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 100px;
+    line-height: 1.6;
+    width: 100%;
+}
+
+/* Medical section textareas - extra wide */
+.card:nth-child(3) textarea.form-control {
+    min-height: 140px;
+    font-size: var(--font-size-base);
+    padding: 1rem 1.25rem;
+}
+
+/* Card enhancements for forms */
+.card {
+    margin-bottom: var(--spacing-xl);
+}
+
+.card-header h2 {
+    color: var(--text-primary);
+    margin: 0;
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .form-grid {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-md);
+    }
+    
+    .card:nth-child(1) .form-grid,
+    .card:nth-child(2) .form-grid,
+    .card:nth-child(3) .form-grid {
         grid-template-columns: 1fr;
     }
     
@@ -200,6 +325,7 @@
     
     .form-actions .btn {
         width: 100%;
+        justify-content: center;
     }
     
     .radio-group,
@@ -211,12 +337,54 @@
     .address-grid {
         grid-template-columns: 1fr;
     }
+    
+    .file-upload {
+        padding: var(--spacing-lg);
+    }
+    
+    .card-content {
+        padding: var(--spacing-lg);
+    }
+    
+    .form-control {
+        padding: 0.75rem 1rem;
+    }
+    
+    textarea.form-control {
+        min-height: 100px;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .form-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .card:nth-child(3) .form-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (min-width: 1025px) {
+    .card:nth-child(1) .form-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .card:nth-child(2) .form-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .card:nth-child(3) .form-grid {
+        grid-template-columns: 1fr;
+        max-width: 100%;
+    }
 }
 
 /* Loading states */
 .form-loading {
     opacity: 0.6;
     pointer-events: none;
+    position: relative;
 }
 
 .form-loading::after {
@@ -232,6 +400,31 @@
     justify-content: center;
 }
 
+.btn.loading {
+    position: relative;
+    color: transparent;
+}
+
+.btn.loading::after {
+    content: "";
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    top: 50%;
+    left: 50%;
+    margin-left: -8px;
+    margin-top: -8px;
+    border: 2px solid transparent;
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
 /* Success states */
 .form-success {
     border-left: 4px solid var(--success-color);
@@ -240,4 +433,335 @@
 .form-success .form-control:valid {
     border-color: var(--success-color);
     background: #F0F9FF;
+}
+
+/* Animation for form elements */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card {
+    animation: slideInUp 0.5s ease;
+}
+
+.card:nth-child(1) { animation-delay: 0.1s; }
+.card:nth-child(2) { animation-delay: 0.2s; }
+.card:nth-child(3) { animation-delay: 0.3s; }
+.card:nth-child(4) { animation-delay: 0.4s; }
+
+/* Focus states for accessibility */
+.form-control:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+.btn:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+/* Wider input fields specifically */
+.form-group {
+    width: 100%;
+}
+
+.form-control {
+    width: 100%;
+}
+
+/* Ensure medical section takes full width */
+.medical-section .form-group {
+    grid-column: 1 / -1;
+}
+
+/* Larger padding for better touch targets on mobile */
+@media (max-width: 768px) {
+    .form-control {
+        padding: 1rem 1.25rem;
+    }
+    
+    textarea.form-control {
+        padding: 1.25rem;
+    }
+}
+
+/* Form specific styles - dashboard style */
+.patient-form {
+    max-width: 100%;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--spacing-lg);
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+/* Card content styles */
+.card-content {
+    padding: var(--spacing-xl);
+}
+
+/* Medical information section - wider fields */
+.card:nth-child(3) .form-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-xl);
+}
+
+.card:nth-child(3) .form-group {
+    width: 100%;
+}
+
+.card:nth-child(3) textarea.form-control {
+    min-height: 120px;
+    font-size: var(--font-size-base);
+    line-height: 1.6;
+}
+
+/* Personal info section - wider fields */
+.card:nth-child(1) .form-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--spacing-lg);
+}
+
+/* Contact info section - wider fields */
+.card:nth-child(2) .form-grid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--spacing-lg);
+}
+
+.card:nth-child(2) .form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+/* Additional notes section - full width */
+.card:nth-child(4) .form-group {
+    width: 100%;
+}
+
+.card:nth-child(4) textarea.form-control {
+    min-height: 120px;
+}
+
+/* Required field indicator */
+.form-label.required::after {
+    content: ' *';
+    color: var(--warning-color);
+}
+
+/* Radio and Checkbox groups */
+.radio-group,
+.checkbox-group {
+    display: flex;
+    gap: var(--spacing-lg);
+    flex-wrap: wrap;
+}
+
+.radio-label,
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    cursor: pointer;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+    background: var(--surface-color);
+    min-width: 140px;
+}
+
+.radio-label:hover,
+.checkbox-label:hover {
+    border-color: var(--primary-color);
+    background: var(--background-color);
+    transform: translateY(-1px);
+}
+
+.radio-label input[type="radio"],
+.checkbox-label input[type="checkbox"] {
+    display: none;
+}
+
+.radio-custom {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--border-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.radio-label input[type="radio"]:checked + .radio-custom {
+    border-color: var(--primary-color);
+    background: var(--primary-color);
+    box-shadow: inset 0 0 0 3px white, 0 0 0 2px var(--primary-color);
+}
+
+.radio-label input[type="radio"]:checked ~ span {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.checkbox-custom {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.checkbox-label input[type="checkbox"]:checked + .checkbox-custom {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.checkbox-label input[type="checkbox"]:checked + .checkbox-custom::after {
+    content: '✓';
+    color: white;
+    font-size: var(--font-size-sm);
+    font-weight: bold;
+}
+
+.checkbox-label input[type="checkbox"]:checked ~ span {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+/* Form actions */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--spacing-md);
+    padding: var(--spacing-xl) 0;
+    border-top: 1px solid var(--border-color);
+    margin-top: var(--spacing-lg);
+}
+
+/* Form validation */
+.form-control:invalid {
+    border-color: var(--warning-color);
+}
+
+.form-control:valid {
+    border-color: var(--success-color);
+}
+
+.error-message {
+    color: var(--warning-color);
+    font-size: var(--font-size-sm);
+    margin-top: var(--spacing-xs);
+    display: none;
+}
+
+.form-control:invalid + .error-message {
+    display: block;
+}
+
+/* Enhanced form controls */
+.form-control {
+    padding: 0.85rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-size: var(--font-size-base);
+    background: var(--surface-color);
+    transition: all 0.3s ease;
+    font-family: var(--font-family);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    transform: translateY(-1px);
+}
+
+.form-control::placeholder {
+    color: var(--text-muted);
+}
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 100px;
+    line-height: 1.6;
+    width: 100%;
+}
+
+/* Medical section textareas - extra wide */
+.card:nth-child(3) textarea.form-control {
+    min-height: 140px;
+    font-size: var(--font-size-base);
+    padding: 1rem 1.25rem;
+}
+
+/* Card enhancements for forms */
+.card {
+    margin-bottom: var(--spacing-xl);
+}
+
+.card-header h2 {
+    color: var(--text-primary);
+    margin: 0;
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-md);
+    }
+    
+    .card:nth-child(1) .form-grid,
+    .card:nth-child(2) .form-grid,
+    .card:nth-child(3) .form-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .form-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .radio-group,
+    .checkbox-group {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+    
+    .card-content {
+        padding: var(--spacing-lg);
+    }
+    
+    .form-control {
+        padding: 0.75rem 1rem;
+    }
+    
+    textarea.form-control {
+        min-height: 100px;
+    }
 }

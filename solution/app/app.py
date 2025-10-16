@@ -67,7 +67,7 @@ def patient_new():
 
 @app.route('/patient/history')
 def patient_history():
-    return render_template(patient/'patient-history.html')
+    return render_template('patient/patient-history.html')
 
 # Диагностика
 @app.route('/diagnosis/questions')
