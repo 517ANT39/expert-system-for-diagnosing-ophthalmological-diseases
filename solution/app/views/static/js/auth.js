@@ -50,6 +50,52 @@ async function loginDoctor(formData) {
     }
 }
 
+// Функция для загрузки данных профиля
+async function loadProfileData() {
+    try {
+        const response = await fetch('/api/profile');
+        const result = await response.json();
+
+        if (result.success) {
+            const doctor = result.doctor;
+            
+            // Обновляем данные в навигации
+            const userNameElements = document.querySelectorAll('.user-name');
+            userNameElements.forEach(element => {
+                element.textContent = `${doctor.first_name} ${doctor.last_name}`;
+            });
+            
+            // Обновляем данные профиля
+            if (document.getElementById('doctorFullName')) {
+                document.getElementById('doctorFullName').textContent = 
+                    `${doctor.last_name} ${doctor.first_name} ${doctor.middle_name || ''}`.trim();
+                document.getElementById('doctorEmail').textContent = doctor.email;
+                document.getElementById('doctorPhone').textContent = doctor.phone || 'Не указан';
+                
+                // Форматируем дату регистрации
+                if (doctor.registered_at) {
+                    const regDate = new Date(doctor.registered_at);
+                    document.getElementById('doctorRegisteredAt').textContent = 
+                        regDate.toLocaleDateString('ru-RU');
+                }
+            }
+            
+            // Обновляем приветствие на dashboard
+            const welcomeElements = document.querySelectorAll('.text-muted');
+            welcomeElements.forEach(element => {
+                if (element.textContent.includes('Добро пожаловать')) {
+                    element.textContent = `Добро пожаловать, Доктор ${doctor.last_name}`;
+                }
+            });
+            
+        } else {
+            showNotification('Ошибка загрузки профиля', 'error');
+        }
+    } catch (error) {
+        console.error('Ошибка загрузки профиля:', error);
+    }
+}
+
 function showNotification(message, type = 'info') {
     // Простая реализация уведомлений
     alert(`${type.toUpperCase()}: ${message}`);
@@ -90,5 +136,13 @@ document.addEventListener('DOMContentLoaded', function() {
             
             loginDoctor(formData);
         });
+    }
+    
+    // Загружаем данные профиля для защищенных страниц
+    if (window.location.pathname === '/profile' || 
+        window.location.pathname === '/dashboard' ||
+        window.location.pathname === '/patient' ||
+        window.location.pathname === '/consultation') {
+        loadProfileData();
     }
 });

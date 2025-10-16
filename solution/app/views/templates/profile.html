@@ -22,8 +22,8 @@
                     <a href="{{ url_for('patient_list') }}" class="nav-link">Пациенты</a>
                     <a href="{{ url_for('consultation') }}" class="nav-link">Консультации</a>
                     <div class="user-menu">
-                        <a href="{{ url_for('profile') }}" class="user-name">Доктор Иванов</a>
-                        <a href="{{ url_for('login') }}" class="btn btn-sm btn-secondary">Выйти</a>
+                        <a href="{{ url_for('profile') }}" class="user-name" id="userName">Загрузка...</a>
+                        <a href="{{ url_for('logout') }}" class="btn btn-sm btn-secondary">Выйти</a>
                     </div>
                 </div>
             </div>
@@ -55,19 +55,19 @@
                     <div class="profile-info">
                         <div class="info-item">
                             <label>ФИО врача:</label>
-                            <span class="info-value">Иванов Алексей Петрович</span>
+                            <span class="info-value" id="doctorFullName">Загрузка...</span>
                         </div>
                         <div class="info-item">
                             <label>Email:</label>
-                            <span class="info-value">a.ivanov@ophthalmexpert.ru</span>
+                            <span class="info-value" id="doctorEmail">Загрузка...</span>
                         </div>
                         <div class="info-item">
                             <label>Номер телефона:</label>
-                            <span class="info-value">+7(800)555-35-35</span>
+                            <span class="info-value" id="doctorPhone">Загрузка...</span>
                         </div>
                         <div class="info-item">
                             <label>Дата регистрации:</label>
-                            <span class="info-value">15.01.2024</span>
+                            <span class="info-value" id="doctorRegisteredAt">Загрузка...</span>
                         </div>
                     </div>
                 </div>
@@ -124,5 +124,7 @@
             </div>
         </div>
     </main>
+
+    <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
 </body>
 </html>

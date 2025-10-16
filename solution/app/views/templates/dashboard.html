@@ -12,7 +12,7 @@
     <nav class="navbar">
         <div class="container">
             <div class="navbar-content">
-                <a href="{{ url_for('index') }}" class="logo logo-link">
+                <a href="{{ url_for('dashboard') }}" class="logo logo-link">
                     <span class="logo-icon">👁️</span>
                     <span class="logo-text">ОфтальмоЭксперт</span>
                 </a>
@@ -21,8 +21,8 @@
                     <a href="{{ url_for('patient_list') }}" class="nav-link">Пациенты</a>
                     <a href="{{ url_for('consultation') }}" class="nav-link">Консультации</a>
                     <div class="user-menu">
-                        <a href="{{ url_for('profile') }}" class="user-name">Доктор Иванов</a>
-                        <a href="{{ url_for('login') }}" class="btn btn-sm btn-secondary">Выйти</a>
+                        <a href="{{ url_for('profile') }}" class="user-name" id="userName">Загрузка...</a>
+                        <a href="{{ url_for('logout') }}" class="btn btn-sm btn-secondary">Выйти</a>
                     </div>
                 </div>
             </div>
@@ -35,7 +35,7 @@
         <div class="page-header">
             <div class="header-content">
                 <h1>Панель управления</h1>
-                <p class="text-muted">Добро пожаловать, Доктор Иванов</p>
+                <p class="text-muted" id="welcomeMessage">Добро пожаловать</p>
             </div>
             <div class="header-actions">
                 <a href="{{ url_for('consultation') }}" class="btn btn-primary">
@@ -111,5 +111,7 @@
             </div>
         </div>
     </main>
+
+    <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
 </body>
 </html>
