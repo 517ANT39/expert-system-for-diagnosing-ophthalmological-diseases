@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/consultation.css') }}">
 </head>
+
 <body class="dashboard-page">
     <!-- Navigation -->
     <nav class="navbar">
@@ -64,13 +66,13 @@
                     <div class="question-number">Вопрос 5 из 12</div>
                 </div>
             </div>
-            
+
             <div class="card-content">
                 <div class="question-content">
                     <div class="question-text">
                         ❓ Пациент жалуется на боль в глазу?
                     </div>
-                    
+
                     <div class="answer-buttons">
                         <button class="btn-answer btn-yes" data-answer="yes">
                             <span class="answer-icon">✅</span>
@@ -118,6 +120,7 @@
         </div>
 
         <!-- Navigation -->
+        
         <div class="consultation-navigation">
             <button class="btn btn-secondary" id="btnBack">
                 ← Назад к предыдущему вопросу
@@ -129,12 +132,13 @@
 
         <!-- Keyboard shortcuts hint -->
         <div class="keyboard-hint text-muted text-sm text-center">
-            Подсказка: используйте клавиши 
-            <span class="keyboard-shortcut">Y</span> для "Да" и 
+            Подсказка: используйте клавиши
+            <span class="keyboard-shortcut">Y</span> для "Да" и
             <span class="keyboard-shortcut">N</span> для "Нет"
         </div>
     </main>
 
     <script src="{{ url_for('static', filename='js/consultation.js') }}"></script>
 </body>
+
 </html>

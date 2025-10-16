@@ -314,3 +314,431 @@
 .symptom-item {
     animation: slideIn 0.3s ease;
 }
+
+/* Consultation Results Page Styles */
+
+/* Page Header */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--spacing-2xl);
+    gap: var(--spacing-lg);
+}
+
+.header-content h1 {
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-sm);
+    font-size: var(--font-size-3xl);
+    font-weight: 700;
+}
+
+.header-actions {
+    display: flex;
+    gap: var(--spacing-md);
+    flex-shrink: 0;
+}
+
+/* Patient Info Card */
+.patient-info-card {
+    margin-bottom: var(--spacing-lg);
+}
+
+.patient-info-card h3 {
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-lg);
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+}
+
+.patient-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--spacing-md);
+}
+
+.detail-item {
+    padding: var(--spacing-sm) 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.detail-item:last-child {
+    border-bottom: none;
+}
+
+.detail-item strong {
+    color: var(--text-primary);
+    display: inline-block;
+    min-width: 140px;
+}
+
+/* Diagnosis Card */
+.diagnosis-card {
+    margin-bottom: var(--spacing-lg);
+    background: linear-gradient(135deg, var(--surface-color) 0%, #f8fafc 100%);
+}
+
+.diagnosis-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-lg);
+}
+
+.diagnosis-header h2 {
+    color: var(--text-primary);
+    margin: 0;
+    font-size: var(--font-size-2xl);
+    font-weight: 700;
+}
+
+.confidence-badge {
+    background: linear-gradient(135deg, var(--success-color), #10B981);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 2rem;
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    box-shadow: var(--shadow-sm);
+}
+
+.primary-diagnosis h3 {
+    color: var(--primary-color);
+    font-size: var(--font-size-2xl);
+    margin-bottom: var(--spacing-md);
+    font-weight: 700;
+}
+
+.diagnosis-description {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    font-size: var(--font-size-base);
+}
+
+/* Explanation Card */
+.explanation-card {
+    margin-bottom: var(--spacing-lg);
+}
+
+.explanation-card h3 {
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-lg);
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+}
+
+.symptoms-evidence {
+    list-style: none;
+    padding: 0;
+    margin: var(--spacing-lg) 0;
+}
+
+.symptoms-evidence li {
+    padding: var(--spacing-sm) var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
+    border-radius: var(--border-radius);
+    font-weight: 500;
+}
+
+.evidence-positive {
+    background: #D1FAE5;
+    color: var(--success-color);
+    border: 1px solid #A7F3D0;
+}
+
+.evidence-negative {
+    background: #FEF3C7;
+    color: #D97706;
+    border: 1px solid #FCD34D;
+}
+
+.reasoning-text {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    padding: var(--spacing-md);
+    background: var(--background-color);
+    border-radius: var(--border-radius);
+    border-left: 4px solid var(--primary-color);
+}
+
+/* Recommendations Card */
+.recommendations-card {
+    margin-bottom: var(--spacing-lg);
+}
+
+.recommendations-card h3 {
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-lg);
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+}
+
+.recommendations-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--spacing-xl);
+}
+
+.recommendation-category h4 {
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-md);
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+}
+
+.recommendation-category ul {
+    list-style: none;
+    padding: 0;
+}
+
+.recommendation-category li {
+    padding: var(--spacing-sm) 0;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+.recommendation-category li:last-child {
+    border-bottom: none;
+}
+
+.recommendation-category li::before {
+    content: "•";
+    color: var(--primary-color);
+    font-weight: bold;
+    display: inline-block;
+    width: 1em;
+    margin-left: -1em;
+}
+
+/* Differential Diagnosis Card */
+.differential-card {
+    margin-bottom: var(--spacing-lg);
+}
+
+.differential-card h3 {
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-lg);
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+}
+
+.differential-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.differential-item {
+    display: flex;
+    flex-direction: column;
+    padding: var(--spacing-lg);
+    background: var(--background-color);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.differential-item:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+    border-color: var(--primary-color);
+}
+
+.differential-item strong {
+    color: var(--text-primary);
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--spacing-xs);
+}
+
+.probability {
+    position: absolute;
+    top: var(--spacing-lg);
+    right: var(--spacing-lg);
+    background: var(--text-muted);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+}
+
+.diff-reason {
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    line-height: 1.5;
+    margin-top: var(--spacing-xs);
+}
+
+/* Doctor's Notes Card */
+.notes-card {
+    margin-bottom: var(--spacing-xl);
+}
+
+.notes-card h3 {
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-lg);
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+}
+
+.doctor-notes-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.form-label {
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+}
+
+.form-control {
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-size: var(--font-size-base);
+    background: var(--surface-color);
+    transition: all 0.3s ease;
+    font-family: var(--font-family);
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.form-control[type="text"] {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 120px;
+    line-height: 1.5;
+}
+
+.form-actions {
+    display: flex;
+    gap: var(--spacing-md);
+    justify-content: flex-end;
+    padding-top: var(--spacing-lg);
+    border-top: 1px solid var(--border-color);
+}
+
+/* Responsive Design for Results Page */
+@media (max-width: 768px) {
+    .page-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--spacing-lg);
+    }
+    
+    .header-actions {
+        justify-content: flex-start;
+    }
+    
+    .diagnosis-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-md);
+    }
+    
+    .patient-details {
+        grid-template-columns: 1fr;
+    }
+    
+    .detail-item strong {
+        min-width: 120px;
+    }
+    
+    .recommendations-content {
+        grid-template-columns: 1fr;
+    }
+    
+    .differential-item {
+        padding: var(--spacing-md);
+    }
+    
+    .probability {
+        position: static;
+        align-self: flex-start;
+        margin-bottom: var(--spacing-xs);
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .form-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .recommendations-content {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .patient-details {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Print Styles for PDF Export */
+@media print {
+    .navbar,
+    .header-actions,
+    .form-actions {
+        display: none;
+    }
+    
+    .card {
+        break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid #ccc;
+    }
+    
+    .confidence-badge {
+        background: #059669 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+}
+
+/* Animation for results page */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.diagnosis-card,
+.explanation-card,
+.recommendations-card,
+.differential-card,
+.notes-card {
+    animation: fadeInUp 0.5s ease;
+}
+
+.diagnosis-card { animation-delay: 0.1s; }
+.explanation-card { animation-delay: 0.2s; }
+.recommendations-card { animation-delay: 0.3s; }
+.differential-card { animation-delay: 0.4s; }
+.notes-card { animation-delay: 0.5s; }

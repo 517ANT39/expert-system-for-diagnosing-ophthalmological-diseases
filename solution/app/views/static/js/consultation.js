@@ -23,19 +23,28 @@ class ConsultationProcess {
         });
 
         // Back button
-        document.getElementById('btnBack').addEventListener('click', () => {
-            this.goToPreviousQuestion();
-        });
+        const backBtn = document.getElementById('btnBack');
+        if (backBtn) {
+            backBtn.addEventListener('click', () => {
+                this.goToPreviousQuestion();
+            });
+        }
 
         // Cancel button
-        document.getElementById('btnCancel').addEventListener('click', () => {
-            this.cancelConsultation();
-        });
+        const cancelBtn = document.getElementById('btnCancel');
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', () => {
+                this.cancelConsultation();
+            });
+        }
 
         // Toggle symptoms
-        document.getElementById('toggleSymptoms').addEventListener('click', () => {
-            this.toggleSymptoms();
-        });
+        const toggleBtn = document.getElementById('toggleSymptoms');
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', () => {
+                this.toggleSymptoms();
+            });
+        }
     }
 
     setupKeyboardNavigation() {
@@ -159,18 +168,21 @@ class ConsultationProcess {
 
     cancelConsultation() {
         if (confirm('Вы уверены, что хотите отменить консультацию? Все несохраненные данные будут потеряны.')) {
-            window.location.href = 'dashboard.html';
+            // Используем Flask route для dashboard
+            window.location.href = '/dashboard';
         }
     }
 
     completeConsultation() {
-        // Redirect to results page
-        window.location.href = 'consultation-result.html';
+        // Используем Flask route для consultation result
+        window.location.href = '/consultation/result';
     }
 
     toggleSymptoms() {
         const symptomsList = document.getElementById('symptomsList');
         const toggleBtn = document.getElementById('toggleSymptoms');
+        
+        if (!symptomsList || !toggleBtn) return;
         
         if (symptomsList.style.display === 'none') {
             symptomsList.style.display = 'grid';
