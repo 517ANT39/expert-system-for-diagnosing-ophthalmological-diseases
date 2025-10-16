@@ -4,67 +4,73 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Пациенты - ОфтальмоЭксперт</title>
-    <link rel="stylesheet" href="css/main.css">
-    <link rel="stylesheet" href="css/patients.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/patients.css') }}">
 </head>
-<body>
+<body class="dashboard-page">
+    <!-- Navigation -->
     <nav class="navbar">
         <div class="container">
             <div class="navbar-content">
-                <a href="dashboard.html" class="logo">
+                <a href="{{ url_for('dashboard') }}" class="logo logo-link">
                     <span class="logo-icon">👁️</span>
                     <span class="logo-text">ОфтальмоЭксперт</span>
                 </a>
                 <div class="nav-links">
-                    <a href="dashboard.html" class="nav-link">Главная</a>
-                    <a href="patients.html" class="nav-link active">Пациенты</a>
-                    <a href="consultation.html" class="nav-link">Консультации</a>
+                    <a href="{{ url_for('dashboard') }}" class="nav-link">Главная</a>
+                    <a href="{{ url_for('patient_list') }}" class="nav-link active">Пациенты</a>
+                    <a href="{{ url_for('consultation') }}" class="nav-link">Консультации</a>
                     <div class="user-menu">
-                        <span class="user-name">Доктор Иванов</span>
-                        <a href="login.html" class="btn btn-sm btn-secondary">Выйти</a>
+                        <a href="{{ url_for('profile') }}" class="user-name">Доктор Иванов</a>
+                        <a href="{{ url_for('login') }}" class="btn btn-sm btn-secondary">Выйти</a>
                     </div>
                 </div>
             </div>
         </div>
     </nav>
 
-    <main class="container">
+    <!-- Main Content -->
+    <main class="container main-content">
+        <!-- Page Header -->
         <div class="page-header">
-            <div>
+            <div class="header-content">
                 <h1>Управление пациентами</h1>
                 <p class="text-muted">Все пациенты в системе</p>
             </div>
             <div class="header-actions">
-                <a href="patient-form.html" class="btn btn-primary">
+                <a href="{{ url_for('patient_new') }}" class="btn btn-primary">
                     👥 Добавить пациента
                 </a>
             </div>
         </div>
 
         <!-- Search and Filters -->
-        <div class="card filters-card">
-            <div class="filters-header">
-                <h3>Поиск и фильтры</h3>
+        <div class="card">
+            <div class="card-header">
+                <h2>Поиск и фильтры</h2>
             </div>
-            <div class="filters-content">
-                <div class="search-box">
-                    <input type="text" id="patientSearch" class="form-control" 
-                           placeholder="Поиск по ФИО, ID или диагнозу...">
-                    <button class="btn btn-primary" onclick="searchPatients()">
-                        🔍 Поиск
-                    </button>
-                </div>
-                <div class="filter-options">
-                    <select id="statusFilter" class="form-control">
-                        <option value="">Все статусы</option>
-                        <option value="active">Активные</option>
-                        <option value="archived">В архиве</option>
-                    </select>
-                    <select id="sortBy" class="form-control">
-                        <option value="name">Сортировка по имени</option>
-                        <option value="date">Сортировка по дате</option>
-                        <option value="lastVisit">Сортировка по последнему визиту</option>
-                    </select>
+            <div class="card-content">
+                <div class="patients-filters-grid">
+                    <div class="search-box">
+                        <input type="text" id="patientSearch" class="form-control" 
+                               placeholder="Поиск по ФИО, ID или диагнозу...">
+                        <button class="btn btn-primary" onclick="searchPatients()">
+                            🔍 Поиск
+                        </button>
+                    </div>
+                    <div class="filter-options">
+                        <select id="statusFilter" class="form-control">
+                            <option value="">Все статусы</option>
+                            <option value="active">Активные</option>
+                            <option value="archived">В архиве</option>
+                        </select>
+                        <select id="sortBy" class="form-control">
+                            <option value="name">Сортировка по имени</option>
+                            <option value="date">Сортировка по дате</option>
+                            <option value="lastVisit">Сортировка по последнему визиту</option>
+                        </select>
+                    </div>
                 </div>
             </div>
         </div>
@@ -72,131 +78,140 @@
         <!-- Patients List -->
         <div class="card">
             <div class="card-header">
-                <h2>Список пациентов</h2>
-                <div class="patient-count">
-                    Найдено: <span id="patientCount">4</span> пациентов
+                <div class="patients-header-content">
+                    <h2>Список пациентов</h2>
+                    <div class="patient-count text-muted">
+                        Найдено: <span id="patientCount">4</span> пациентов
+                    </div>
                 </div>
             </div>
             
-            <div class="table-responsive">
-                <table class="table" id="patientsTable">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>ФИО</th>
-                            <th>Дата рождения</th>
-                            <th>Пол</th>
-                            <th>Последняя консультация</th>
-                            <th>Всего консультаций</th>
-                            <th>Действия</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>#001</td>
-                            <td>
-                                <div class="patient-name">
-                                    <strong>Петров Иван Сергеевич</strong>
-                                    <span class="patient-contact">ivan.petrov@email.com</span>
-                                </div>
-                            </td>
-                            <td>15.03.1985</td>
-                            <td>Мужской</td>
-                            <td>20.01.2024</td>
-                            <td>3</td>
-                            <td>
-                                <div class="action-buttons">
-                                    <a href="patient-history.html" class="btn btn-sm btn-secondary">
-                                        📋 История
-                                    </a>
-                                    <a href="consultation.html" class="btn btn-sm btn-primary">
-                                        🆕 Консультация
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>#002</td>
-                            <td>
-                                <div class="patient-name">
-                                    <strong>Сидорова Мария Петровна</strong>
-                                    <span class="patient-contact">+7 (912) 345-67-89</span>
-                                </div>
-                            </td>
-                            <td>22.07.1978</td>
-                            <td>Женский</td>
-                            <td>19.01.2024</td>
-                            <td>5</td>
-                            <td>
-                                <div class="action-buttons">
-                                    <a href="patient-history.html" class="btn btn-sm btn-secondary">
-                                        📋 История
-                                    </a>
-                                    <a href="consultation.html" class="btn btn-sm btn-primary">
-                                        🆕 Консультация
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>#003</td>
-                            <td>
-                                <div class="patient-name">
-                                    <strong>Козлов Алексей Владимирович</strong>
-                                    <span class="patient-contact">alex.kozlov@email.com</span>
-                                </div>
-                            </td>
-                            <td>30.11.1992</td>
-                            <td>Мужской</td>
-                            <td>18.01.2024</td>
-                            <td>2</td>
-                            <td>
-                                <div class="action-buttons">
-                                    <a href="patient-history.html" class="btn btn-sm btn-secondary">
-                                        📋 История
-                                    </a>
-                                    <a href="consultation.html" class="btn btn-sm btn-primary">
-                                        🆕 Консультация
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>#004</td>
-                            <td>
-                                <div class="patient-name">
-                                    <strong>Николаева Екатерина Игоревна</strong>
-                                    <span class="patient-contact">+7 (912) 123-45-67</span>
-                                </div>
-                            </td>
-                            <td>14.05.1988</td>
-                            <td>Женский</td>
-                            <td>15.01.2024</td>
-                            <td>1</td>
-                            <td>
-                                <div class="action-buttons">
-                                    <a href="patient-history.html" class="btn btn-sm btn-secondary">
-                                        📋 История
-                                    </a>
-                                    <a href="consultation.html" class="btn btn-sm btn-primary">
-                                        🆕 Консультация
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+            <div class="card-content">
+                <div class="table-responsive">
+                    <table class="table" id="patientsTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>ФИО</th>
+                                <th>Дата рождения</th>
+                                <th>Пол</th>
+                                <th>Последняя консультация</th>
+                                <th>Всего консультаций</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>#001</td>
+                                <td>
+                                    <div class="patient-info">
+                                        <strong>Петров Иван Сергеевич</strong>
+                                        <span class="text-muted text-sm">ivan.petrov@email.com</span>
+                                    </div>
+                                </td>
+                                <td>15.03.1985</td>
+                                <td>Мужской</td>
+                                <td>20.01.2024</td>
+                                <td>3</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <a href="{{ url_for('patient_history') }}" class="btn btn-sm btn-secondary">
+                                            📋 История
+                                        </a>
+                                        <a href="{{ url_for('consultation') }}" class="btn btn-sm btn-primary">
+                                            🆕 Консультация
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>#002</td>
+                                <td>
+                                    <div class="patient-info">
+                                        <strong>Сидорова Мария Петровна</strong>
+                                        <span class="text-muted text-sm">+7 (912) 345-67-89</span>
+                                    </div>
+                                </td>
+                                <td>22.07.1978</td>
+                                <td>Женский</td>
+                                <td>19.01.2024</td>
+                                <td>5</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <a href="{{ url_for('patient_history') }}" class="btn btn-sm btn-secondary">
+                                            📋 История
+                                        </a>
+                                        <a href="{{ url_for('consultation') }}" class="btn btn-sm btn-primary">
+                                            🆕 Консультация
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>#003</td>
+                                <td>
+                                    <div class="patient-info">
+                                        <strong>Козлов Алексей Владимирович</strong>
+                                        <span class="text-muted text-sm">alex.kozlov@email.com</span>
+                                    </div>
+                                </td>
+                                <td>30.11.1992</td>
+                                <td>Мужской</td>
+                                <td>18.01.2024</td>
+                                <td>2</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <a href="{{ url_for('patient_history') }}" class="btn btn-sm btn-secondary">
+                                            📋 История
+                                        </a>
+                                        <a href="{{ url_for('consultation') }}" class="btn btn-sm btn-primary">
+                                            🆕 Консультация
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>#004</td>
+                                <td>
+                                    <div class="patient-info">
+                                        <strong>Николаева Екатерина Игоревна</strong>
+                                        <span class="text-muted text-sm">+7 (912) 123-45-67</span>
+                                    </div>
+                                </td>
+                                <td>14.05.1988</td>
+                                <td>Женский</td>
+                                <td>15.01.2024</td>
+                                <td>1</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <a href="{{ url_for('patient_history') }}" class="btn btn-sm btn-secondary">
+                                            📋 История
+                                        </a>
+                                        <a href="{{ url_for('consultation') }}" class="btn btn-sm btn-primary">
+                                            🆕 Консультация
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
 
-            <!-- Pagination -->
-            <div class="pagination">
-                <button class="btn btn-secondary" disabled>← Назад</button>
-                <span class="page-info">Страница 1 из 1</span>
-                <button class="btn btn-secondary" disabled>Вперед →</button>
+                <!-- Pagination -->
+                <div class="pagination">
+                    <button class="btn btn-secondary" disabled>← Назад</button>
+                    <span class="page-info text-muted">Страница 1 из 1</span>
+                    <button class="btn btn-secondary" disabled>Вперед →</button>
+                </div>
             </div>
         </div>
     </main>
 
-    <script src="js/patients.js"></script>
+    <script>
+        function searchPatients() {
+            // Placeholder for search functionality
+            console.log('Searching patients...');
+        }
+    </script>
 </body>
 </html>
