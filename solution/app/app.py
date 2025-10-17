@@ -189,6 +189,130 @@ def profile():
 def edit_profile():
     return render_template('edit-profile.html')
 
+# API для обновления профиля
+@app.route('/api/profile/update', methods=['POST'])
+@login_required
+def api_profile_update():
+    try:
+        db_session = SessionLocal()
+        auth_service = AuthService(db_session)
+        
+        data = request.get_json()
+        doctor_id = session['doctor_id']
+        
+        # Получаем текущего врача
+        doctor = auth_service.get_doctor_profile(doctor_id)
+        if not doctor:
+            return jsonify({
+                'success': False,
+                'message': 'Пользователь не найден'
+            }), 404
+        
+        # Обновляем данные
+        if 'last_name' in data:
+            doctor.last_name = data['last_name']
+        if 'first_name' in data:
+            doctor.first_name = data['first_name']
+        if 'middle_name' in data:
+            doctor.middle_name = data['middle_name']
+        if 'email' in data:
+            # Проверяем, не занят ли email другим пользователем
+            existing_doctor = db_session.query(Doctor).filter(
+                Doctor.email == data['email'],
+                Doctor.id != doctor_id
+            ).first()
+            if existing_doctor:
+                return jsonify({
+                    'success': False,
+                    'message': 'Этот email уже используется другим пользователем'
+                }), 400
+            doctor.email = data['email']
+        if 'phone' in data:
+            doctor.phone = data['phone']
+        
+        db_session.commit()
+        
+        # Обновляем сессию
+        session['doctor_name'] = f"{doctor.last_name} {doctor.first_name}"
+        session['doctor_full_name'] = f"{doctor.last_name} {doctor.first_name} {doctor.middle_name or ''}".strip()
+        
+        db_session.close()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Профиль успешно обновлен',
+            'doctor': doctor.to_dict()
+        }), 200
+        
+    except Exception as e:
+        db_session.rollback()
+        return jsonify({
+            'success': False,
+            'message': 'Ошибка сервера при обновлении профиля'
+        }), 500
+
+# API для смены пароля
+@app.route('/api/profile/change-password', methods=['POST'])
+@login_required
+def api_change_password():
+    try:
+        db_session = SessionLocal()
+        auth_service = AuthService(db_session)
+        
+        data = request.get_json()
+        doctor_id = session['doctor_id']
+        
+        # Проверяем обязательные поля
+        if not data.get('current_password') or not data.get('new_password'):
+            return jsonify({
+                'success': False,
+                'message': 'Текущий и новый пароль обязательны'
+            }), 400
+        
+        # Получаем текущего врача
+        doctor = auth_service.get_doctor_profile(doctor_id)
+        if not doctor:
+            return jsonify({
+                'success': False,
+                'message': 'Пользователь не найден'
+            }), 404
+        
+        # Проверяем текущий пароль
+        if not auth_service.user_repository.verify_password(data['current_password'], doctor.password):
+            return jsonify({
+                'success': False,
+                'message': 'Неверный текущий пароль'
+            }), 400
+        
+        # Проверяем длину нового пароля
+        if len(data['new_password']) < 6:
+            return jsonify({
+                'success': False,
+                'message': 'Новый пароль должен содержать минимум 6 символов'
+            }), 400
+        
+        # Хешируем и сохраняем новый пароль
+        hashed_password = bcrypt.hashpw(
+            data['new_password'].encode('utf-8'), 
+            bcrypt.gensalt()
+        ).decode('utf-8')
+        
+        doctor.password = hashed_password
+        db_session.commit()
+        db_session.close()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Пароль успешно изменен'
+        }), 200
+        
+    except Exception as e:
+        db_session.rollback()
+        return jsonify({
+            'success': False,
+            'message': 'Ошибка сервера при смене пароля'
+        }), 500
+
 @app.route('/logout')
 def logout():
     session.clear()
