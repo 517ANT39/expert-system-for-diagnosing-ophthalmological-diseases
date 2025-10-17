@@ -24,8 +24,8 @@
                     <a href="{{ url_for('patient_list') }}" class="nav-link">Пациенты</a>
                     <a href="{{ url_for('consultation') }}" class="nav-link active">Консультации</a>
                     <div class="user-menu">
-                        <a href="{{ url_for('profile') }}" class="user-name">Доктор Иванов</a>
-                        <a href="{{ url_for('login') }}" class="btn btn-sm btn-secondary">Выйти</a>
+                        <a href="{{ url_for('profile') }}" class="user-name" id="userName">Загрузка...</a>
+                        <a href="{{ url_for('logout') }}" class="btn btn-sm btn-secondary">Выйти</a>
                     </div>
                 </div>
             </div>
@@ -139,6 +139,7 @@
     </main>
 
     <script src="{{ url_for('static', filename='js/consultation.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
 </body>
 
 </html>

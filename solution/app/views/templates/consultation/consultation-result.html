@@ -24,8 +24,8 @@
                     <a href="{{ url_for('patient_list') }}" class="nav-link">Пациенты</a>
                     <a href="{{ url_for('consultation') }}" class="nav-link active">Консультации</a>
                     <div class="user-menu">
-                        <a href="{{ url_for('profile') }}" class="user-name">Доктор Иванов</a>
-                        <a href="{{ url_for('login') }}" class="btn btn-sm btn-secondary">Выйти</a>
+                        <a href="{{ url_for('profile') }}" class="user-name" id="userName">Загрузка...</a>
+                        <a href="{{ url_for('logout') }}" class="btn btn-sm btn-secondary">Выйти</a>
                     </div>
                 </div>
             </div>
@@ -210,18 +210,33 @@
                             ← Назад в панель управления
                         </a>
                     </div>
+                </form>
+            </div>
+        </div>
+    </main>
 
-                    <script>
-                        function completeConsultation() {
-                            // Здесь может быть логика сохранения данных
-                            window.location.href = "{{ url_for('dashboard') }}";
-                        }
+    <script>
+        function completeConsultation(event) {
+            if (event) {
+                event.preventDefault();
+            }
+            // Здесь может быть логика сохранения данных
+            window.location.href = "{{ url_for('dashboard') }}";
+        }
 
-                        function saveDraft() {
-                            // Логика сохранения черновика
-                            alert('Черновик сохранен');
-                        }
-                    </script>
+        function saveDraft() {
+            // Логика сохранения черновика
+            alert('Черновик сохранен');
+        }
+
+        function exportToPDF() {
+            // Логика экспорта в PDF
+            alert('Экспорт в PDF (функция в разработке)');
+        }
+    </script>
+    
+    <!-- ПОДКЛЮЧАЕМ СКРИПТ ПОСЛЕ ВСЕХ ОСНОВНЫХ ФУНКЦИЙ -->
+    <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
 </body>
 
 </html>

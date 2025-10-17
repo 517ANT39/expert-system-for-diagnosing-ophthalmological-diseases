@@ -53,16 +53,33 @@ async function loginDoctor(formData) {
 // Функция для загрузки данных профиля
 async function loadProfileData() {
     try {
-        const response = await fetch('/api/profile');
+        console.log('Loading profile data from:', '/api/profile');
+        const response = await fetch('/api/profile', {
+            credentials: 'same-origin' // Важно для отправки сессии
+        });
+        
+        if (response.status === 401) {
+            console.log('User not authenticated, redirecting to login');
+            window.location.href = '/login';
+            return;
+        }
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
         const result = await response.json();
+        console.log('Profile response:', result);
 
         if (result.success) {
             const doctor = result.doctor;
+            console.log('Doctor data loaded:', doctor);
             
             // Обновляем данные в навигации
             const userNameElements = document.querySelectorAll('.user-name');
             userNameElements.forEach(element => {
                 element.textContent = `${doctor.first_name} ${doctor.last_name}`;
+                console.log('Updated user name to:', `${doctor.first_name} ${doctor.last_name}`);
             });
             
             // Обновляем данные профиля
@@ -89,10 +106,12 @@ async function loadProfileData() {
             });
             
         } else {
+            console.error('Profile load failed:', result.message);
             showNotification('Ошибка загрузки профиля', 'error');
         }
     } catch (error) {
         console.error('Ошибка загрузки профиля:', error);
+        // Не показываем уведомление об ошибке, чтобы не мешать пользователю
     }
 }
 
@@ -101,8 +120,17 @@ function showNotification(message, type = 'info') {
     alert(`${type.toUpperCase()}: ${message}`);
 }
 
+// Проверяем, является ли страница защищенной (требует авторизации)
+function isProtectedPage() {
+    // Исключаем публичные страницы
+    const publicPages = ['/', '/login', '/registration'];
+    return !publicPages.includes(window.location.pathname);
+}
+
 // Обработчики для форм
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded, current path:', window.location.pathname);
+    
     // Регистрация
     const registerForm = document.querySelector('.login-form');
     if (registerForm && window.location.pathname === '/registration') {
@@ -138,11 +166,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Загружаем данные профиля для защищенных страниц
-    if (window.location.pathname === '/profile' || 
-        window.location.pathname === '/dashboard' ||
-        window.location.pathname === '/patient' ||
-        window.location.pathname === '/consultation') {
+    // Загружаем данные профиля для ВСЕХ защищенных страниц
+    if (isProtectedPage()) {
+        console.log('Protected page detected, loading profile data...');
         loadProfileData();
     }
 });

@@ -22,8 +22,8 @@
                     <a href="{{ url_for('patient_list') }}" class="nav-link active">Пациенты</a>
                     <a href="{{ url_for('consultation') }}" class="nav-link">Консультации</a>
                     <div class="user-menu">
-                        <a href="{{ url_for('profile') }}" class="user-name">Доктор Иванов</a>
-                        <a href="{{ url_for('login') }}" class="btn btn-sm btn-secondary">Выйти</a>
+                        <a href="{{ url_for('profile') }}" class="user-name" id="userName">Загрузка...</a>
+                        <a href="{{ url_for('logout') }}" class="btn btn-sm btn-secondary">Выйти</a>
                     </div>
                 </div>
             </div>
@@ -213,5 +213,6 @@
             console.log('Searching patients...');
         }
     </script>
+    <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
 </body>
 </html>
