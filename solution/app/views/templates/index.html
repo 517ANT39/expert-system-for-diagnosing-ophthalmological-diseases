@@ -19,7 +19,17 @@
                     <div class="nav-links">
                         <a href="#features" class="nav-link">Возможности</a>
                         <a href="#about" class="nav-link">О системе</a>
-                        <a href="{{ url_for('login') }}" class="btn btn-primary">Войти в систему</a>
+                        {% if logged_in %}
+                            <!-- Для авторизованных пользователей -->
+                            <div class="user-menu">
+                                <a href="{{ url_for('profile') }}" class="btn btn-primary">
+                                    👨‍⚕️ {{ doctor_name }}
+                                </a>
+                            </div>
+                        {% else %}
+                            <!-- Для неавторизованных пользователей -->
+                            <a href="{{ url_for('login') }}" class="btn btn-primary">Войти в систему</a>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -34,8 +44,13 @@
                         Оказывайте качественную помощь даже в условиях ограниченного диагностического оборудования.
                     </p>
                     <div class="hero-actions">
-                        <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg">Начать работу</a>
-                        <a href="#features" class="btn btn-secondary btn-lg">Узнать больше</a>
+                        {% if logged_in %}
+                            <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg">Перейти в панель управления</a>
+                            <a href="{{ url_for('consultation') }}" class="btn btn-secondary btn-lg">Новая консультация</a>
+                        {% else %}
+                            <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg">Начать работу</a>
+                            <a href="#features" class="btn btn-secondary btn-lg">Узнать больше</a>
+                        {% endif %}
                     </div>
                 </div>
                 <div class="hero-image">
@@ -150,7 +165,11 @@
             <div class="cta-content">
                 <h2>Готовы начать работу?</h2>
                 <p>Присоединяйтесь к сообществу врачей, использующих современные технологии для улучшения качества медицинской помощи</p>
-                <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg">Войти в систему</a>
+                {% if logged_in %}
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg">Перейти в панель управления</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg">Войти в систему</a>
+                {% endif %}
             </div>
         </div>
     </section>

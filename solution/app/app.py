@@ -154,18 +154,22 @@ def api_profile():
 # Основные маршруты с проверкой авторизации
 @app.route('/')
 def index():
-    if session.get('logged_in'):
-        return redirect(url_for('dashboard'))
-    return render_template('index.html')
+    # Главная страница доступна всем - и авторизованным и неавторизованным
+    # Передаем информацию о авторизации в шаблон
+    return render_template('index.html', 
+                         logged_in=session.get('logged_in', False),
+                         doctor_name=session.get('doctor_name'))
 
 @app.route('/login')
 def login():
+    # Если уже авторизован - перенаправляем на dashboard
     if session.get('logged_in'):
         return redirect(url_for('dashboard'))
     return render_template('login.html')
 
 @app.route('/registration')
 def registration():
+    # Если уже авторизован - перенаправляем на dashboard
     if session.get('logged_in'):
         return redirect(url_for('dashboard'))
     return render_template('registration.html')
@@ -188,42 +192,50 @@ def edit_profile():
 @app.route('/logout')
 def logout():
     session.clear()
-    return redirect(url_for('login'))
+    return redirect(url_for('index'))  # После выхода - на главную страницу
 
-# Остальные маршруты остаются без изменений
+# Защищенные маршруты (требуют авторизации)
 @app.route('/consultation')
+@login_required
 def consultation():
     return render_template('consultation/consultation.html')
 
 @app.route('/consultation/result')
+@login_required
 def consultation_result():
     return render_template('consultation/consultation-result.html')
 
 @app.route('/consultation/history')
+@login_required
 def consultation_history():
     return render_template('consultation/consultation-history.html')
 
-# Пациенты
+# Пациенты (требуют авторизации)
 @app.route('/patient')
+@login_required
 def patient_list():
     return render_template('patient/patients.html')
 
 @app.route('/patient/new')
+@login_required
 def patient_new():
     # Передаем текущую дату для ограничения даты рождения
     today = datetime.now().strftime('%Y-%m-%d')
     return render_template('patient/patient-new.html', today=today)
 
 @app.route('/patient/history')
+@login_required
 def patient_history():
     return render_template('patient/patient-history.html')
 
-# Диагностика
+# Диагностика (требуют авторизации)
 @app.route('/diagnosis/questions')
+@login_required
 def diagnosis_questions():
     return render_template('questions.html')
 
 @app.route('/diagnosis/result')
+@login_required
 def diagnosis_result():
     return render_template('diagnosis-result.html')
 
@@ -253,7 +265,7 @@ if __name__ == '__main__':
     print("=== Starting Flask Application ===")
     print(f"Base directory: {base_dir}")
     print(f"Template folder: {template_dir}")
-    print(f"Static folder: {static_dir}")
+    print(f"Static footer: {static_dir}")
     print(f"Templates exist: {os.path.exists(template_dir)}")
     print(f"Static exists: {os.path.exists(static_dir)}")
     print(f"CSS exists: {os.path.exists(os.path.join(static_dir, 'css', 'main.css'))}")

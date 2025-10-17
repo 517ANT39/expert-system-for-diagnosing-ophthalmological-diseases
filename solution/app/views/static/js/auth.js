@@ -57,46 +57,46 @@ async function loadProfileData() {
         const response = await fetch('/api/profile', {
             credentials: 'same-origin' // Важно для отправки сессии
         });
-        
+
         if (response.status === 401) {
             console.log('User not authenticated, redirecting to login');
             window.location.href = '/login';
             return;
         }
-        
+
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-        
+
         const result = await response.json();
         console.log('Profile response:', result);
 
         if (result.success) {
             const doctor = result.doctor;
             console.log('Doctor data loaded:', doctor);
-            
+
             // Обновляем данные в навигации
             const userNameElements = document.querySelectorAll('.user-name');
             userNameElements.forEach(element => {
                 element.textContent = `${doctor.first_name} ${doctor.last_name}`;
                 console.log('Updated user name to:', `${doctor.first_name} ${doctor.last_name}`);
             });
-            
+
             // Обновляем данные профиля
             if (document.getElementById('doctorFullName')) {
-                document.getElementById('doctorFullName').textContent = 
+                document.getElementById('doctorFullName').textContent =
                     `${doctor.last_name} ${doctor.first_name} ${doctor.middle_name || ''}`.trim();
                 document.getElementById('doctorEmail').textContent = doctor.email;
                 document.getElementById('doctorPhone').textContent = doctor.phone || 'Не указан';
-                
+
                 // Форматируем дату регистрации
                 if (doctor.registered_at) {
                     const regDate = new Date(doctor.registered_at);
-                    document.getElementById('doctorRegisteredAt').textContent = 
+                    document.getElementById('doctorRegisteredAt').textContent =
                         regDate.toLocaleDateString('ru-RU');
                 }
             }
-            
+
             // Обновляем приветствие на dashboard
             const welcomeElements = document.querySelectorAll('.text-muted');
             welcomeElements.forEach(element => {
@@ -104,7 +104,7 @@ async function loadProfileData() {
                     element.textContent = `Добро пожаловать, Доктор ${doctor.last_name}`;
                 }
             });
-            
+
         } else {
             console.error('Profile load failed:', result.message);
             showNotification('Ошибка загрузки профиля', 'error');
@@ -128,15 +128,15 @@ function isProtectedPage() {
 }
 
 // Обработчики для форм
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     console.log('DOM loaded, current path:', window.location.pathname);
-    
+
     // Регистрация
     const registerForm = document.querySelector('.login-form');
     if (registerForm && window.location.pathname === '/registration') {
-        registerForm.addEventListener('submit', function(e) {
+        registerForm.addEventListener('submit', function (e) {
             e.preventDefault();
-            
+
             const formData = {
                 last_name: document.getElementById('last_name').value,
                 first_name: document.getElementById('first_name').value,
@@ -146,29 +146,35 @@ document.addEventListener('DOMContentLoaded', function() {
                 password: document.getElementById('password').value,
                 confirm_password: document.getElementById('confirmPassword').value
             };
-            
+
             registerDoctor(formData);
         });
     }
-    
+
     // Авторизация
     const loginForm = document.querySelector('.login-form');
     if (loginForm && window.location.pathname === '/login') {
-        loginForm.addEventListener('submit', function(e) {
+        loginForm.addEventListener('submit', function (e) {
             e.preventDefault();
-            
+
             const formData = {
                 email: document.getElementById('email').value,
                 password: document.getElementById('password').value
             };
-            
+
             loginDoctor(formData);
         });
     }
-    
+
     // Загружаем данные профиля для ВСЕХ защищенных страниц
     if (isProtectedPage()) {
         console.log('Protected page detected, loading profile data...');
         loadProfileData();
+    }
+    // Проверяем, является ли страница защищенной (требует авторизации)
+    function isProtectedPage() {
+        // Публичные страницы (доступны без авторизации)
+        const publicPages = ['/', '/login', '/registration'];
+        return !publicPages.includes(window.location.pathname);
     }
 });
