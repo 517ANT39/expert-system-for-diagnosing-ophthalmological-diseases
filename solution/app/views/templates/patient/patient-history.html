@@ -80,9 +80,8 @@
                     <a href="{{ url_for('consultation', patient_id=patient.id) }}" class="btn btn-primary">
                         🆕 Новая консультация
                     </a>
-                    <a href="{{ url_for('patient_new') }}?edit={{ patient.id }}" class="btn btn-secondary">
-                        ✏️ Редактировать
-                    </a>
+                    <!-- ИСПРАВЛЕННАЯ ССЫЛКА - добавлен вызов функции edit_patient -->
+                    <a href="{{ url_for('edit_patient', patient_id=patient.id) }}" class="btn btn-sm btn-primary">✏️ Редактировать</a>
                 </div>
             </div>
         </div>

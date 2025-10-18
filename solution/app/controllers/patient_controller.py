@@ -341,7 +341,12 @@ def patient_controller(app):
                     'sex': patient.sex.value,
                     'phone': patient.phone,
                     'email': patient.email,
-                    'address': patient.address
+                    'address': patient.address,
+                    'allergies': patient.allergies,
+                    'chronic_diseases': patient.chronic_diseases,
+                    'current_medications': patient.current_medications,
+                    'family_anamnes': patient.family_anamnes,
+                    'notes': patient.notes
                 }
             }), 200
             
@@ -358,3 +363,28 @@ def patient_controller(app):
         finally:
             if db_session:
                 db_session.close()
+
+    @app.route('/patient/<int:patient_id>/edit')
+    @login_required
+    def edit_patient(patient_id):
+        """Страница редактирования пациента"""
+        db_session = None
+        try:
+            db_session = get_db_session()
+            
+            # Получаем данные пациента
+            patient = db_session.query(Patient).filter(Patient.id == patient_id).first()
+            if not patient:
+                db_session.close()
+                return "Пациент не найден", 404
+            
+            db_session.close()
+            
+            # Рендерим шаблон редактирования пациента
+            return render_template('patient/edit-patient.html', patient=patient)
+            
+        except Exception as e:
+            print(f"Ошибка при загрузке страницы редактирования пациента: {str(e)}")
+            if db_session:
+                db_session.close()
+            return "Ошибка при загрузке страницы", 500
