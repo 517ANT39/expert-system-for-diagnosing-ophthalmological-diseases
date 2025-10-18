@@ -1,8 +1,19 @@
 from flask import Flask, render_template, session, redirect, url_for, request, jsonify
 import os
+import sys
 from datetime import datetime
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+
+# Добавляем путь к корню проекта в sys.path
+current_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.join(current_dir, '..', '..')
+sys.path.insert(0, project_root)
+
+# Абсолютные импорты с полным путем
+from solution.app.models.database_models import Doctor
+from solution.app.controllers.patient_controller import patient_controller
+from solution.app.services.auth_service import AuthService
 
 # В Docker рабочая директория /app, поэтому пути другие
 base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -25,11 +36,6 @@ app.config['SESSION_TYPE'] = 'filesystem'
 database_url = os.getenv("DATABASE_URL", "postgresql://admin:password@db:5432/ophthalmology_db")
 engine = create_engine(database_url)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-# Импортируем AuthService после определения путей
-import sys
-sys.path.append(os.path.join(base_dir))
-from services.auth_service import AuthService
 
 def login_required(f):
     """Декоратор для проверки авторизации"""
@@ -174,6 +180,9 @@ def registration():
         return redirect(url_for('dashboard'))
     return render_template('registration.html')
 
+# Регистрируем контроллер пациентов
+patient_controller(app)
+
 @app.route('/dashboard')
 @login_required
 def dashboard():
@@ -292,6 +301,7 @@ def api_change_password():
             }), 400
         
         # Хешируем и сохраняем новый пароль
+        import bcrypt
         hashed_password = bcrypt.hashpw(
             data['new_password'].encode('utf-8'), 
             bcrypt.gensalt()
@@ -356,12 +366,12 @@ def patient_history():
 @app.route('/diagnosis/questions')
 @login_required
 def diagnosis_questions():
-    return render_template('questions.html')
+    return render_template('diagnosis/questions.html')
 
 @app.route('/diagnosis/result')
 @login_required
 def diagnosis_result():
-    return render_template('diagnosis-result.html')
+    return render_template('diagnosis/result.html')
 
 @app.route('/health')
 def health():
