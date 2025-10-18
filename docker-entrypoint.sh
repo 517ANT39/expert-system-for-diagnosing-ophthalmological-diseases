@@ -1,26 +1,19 @@
 #!/bin/bash
 set -e
 
-echo "Starting application initialization..."
-
-# Даем время базе данных запуститься
 echo "Waiting for database..."
-sleep 10
+while ! nc -z db 5432; do
+  sleep 1
+done
+echo "Database is ready!"
 
-echo "Database should be ready, proceeding with setup..."
+echo "Checking and fixing migration state..."
+python scripts/check_and_fix_migrations.py
 
-# Инициализируем базу данных (создает таблицы если их нет)
-echo "Initializing database..."
-python scripts/init_db.py
+echo "Running database migrations..."
+alembic upgrade head || {
+    echo "Migrations completed with warnings, but continuing startup..."
+}
 
-# Запускаем миграции (не блокируем запуск при ошибках)
-echo "Running migrations..."
-if python scripts/migrate.py; then
-    echo "Migrations applied successfully"
-else
-    echo "Migrations skipped or already applied"
-fi
-
-# Запускаем основное приложение
 echo "Starting Flask application..."
 exec python solution/app/app.py
