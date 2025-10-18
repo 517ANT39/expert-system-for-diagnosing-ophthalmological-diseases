@@ -48,8 +48,17 @@ class PatientService:
         if patient_data.get('phone') and not self._validate_phone(patient_data['phone']):
             raise ValueError("Некорректный формат телефона")
 
+        # Проверка на существующего пациента по email
+        if patient_data.get('email') and self._patient_exists_by_email(patient_data['email']):
+            raise ValueError("Пациент с таким email уже существует в системе")
+
         # Создаем пациента
         return self.patient_repository.create_patient(patient_data)
+
+    def _patient_exists_by_email(self, email: str) -> bool:
+        """Проверка существования пациента по email"""
+        existing_patients = self.patient_repository.search_patients_by_email(email)
+        return len(existing_patients) > 0
 
     def get_patient(self, patient_id: int):
         """Получение пациента по ID"""

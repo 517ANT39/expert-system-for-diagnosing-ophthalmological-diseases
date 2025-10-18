@@ -200,7 +200,7 @@ class PatientForm {
 
             // Redirect to patients list
             setTimeout(() => {
-                window.location.href = 'patients.html';
+                window.location.href = 'patient/patients.html';
             }, 1500);
 
         } catch (error) {

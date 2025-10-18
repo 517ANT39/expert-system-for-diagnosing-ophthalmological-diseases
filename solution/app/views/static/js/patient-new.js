@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (result.success) {
                 alert('Пациент успешно сохранен!');
-                window.location.href = '/patient'; // Перенаправляем к списку пациентов
+                window.location.href = '/patients'; // Перенаправляем к списку пациентов
             } else {
                 alert('Ошибка при сохранении: ' + result.message);
             }

@@ -8,6 +8,10 @@ class PatientRepository:
     def __init__(self, db_session: Session):
         self.db_session = db_session
 
+    def search_patients_by_email(self, email: str):
+        """Поиск пациентов по email"""
+        return self.db_session.query(Patient).filter(Patient.email == email).all()
+
     def create_patient(self, patient_data: dict):
         """Создание нового пациента"""
         try:
