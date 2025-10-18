@@ -31,6 +31,26 @@ class PatientRepository:
     def get_patient_by_id(self, patient_id: int):
         """Получение пациента по ID"""
         return self.db_session.query(Patient).filter(Patient.id == patient_id).first()
+    
+    def get_all_patients(self):
+        """Получение всех пациентов из базы данных"""
+        return self.db_session.query(Patient).all()
+    
+    def search_patients(self, search_term: str = None):
+        """Поиск пациентов по ФИО"""
+        query = self.db_session.query(Patient)
+        
+        if search_term:
+            search_pattern = f"%{search_term}%"
+            query = query.filter(
+                (Patient.last_name.ilike(search_pattern)) |
+                (Patient.first_name.ilike(search_pattern)) |
+                (Patient.middle_name.ilike(search_pattern)) |
+                (Patient.phone.ilike(search_pattern)) |
+                (Patient.email.ilike(search_pattern))
+            )
+        
+        return query.all()
 
     def get_patients_by_doctor(self, doctor_id: int):
         """Получение всех пациентов врача (через консультации)"""

@@ -1,4 +1,4 @@
-from flask import request, jsonify, session
+from flask import request, jsonify, session, render_template
 from functools import wraps
 import os
 import sys
@@ -45,6 +45,79 @@ def _calculate_age(birthdate):
 def patient_controller(app):
     """Регистрация маршрутов для работы с пациентами"""
     
+    # HTML маршрут для страницы пациентов
+    @app.route('/patients')
+    @login_required
+    def patient_list():
+        """Страница списка пациентов"""
+        try:
+            db_session = get_db_session()
+            patient_service = PatientService(db_session)
+            
+            # Получаем всех пациентов напрямую из таблицы patients
+            patients = patient_service.get_all_patients()
+            
+            # Добавляем возраст для отображения
+            for patient in patients:
+                if patient.birthday:
+                    patient.age = _calculate_age(patient.birthday)
+                else:
+                    patient.age = None
+            
+            db_session.close()
+            
+            return render_template('patient/patients.html', patients=patients)
+            
+        except Exception as e:
+            print(f"Ошибка при загрузке списка пациентов: {str(e)}")
+            # В случае ошибки показываем пустой список
+            return render_template('patient/patients.html', patients=[])
+    
+    # API маршрут для поиска пациентов
+    @app.route('/api/patients/search')
+    @login_required
+    def api_search_patients():
+        """Поиск пациентов через API"""
+        db_session = None
+        try:
+            db_session = get_db_session()
+            patient_service = PatientService(db_session)
+            
+            search_term = request.args.get('term', '')
+            patients = patient_service.search_patients(search_term)
+            
+            # Форматируем ответ
+            patients_data = []
+            for patient in patients:
+                patients_data.append({
+                    'id': patient.id,
+                    'last_name': patient.last_name,
+                    'first_name': patient.first_name,
+                    'middle_name': patient.middle_name,
+                    'birthday': patient.birthday.isoformat() if patient.birthday else None,
+                    'sex': patient.sex.value,
+                    'phone': patient.phone,
+                    'email': patient.email,
+                    'age': _calculate_age(patient.birthday) if patient.birthday else None,
+                    'registered_at': patient.registered_at.isoformat() if patient.registered_at else None
+                })
+            
+            return jsonify({
+                'success': True,
+                'patients': patients_data,
+                'total': len(patients_data)
+            }), 200
+            
+        except Exception as e:
+            return jsonify({
+                'success': False,
+                'message': f'Ошибка при поиске пациентов: {str(e)}'
+            }), 500
+        finally:
+            if db_session:
+                db_session.close()
+    
+    # Остальные API маршруты остаются без изменений
     @app.route('/api/patients', methods=['POST'])
     @login_required
     def api_create_patient():

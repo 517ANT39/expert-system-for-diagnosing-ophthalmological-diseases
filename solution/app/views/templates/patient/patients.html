@@ -81,12 +81,13 @@
                 <div class="patients-header-content">
                     <h2>Список пациентов</h2>
                     <div class="patient-count text-muted">
-                        Найдено: <span id="patientCount">4</span> пациентов
+                        Найдено: <span id="patientCount">{{ patients|length if patients else 0 }}</span> пациентов
                     </div>
                 </div>
             </div>
             
             <div class="card-content">
+                {% if patients %}
                 <div class="table-responsive">
                     <table class="table" id="patientsTable">
                         <thead>
@@ -94,105 +95,46 @@
                                 <th>ID</th>
                                 <th>ФИО</th>
                                 <th>Дата рождения</th>
+                                <th>Возраст</th>
                                 <th>Пол</th>
-                                <th>Последняя консультация</th>
-                                <th>Всего консультаций</th>
+                                <th>Телефон</th>
+                                <th>Email</th>
+                                <th>Дата регистрации</th>
                                 <th>Действия</th>
                             </tr>
                         </thead>
                         <tbody>
+                            {% for patient in patients %}
                             <tr>
-                                <td>#001</td>
+                                <td>#{{ patient.id }}</td>
                                 <td>
                                     <div class="patient-info">
-                                        <strong>Петров Иван Сергеевич</strong>
-                                        <span class="text-muted text-sm">ivan.petrov@email.com</span>
+                                        <strong>{{ patient.last_name }} {{ patient.first_name }} {{ patient.middle_name or '' }}</strong>
+                                        {% if patient.email %}
+                                        <span class="text-muted text-sm">{{ patient.email }}</span>
+                                        {% elif patient.phone %}
+                                        <span class="text-muted text-sm">{{ patient.phone }}</span>
+                                        {% endif %}
                                     </div>
                                 </td>
-                                <td>15.03.1985</td>
-                                <td>Мужской</td>
-                                <td>20.01.2024</td>
-                                <td>3</td>
+                                <td>{{ patient.birthday.strftime('%d.%m.%Y') if patient.birthday else 'Не указана' }}</td>
+                                <td>{{ patient.age }} лет</td>
+                                <td>{{ 'Мужской' if patient.sex == 'M' else 'Женский' }}</td>
+                                <td>{{ patient.phone or 'Не указан' }}</td>
+                                <td>{{ patient.email or 'Не указан' }}</td>
+                                <td>{{ patient.registered_at.strftime('%d.%m.%Y') if patient.registered_at else 'Не указана' }}</td>
                                 <td>
                                     <div class="action-buttons">
-                                        <a href="{{ url_for('patient_history') }}" class="btn btn-sm btn-secondary">
+                                        <a href="{{ url_for('patient_history', patient_id=patient.id) }}" class="btn btn-sm btn-secondary">
                                             📋 История
                                         </a>
-                                        <a href="{{ url_for('consultation') }}" class="btn btn-sm btn-primary">
+                                        <a href="{{ url_for('consultation', patient_id=patient.id) }}" class="btn btn-sm btn-primary">
                                             🆕 Консультация
                                         </a>
                                     </div>
                                 </td>
                             </tr>
-                            <tr>
-                                <td>#002</td>
-                                <td>
-                                    <div class="patient-info">
-                                        <strong>Сидорова Мария Петровна</strong>
-                                        <span class="text-muted text-sm">+7 (912) 345-67-89</span>
-                                    </div>
-                                </td>
-                                <td>22.07.1978</td>
-                                <td>Женский</td>
-                                <td>19.01.2024</td>
-                                <td>5</td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <a href="{{ url_for('patient_history') }}" class="btn btn-sm btn-secondary">
-                                            📋 История
-                                        </a>
-                                        <a href="{{ url_for('consultation') }}" class="btn btn-sm btn-primary">
-                                            🆕 Консультация
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>#003</td>
-                                <td>
-                                    <div class="patient-info">
-                                        <strong>Козлов Алексей Владимирович</strong>
-                                        <span class="text-muted text-sm">alex.kozlov@email.com</span>
-                                    </div>
-                                </td>
-                                <td>30.11.1992</td>
-                                <td>Мужской</td>
-                                <td>18.01.2024</td>
-                                <td>2</td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <a href="{{ url_for('patient_history') }}" class="btn btn-sm btn-secondary">
-                                            📋 История
-                                        </a>
-                                        <a href="{{ url_for('consultation') }}" class="btn btn-sm btn-primary">
-                                            🆕 Консультация
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>#004</td>
-                                <td>
-                                    <div class="patient-info">
-                                        <strong>Николаева Екатерина Игоревна</strong>
-                                        <span class="text-muted text-sm">+7 (912) 123-45-67</span>
-                                    </div>
-                                </td>
-                                <td>14.05.1988</td>
-                                <td>Женский</td>
-                                <td>15.01.2024</td>
-                                <td>1</td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <a href="{{ url_for('patient_history') }}" class="btn btn-sm btn-secondary">
-                                            📋 История
-                                        </a>
-                                        <a href="{{ url_for('consultation') }}" class="btn btn-sm btn-primary">
-                                            🆕 Консультация
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
@@ -203,14 +145,96 @@
                     <span class="page-info text-muted">Страница 1 из 1</span>
                     <button class="btn btn-secondary" disabled>Вперед →</button>
                 </div>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-state-icon">👥</div>
+                    <h3>Список пациентов пуст</h3>
+                    <p class="text-muted">В системе пока нет пациентов. Добавьте первого пациента, чтобы начать работу.</p>
+                    <a href="{{ url_for('patient_new') }}" class="btn btn-primary">
+                        👥 Добавить первого пациента
+                    </a>
+                </div>
+                {% endif %}
             </div>
         </div>
     </main>
 
     <script>
         function searchPatients() {
-            // Placeholder for search functionality
-            console.log('Searching patients...');
+            const searchTerm = document.getElementById('patientSearch').value;
+            
+            // AJAX запрос для поиска пациентов
+            fetch(`/api/patients/search?term=${encodeURIComponent(searchTerm)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        updatePatientsTable(data.patients);
+                    } else {
+                        console.error('Ошибка поиска:', data.message);
+                        alert('Ошибка при поиске пациентов');
+                    }
+                })
+                .catch(error => {
+                    console.error('Ошибка:', error);
+                    alert('Ошибка при выполнении поиска');
+                });
+        }
+
+        function updatePatientsTable(patients) {
+            const tbody = document.querySelector('#patientsTable tbody');
+            const patientCount = document.getElementById('patientCount');
+            
+            if (!patients || patients.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="9" class="text-center text-muted">
+                            Пациенты не найдены
+                        </td>
+                    </tr>
+                `;
+                patientCount.textContent = '0';
+                return;
+            }
+            
+            let html = '';
+            patients.forEach(patient => {
+                const fullName = `${patient.last_name} ${patient.first_name} ${patient.middle_name || ''}`;
+                const contactInfo = patient.email || patient.phone;
+                const birthday = patient.birthday ? new Date(patient.birthday).toLocaleDateString('ru-RU') : 'Не указана';
+                const registeredAt = patient.registered_at ? new Date(patient.registered_at).toLocaleDateString('ru-RU') : 'Не указана';
+                const sex = patient.sex === 'M' ? 'Мужской' : 'Женский';
+                
+                html += `
+                    <tr>
+                        <td>#${patient.id}</td>
+                        <td>
+                            <div class="patient-info">
+                                <strong>${fullName}</strong>
+                                ${contactInfo ? `<span class="text-muted text-sm">${contactInfo}</span>` : ''}
+                            </div>
+                        </td>
+                        <td>${birthday}</td>
+                        <td>${patient.age || 'Не указан'} лет</td>
+                        <td>${sex}</td>
+                        <td>${patient.phone || 'Не указан'}</td>
+                        <td>${patient.email || 'Не указан'}</td>
+                        <td>${registeredAt}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <a href="/patient/${patient.id}/history" class="btn btn-sm btn-secondary">
+                                    📋 История
+                                </a>
+                                <a href="/consultation?patient_id=${patient.id}" class="btn btn-sm btn-primary">
+                                    🆕 Консультация
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            tbody.innerHTML = html;
+            patientCount.textContent = patients.length;
         }
     </script>
     <script src="{{ url_for('static', filename='js/auth.js') }}"></script>

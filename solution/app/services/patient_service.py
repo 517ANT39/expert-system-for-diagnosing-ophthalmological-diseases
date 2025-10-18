@@ -58,6 +58,14 @@ class PatientService:
     def get_doctor_patients(self, doctor_id: int):
         """Получение пациентов врача"""
         return self.patient_repository.get_patients_by_doctor(doctor_id)
+    
+    def get_all_patients(self):
+        """Получение всех пациентов"""
+        return self.patient_repository.get_all_patients()
+
+    def search_patients(self, search_term: str = None):
+        """Поиск пациентов"""
+        return self.patient_repository.search_patients(search_term)
 
     def update_patient(self, patient_id: int, patient_data: dict):
         """Обновление данных пациента"""
