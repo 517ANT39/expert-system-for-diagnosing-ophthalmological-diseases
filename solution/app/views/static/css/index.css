@@ -1,0 +1,323 @@
+/* Hero Section */
+.hero {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    color: white;
+    padding: 2rem 0 6rem 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" opacity="0.1"><circle cx="200" cy="200" r="100" fill="white"/><circle cx="700" cy="300" r="150" fill="white"/><circle cx="300" cy="700" r="120" fill="white"/></svg>');
+}
+
+.hero .navbar {
+    background: transparent;
+    box-shadow: none;
+    position: relative;
+    z-index: 2;
+}
+
+.hero .nav-link {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.hero .nav-link:hover {
+    color: white;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.hero-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-2xl);
+    align-items: center;
+    position: relative;
+    z-index: 2;
+}
+
+.hero-text h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: var(--spacing-lg);
+    color: white;
+}
+
+.hero-description {
+    font-size: var(--font-size-lg);
+    line-height: 1.6;
+    margin-bottom: var(--spacing-2xl);
+    opacity: 0.9;
+}
+
+.hero-actions {
+    display: flex;
+    gap: var(--spacing-md);
+    flex-wrap: wrap;
+}
+
+.hero-image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.medical-illustration {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-lg);
+    max-width: 300px;
+}
+
+.illustration-item {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-lg);
+    text-align: center;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: transform 0.3s ease;
+}
+
+.illustration-item:hover {
+    transform: translateY(-5px);
+}
+
+.illustration-item .icon {
+    font-size: 2.5rem;
+    margin-bottom: var(--spacing-sm);
+}
+
+.illustration-item span {
+    color: white;
+    font-weight: 500;
+}
+
+/* Features Section */
+.features-section {
+    padding: 6rem 0;
+    background: var(--surface-color);
+}
+
+.section-title {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: var(--spacing-2xl);
+    color: var(--text-primary);
+}
+
+.feature-card {
+    text-align: center;
+    padding: var(--spacing-xl);
+    background: var(--surface-color);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+    border: 1px solid var(--border-color);
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+}
+
+.feature-icon {
+    font-size: 3rem;
+    margin-bottom: var(--spacing-lg);
+}
+
+.feature-card h3 {
+    margin-bottom: var(--spacing-md);
+    color: var(--text-primary);
+}
+
+.feature-card p {
+    color: var(--text-muted);
+    line-height: 1.6;
+}
+
+/* About Section */
+.about-section {
+    padding: 6rem 0;
+    background: var(--background-color);
+}
+
+.about-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: var(--spacing-2xl);
+    align-items: start;
+}
+
+.about-text h2 {
+    margin-bottom: var(--spacing-lg);
+}
+
+.about-text p {
+    margin-bottom: var(--spacing-lg);
+    line-height: 1.7;
+    color: var(--text-secondary);
+}
+
+.tech-stack {
+    margin-top: var(--spacing-xl);
+}
+
+.tech-item {
+    display: flex;
+    justify-content: space-between;
+    padding: var(--spacing-sm) 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.tech-name {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.tech-value {
+    color: var(--text-muted);
+}
+
+.about-stats {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xl);
+}
+
+.stat {
+    text-align: center;
+    padding: var(--spacing-lg);
+    background: var(--surface-color);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-sm);
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: var(--spacing-sm);
+}
+
+.stat-label {
+    color: var(--text-muted);
+    font-size: var(--font-size-sm);
+}
+
+/* CTA Section */
+.cta-section {
+    padding: 6rem 0;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    color: white;
+    text-align: center;
+}
+
+.cta-content h2 {
+    font-size: 2.5rem;
+    margin-bottom: var(--spacing-lg);
+    color: white;
+}
+
+.cta-content p {
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--spacing-2xl);
+    opacity: 0.9;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Footer */
+.footer {
+    background: var(--text-primary);
+    color: white;
+    padding: 3rem 0 1rem 0;
+}
+
+.footer-content {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: var(--spacing-2xl);
+    margin-bottom: var(--spacing-2xl);
+}
+
+.footer-logo .logo {
+    color: white;
+    margin-bottom: var(--spacing-sm);
+}
+
+.footer-links {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-xl);
+}
+
+.footer-column h4 {
+    margin-bottom: var(--spacing-md);
+    color: white;
+}
+
+.footer-column a {
+    display: block;
+    color: var(--text-muted);
+    text-decoration: none;
+    margin-bottom: var(--spacing-sm);
+    transition: color 0.2s ease;
+}
+
+.footer-column a:hover {
+    color: white;
+}
+
+.footer-bottom {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: var(--spacing-lg);
+    text-align: center;
+    color: var(--text-muted);
+}
+
+/* Responsive */
+@media (max-width: 968px) {
+    .hero-content {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+    
+    .hero-text h1 {
+        font-size: 2.5rem;
+    }
+    
+    .about-content {
+        grid-template-columns: 1fr;
+    }
+    
+    .footer-content {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-text h1 {
+        font-size: 2rem;
+    }
+    
+    .section-title {
+        font-size: 2rem;
+    }
+    
+    .medical-illustration {
+        grid-template-columns: 1fr;
+    }
+    
+    .hero-actions {
+        justify-content: center;
+    }
+}

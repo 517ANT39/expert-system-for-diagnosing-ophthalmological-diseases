@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация - ОфтальмоЭксперт</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+</head>
+<body class="login-page">
+    <!-- Hero Section -->
+    <header class="hero">
+        <nav class="navbar">
+            <div class="container">
+                <div class="navbar-content">
+                    <a href="{{ url_for('index') }}" class="logo logo-link">
+                        <span class="logo-icon">👁️</span>
+                        <span class="logo-text">ОфтальмоЭксперт</span>
+                    </a>
+                    <div class="nav-links">
+                        <a href="#features" class="nav-link">Возможности</a>
+                        <a href="#about" class="nav-link">О системе</a>
+                        <a href="{{ url_for('login') }}" class="btn btn-primary">Вход</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Registration Section -->
+    <section class="login-section">
+        <div class="container">
+            <div class="login-container">
+                <div class="login-card">
+                    <div class="login-header">
+                        <h2>Регистрация врача</h2>
+                        <p class="text-muted">Создайте учетную запись для работы с системой</p>
+                    </div>
+                    
+                    <form class="login-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="last_name" class="form-label">Фамилия врача</label>
+                                <input type="text" id="last_name" class="form-control" placeholder="Введите вашу фамилию" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="first_name" class="form-label">Имя врача</label>
+                                <input type="text" id="first_name" class="form-control" placeholder="Введите ваше имя" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="middle_name" class="form-label">Отчество врача</label>
+                            <input type="text" id="middle_name" class="form-control" placeholder="Введите ваше отчество" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" id="email" class="form-control" placeholder="Введите ваш email" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="phone" class="form-label">Номер телефона</label>
+                            <input type="tel" id="phone" class="form-control" placeholder="Введите ваш номер телефона" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="password" class="form-label">Пароль</label>
+                            <input type="password" id="password" class="form-control" placeholder="Создайте пароль" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="confirmPassword" class="form-label">Подтверждение пароля</label>
+                            <input type="password" id="confirmPassword" class="form-control" placeholder="Повторите пароль" required>
+                        </div>
+
+                        <div class="form-options">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="agreeTerms" required>
+                                <span class="checkmark"></span>
+                                Я согласен с <a href="#" class="link">условиями использования</a>
+                            </label>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-lg w-100">
+                            Зарегистрироваться
+                        </button>
+                    </form>
+
+                    <div class="register-section">
+                        <p class="text-center text-muted">
+                            Уже есть аккаунт? 
+                            <a href="{{ url_for('login') }}" class="register-link">Войти в систему</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <div class="logo">
+                        <span class="logo-icon">👁️</span>
+                        <span class="logo-text">ОфтальмоЭксперт</span>
+                    </div>
+                    <p class="text-muted">Экспертная система поддержки врачебных решений</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h4>Система</h4>
+                        <a href="{{ url_for('login') }}">Вход</a>
+                        <a href="{{ url_for('registration') }}">Регистрация</a>
+                        <a href="{{ url_for('index') }}">Главная</a>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Поддержка</h4>
+                        <a href="#">Документация</a>
+                        <a href="#">Обратная связь</a>
+                        <a href="#">Обучение</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 ОфтальмоЭксперт. Все права защищены.</p>
+            </div>
+        </div>
+    </footer>
+    <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+</body>
+</html>

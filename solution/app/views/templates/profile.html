@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профиль врача - ОфтальмоЭксперт</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
+</head>
+<body class="dashboard-page">
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-content">
+                <a href="{{ url_for('dashboard') }}" class="logo logo-link">
+                    <span class="logo-icon">👁️</span>
+                    <span class="logo-text">ОфтальмоЭксперт</span>
+                </a>
+                <div class="nav-links">
+                    <a href="{{ url_for('dashboard') }}" class="nav-link">Главная</a>
+                    <a href="{{ url_for('patient_list') }}" class="nav-link">Пациенты</a>
+                    <a href="{{ url_for('consultation') }}" class="nav-link">Консультации</a>
+                    <div class="user-menu">
+                        <a href="{{ url_for('profile') }}" class="user-name" id="userName">Загрузка...</a>
+                        <a href="{{ url_for('logout') }}" class="btn btn-sm btn-secondary">Выйти</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container main-content">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="header-content">
+                <h1>Профиль врача</h1>
+                <p class="text-muted">Личная информация и настройки аккаунта</p>
+            </div>
+            <div class="header-actions">
+                <a href="{{ url_for('edit_profile') }}" class="btn btn-primary">
+                    ✏️ Редактировать профиль
+                </a>
+            </div>
+        </div>
+
+        <!-- Profile Info -->
+        <div class="grid grid-2">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Основная информация</h2>
+                </div>
+                <div class="card-content">
+                    <div class="profile-info">
+                        <div class="info-item">
+                            <label>ФИО врача:</label>
+                            <span class="info-value" id="doctorFullName">Загрузка...</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Email:</label>
+                            <span class="info-value" id="doctorEmail">Загрузка...</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Номер телефона:</label>
+                            <span class="info-value" id="doctorPhone">Загрузка...</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Дата регистрации:</label>
+                            <span class="info-value" id="doctorRegisteredAt">Загрузка...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Убран блок "Статистика" с помощью display:none -->
+            <div class="card" style="display:none">
+                <div class="card-header">
+                    <h2>Статистика</h2>
+                </div>
+                <div class="card-content">
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-number">24</div>
+                            <div class="stat-label">Пациентов</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">47</div>
+                            <div class="stat-label">Консультаций</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">89%</div>
+                            <div class="stat-label">Успешных диагнозов</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="card">
+            <div class="card-header">
+                <h2>Последняя активность</h2>
+            </div>
+            <div class="card-content">
+                <div class="activity-list">
+                    <div class="activity-item">
+                        <div class="activity-icon">👁️</div>
+                        <div class="activity-content">
+                            <div class="activity-title">Проведена консультация</div>
+                            <div class="activity-desc">Пациент: Петров Иван Сергеевич</div>
+                            <div class="activity-time">20.01.2024, 14:30</div>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon">👥</div>
+                        <div class="activity-content">
+                            <div class="activity-title">Добавлен новый пациент</div>
+                            <div class="activity-desc">Сидорова Мария Петровна</div>
+                            <div class="activity-time">19.01.2024, 11:15</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+</body>
+</html>

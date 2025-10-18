@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Новый пациент - ОфтальмоЭксперт</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/forms.css') }}">
+</head>
+<body class="dashboard-page">
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-content">
+                <a href="{{ url_for('dashboard') }}" class="logo logo-link">
+                    <span class="logo-icon">👁️</span>
+                    <span class="logo-text">ОфтальмоЭксперт</span>
+                </a>
+                <div class="nav-links">
+                    <a href="{{ url_for('dashboard') }}" class="nav-link">Главная</a>
+                    <a href="{{ url_for('patient_list') }}" class="nav-link active">Пациенты</a>
+                    <a href="{{ url_for('consultation') }}" class="nav-link">Консультации</a>
+                    <div class="user-menu">
+                        <a href="{{ url_for('profile') }}" class="user-name" id="userName">Загрузка...</a>
+                        <a href="{{ url_for('logout') }}" class="btn btn-sm btn-secondary">Выйти</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container main-content">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="header-content">
+                <h1>Новый пациент</h1>
+                <p class="text-muted">Добавление нового пациента в базу данных</p>
+            </div>
+            <div class="header-actions">
+                <a href="{{ url_for('patient_list') }}" class="btn btn-secondary">
+                    ← Назад к списку
+                </a>
+            </div>
+        </div>
+
+        <form id="patientForm" class="patient-form">
+            <!-- Personal Information -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>👤 Персональная информация</h2>
+                </div>
+                <div class="card-content">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="lastName" class="form-label required">Фамилия</label>
+                            <input type="text" id="lastName" class="form-control" required
+                                   placeholder="Введите фамилию">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="firstName" class="form-label required">Имя</label>
+                            <input type="text" id="firstName" class="form-control" required
+                                   placeholder="Введите имя">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="middleName" class="form-label">Отчество</label>
+                            <input type="text" id="middleName" class="form-control"
+                                   placeholder="Введите отчество">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="birthDate" class="form-label required">Дата рождения</label>
+                            <input type="date" id="birthDate" class="form-control" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label required">Пол</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="gender" value="male" required>
+                                    <span class="radio-custom"></span>
+                                    Мужской
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="gender" value="female" required>
+                                    <span class="radio-custom"></span>
+                                    Женский
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Information -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>📞 Контактная информация</h2>
+                </div>
+                <div class="card-content">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="phone" class="form-label">Телефон</label>
+                            <input type="tel" id="phone" class="form-control"
+                                   placeholder="+7 (___) ___-__-__">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" id="email" class="form-control"
+                                   placeholder="email@example.com">
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="address" class="form-label">Адрес</label>
+                            <input type="text" id="address" class="form-control"
+                                   placeholder="Введите адрес проживания">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Medical Information -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>🏥 Медицинская информация</h2>
+                </div>
+                <div class="card-content">
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label for="allergies" class="form-label">Аллергии</label>
+                            <textarea id="allergies" class="form-control" rows="3"
+                                      placeholder="Укажите известные аллергии (лекарства, продукты и т.д.)"></textarea>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="chronicDiseases" class="form-label">Хронические заболевания</label>
+                            <textarea id="chronicDiseases" class="form-control" rows="3"
+                                      placeholder="Укажите хронические заболевания"></textarea>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="currentMedications" class="form-label">Текущие лекарства</label>
+                            <textarea id="currentMedications" class="form-control" rows="3"
+                                      placeholder="Укажите регулярно принимаемые лекарства"></textarea>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="familyHistory" class="form-label">Семейный анамнез</label>
+                            <textarea id="familyHistory" class="form-control" rows="3"
+                                      placeholder="Укажите наследственные заболевания в семье"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Notes -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>📝 Дополнительные примечания</h2>
+                </div>
+                <div class="card-content">
+                    <div class="form-group">
+                        <label for="notes" class="form-label">Примечания</label>
+                        <textarea id="notes" class="form-control" rows="4"
+                                  placeholder="Дополнительная информация о пациенте..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="window.history.back()">
+                    Отмена
+                </button>
+                <button type="button" class="btn btn-secondary" id="saveDraftBtn">
+                    💾 Сохранить черновик
+                </button>
+                <button type="submit" class="btn btn-primary">
+                    ✅ Сохранить пациента
+                </button>
+            </div>
+        </form>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/patient-form.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/patient-new.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+</body>
+</html>

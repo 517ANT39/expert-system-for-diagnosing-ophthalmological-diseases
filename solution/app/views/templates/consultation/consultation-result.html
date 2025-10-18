@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Результаты консультации - ОфтальмоЭксперт</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/consultation.css') }}">
+</head>
+
+<body class="dashboard-page">
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-content">
+                <a href="{{ url_for('dashboard') }}" class="logo logo-link">
+                    <span class="logo-icon">👁️</span>
+                    <span class="logo-text">ОфтальмоЭксперт</span>
+                </a>
+                <div class="nav-links">
+                    <a href="{{ url_for('dashboard') }}" class="nav-link">Главная</a>
+                    <a href="{{ url_for('patient_list') }}" class="nav-link">Пациенты</a>
+                    <a href="{{ url_for('consultation') }}" class="nav-link active">Консультации</a>
+                    <div class="user-menu">
+                        <a href="{{ url_for('profile') }}" class="user-name" id="userName">Загрузка...</a>
+                        <a href="{{ url_for('logout') }}" class="btn btn-sm btn-secondary">Выйти</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container main-content">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="header-content">
+                <h1>Результаты диагностики</h1>
+                <p class="text-muted">Консультация от 20.01.2024</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-primary" onclick="exportToPDF()">
+                    📄 Экспорт в PDF
+                </button>
+            </div>
+        </div>
+
+        <!-- Patient Info -->
+        <div class="card patient-info-card">
+            <div class="card-header">
+                <h3>Информация о пациенте</h3>
+            </div>
+            <div class="card-content">
+                <div class="patient-details">
+                    <div class="detail-item">
+                        <strong>ФИО:</strong> Петров Иван Сергеевич
+                    </div>
+                    <div class="detail-item">
+                        <strong>Дата рождения:</strong> 15.03.1985
+                    </div>
+                    <div class="detail-item">
+                        <strong>Пол:</strong> Мужской
+                    </div>
+                    <div class="detail-item">
+                        <strong>Дата консультации:</strong> 20.01.2024 14:30
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Diagnosis Result -->
+        <div class="card diagnosis-card">
+            <div class="card-header">
+                <div class="diagnosis-header">
+                    <h2>🎯 Вероятный диагноз</h2>
+                    <div class="confidence-badge">
+                        Уверенность: 85%
+                    </div>
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="primary-diagnosis">
+                    <h3>Острый конъюнктивит</h3>
+                    <p class="diagnosis-description">
+                        Воспаление конъюнктивы - слизистой оболочки, покрывающей
+                        внутреннюю поверхность век и переднюю поверхность глазного яблока.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Explanation -->
+        <div class="card explanation-card">
+            <div class="card-header">
+                <h3>Объяснение диагноза</h3>
+            </div>
+            <div class="card-content">
+                <div class="explanation-content">
+                    <p class="text-muted">
+                        Диагноз основан на следующих выявленных симптомах:
+                    </p>
+                    <ul class="symptoms-evidence">
+                        <li class="evidence-positive">✅ Покраснение глаза</li>
+                        <li class="evidence-positive">✅ Слезотечение</li>
+                        <li class="evidence-positive">✅ Боль в глазу</li>
+                        <li class="evidence-negative">❌ Отсутствие светобоязни</li>
+                        <li class="evidence-negative">❌ Отсутствие выделений</li>
+                    </ul>
+                    <p class="reasoning-text">
+                        Сочетание боли, покраснения и слезотечения при отсутствии светобоязни
+                        и гнойных выделений характерно для острой формы конъюнктивита.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recommendations -->
+        <div class="card recommendations-card">
+            <div class="card-header">
+                <h3>Рекомендации</h3>
+            </div>
+            <div class="card-content">
+                <div class="recommendations-content">
+                    <div class="recommendation-category">
+                        <h4>💊 Медикаментозное лечение</h4>
+                        <ul>
+                            <li>Антибактериальные капли: Ципрофлоксацин 0.3% - по 1-2 капли 4 раза в день</li>
+                            <li>Противовоспалительные капли: Диклофенак 0.1% - по 1 капле 3 раза в день</li>
+                        </ul>
+                    </div>
+
+                    <div class="recommendation-category">
+                        <h4>📋 Общие рекомендации</h4>
+                        <ul>
+                            <li>Избегать трения глаз</li>
+                            <li>Частое мытье рук</li>
+                            <li>Использование отдельного полотенца</li>
+                            <li>Отказ от контактных линз на период лечения</li>
+                        </ul>
+                    </div>
+
+                    <div class="recommendation-category">
+                        <h4>📅 Наблюдение</h4>
+                        <ul>
+                            <li>Повторный осмотр через 3 дня</li>
+                            <li>Обратиться немедленно при ухудшении состояния</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Differential Diagnosis -->
+        <div class="card differential-card">
+            <div class="card-header">
+                <h3>Дифференциальный диагноз</h3>
+            </div>
+            <div class="card-content">
+                <div class="differential-list">
+                    <div class="differential-item">
+                        <strong>Кератит</strong>
+                        <span class="probability">25%</span>
+                        <p class="diff-reason">Менее вероятен из-за отсутствия светобоязни</p>
+                    </div>
+                    <div class="differential-item">
+                        <strong>Иридоциклит</strong>
+                        <span class="probability">15%</span>
+                        <p class="diff-reason">Исключен из-за нормальной реакции зрачка</p>
+                    </div>
+                    <div class="differential-item">
+                        <strong>Синдром сухого глаза</strong>
+                        <span class="probability">10%</span>
+                        <p class="diff-reason">Менее вероятен из-за наличия слезотечения</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Doctor's Notes -->
+        <div class="card notes-card">
+            <div class="card-header">
+                <h3>Заключение врача</h3>
+            </div>
+            <div class="card-content">
+                <form class="doctor-notes-form">
+                    <div class="form-group">
+                        <label for="finalDiagnosis" class="form-label">Окончательный диагноз</label>
+                        <input type="text" id="finalDiagnosis" class="form-control" value="Острый конъюнктивит"
+                            placeholder="Введите окончательный диагноз">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="doctorNotes" class="form-label">Примечания и назначения</label>
+                        <textarea id="doctorNotes" class="form-control" rows="4"
+                            placeholder="Дополнительные примечания и назначения...">
+Назначены антибактериальные капли. Рекомендован осмотр через 3 дня. Выдан больничный лист на 5 дней.
+                        </textarea>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="saveDraft()">
+                            💾 Сохранить черновик
+                        </button>
+                        <button type="submit" class="btn btn-primary" onclick="completeConsultation()">
+                            ✅ Завершить консультацию
+                        </button>
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+                            ← Назад в панель управления
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function completeConsultation(event) {
+            if (event) {
+                event.preventDefault();
+            }
+            // Здесь может быть логика сохранения данных
+            window.location.href = "{{ url_for('dashboard') }}";
+        }
+
+        function saveDraft() {
+            // Логика сохранения черновика
+            alert('Черновик сохранен');
+        }
+
+        function exportToPDF() {
+            // Логика экспорта в PDF
+            alert('Экспорт в PDF (функция в разработке)');
+        }
+    </script>
+    
+    <!-- ПОДКЛЮЧАЕМ СКРИПТ ПОСЛЕ ВСЕХ ОСНОВНЫХ ФУНКЦИЙ -->
+    <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+</body>
+
+</html>

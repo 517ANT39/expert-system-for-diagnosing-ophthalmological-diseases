@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Редактирование пациента - ОфтальмоЭксперт</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
+</head>
+
+<body class="dashboard-page">
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-content">
+                <a href="{{ url_for('dashboard') }}" class="logo logo-link">
+                    <span class="logo-icon">👁️</span>
+                    <span class="logo-text">ОфтальмоЭксперт</span>
+                </a>
+                <div class="nav-links">
+                    <a href="{{ url_for('dashboard') }}" class="nav-link">Главная</a>
+                    <a href="{{ url_for('patient_list') }}" class="nav-link">Пациенты</a>
+                    <a href="{{ url_for('consultation') }}" class="nav-link">Консультации</a>
+                    <div class="user-menu">
+                        <a href="{{ url_for('profile') }}" class="user-name" id="userName">Загрузка...</a>
+                        <a href="{{ url_for('logout') }}" class="btn btn-sm btn-secondary">Выйти</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container main-content">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="header-content">
+                <h1>Редактирование пациента</h1>
+                <p class="text-muted">Обновите информацию о пациенте</p>
+            </div>
+            <div class="header-actions">
+                <a href="{{ url_for('patient_list') }}" class="btn btn-secondary">
+                    ← Назад к списку пациентов
+                </a>
+            </div>
+        </div>
+
+        <!-- Edit Form -->
+        <div class="card">
+            <div class="card-header">
+                <h2>Личная информация пациента</h2>
+            </div>
+            <div class="card-content">
+                <form class="profile-form" id="patientForm">
+                    <div class="grid grid-2">
+                        <div class="form-group">
+                            <label for="lastName" class="form-label">Фамилия *</label>
+                            <input type="text" id="lastName" class="form-control" placeholder="Введите фамилию" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="firstName" class="form-label">Имя *</label>
+                            <input type="text" id="firstName" class="form-control" placeholder="Введите имя" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="middleName" class="form-label">Отчество</label>
+                            <input type="text" id="middleName" class="form-control" placeholder="Введите отчество">
+                        </div>
+                        <div class="form-group">
+                            <label for="birthday" class="form-label">Дата рождения *</label>
+                            <input type="date" id="birthday" class="form-control" required>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-2">
+                        <div class="form-group">
+                            <label for="sex" class="form-label">Пол *</label>
+                            <select id="sex" class="form-control" required>
+                                <option value="">Выберите пол</option>
+                                <option value="M">Мужской</option>
+                                <option value="F">Женский</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone" class="form-label">Телефон</label>
+                            <input type="tel" id="phone" class="form-control" placeholder="+7 (XXX) XXX-XX-XX">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" id="email" class="form-control" placeholder="email@example.com">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="address" class="form-label">Адрес</label>
+                        <textarea id="address" class="form-control" placeholder="Введите адрес проживания" rows="3"></textarea>
+                    </div>
+                    
+                    <!-- Медицинская информация -->
+                    <div class="grid grid-2">
+                        <div class="form-group">
+                            <label for="allergies" class="form-label">Аллергии</label>
+                            <textarea id="allergies" class="form-control" placeholder="Укажите аллергии пациента" rows="3"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="chronic_diseases" class="form-label">Хронические заболевания</label>
+                            <textarea id="chronic_diseases" class="form-control" placeholder="Укажите хронические заболевания" rows="3"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-2">
+                        <div class="form-group">
+                            <label for="current_medications" class="form-label">Текущие лекарства</label>
+                            <textarea id="current_medications" class="form-control" placeholder="Укажите принимаемые лекарства" rows="3"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="family_anamnes" class="form-label">Семейный анамнез</label>
+                            <textarea id="family_anamnes" class="form-control" placeholder="Укажите семейный анамнез" rows="3"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="notes" class="form-label">Примечания</label>
+                        <textarea id="notes" class="form-control" placeholder="Дополнительные примечания о пациенте" rows="4"></textarea>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="window.location.href='{{ url_for("patient_list") }}'">
+                            Отмена
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            💾 Сохранить изменения
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+    <script>
+        // Получаем ID пациента из пути URL
+        function getPatientIdFromPath() {
+            const pathSegments = window.location.pathname.split('/');
+            // Путь: /patient/1/edit, поэтому patient_id будет на позиции 2
+            for (let i = 0; i < pathSegments.length; i++) {
+                if (pathSegments[i] === 'patient' && i + 1 < pathSegments.length) {
+                    const patientId = parseInt(pathSegments[i + 1]);
+                    if (!isNaN(patientId)) {
+                        return patientId;
+                    }
+                }
+            }
+            return null;
+        }
+
+        // Функция для загрузки данных пациента в форму
+        async function loadPatientDataToForm() {
+            const patientId = getPatientIdFromPath();
+            
+            if (!patientId) {
+                alert('ID пациента не найден в URL');
+                window.location.href = "{{ url_for('patient_list') }}";
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/patients/${patientId}`);
+                const result = await response.json();
+
+                if (result.success) {
+                    const patient = result.patient;
+                    
+                    // Заполняем форму данными пациента
+                    document.getElementById('lastName').value = patient.last_name || '';
+                    document.getElementById('firstName').value = patient.first_name || '';
+                    document.getElementById('middleName').value = patient.middle_name || '';
+                    document.getElementById('birthday').value = patient.birthday || '';
+                    document.getElementById('sex').value = patient.sex || '';
+                    document.getElementById('phone').value = patient.phone || '';
+                    document.getElementById('email').value = patient.email || '';
+                    document.getElementById('address').value = patient.address || '';
+                    document.getElementById('allergies').value = patient.allergies || '';
+                    document.getElementById('chronic_diseases').value = patient.chronic_diseases || '';
+                    document.getElementById('current_medications').value = patient.current_medications || '';
+                    document.getElementById('family_anamnes').value = patient.family_anamnes || '';
+                    document.getElementById('notes').value = patient.notes || '';
+                } else {
+                    console.error('Ошибка загрузки данных пациента:', result.message);
+                    alert('Ошибка загрузки данных пациента: ' + result.message);
+                    window.location.href = "{{ url_for('patient_list') }}";
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки данных пациента:', error);
+                alert('Ошибка загрузки данных пациента');
+                window.location.href = "{{ url_for('patient_list') }}";
+            }
+        }
+
+        // Обработка формы редактирования пациента
+        document.getElementById('patientForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            
+            const patientId = getPatientIdFromPath();
+            
+            if (!patientId) {
+                alert('ID пациента не найден');
+                return;
+            }
+            
+            const formData = {
+                last_name: document.getElementById('lastName').value,
+                first_name: document.getElementById('firstName').value,
+                middle_name: document.getElementById('middleName').value,
+                birthday: document.getElementById('birthday').value,
+                sex: document.getElementById('sex').value,
+                phone: document.getElementById('phone').value,
+                email: document.getElementById('email').value,
+                address: document.getElementById('address').value,
+                allergies: document.getElementById('allergies').value,
+                chronic_diseases: document.getElementById('chronic_diseases').value,
+                current_medications: document.getElementById('current_medications').value,
+                family_anamnes: document.getElementById('family_anamnes').value,
+                notes: document.getElementById('notes').value
+            };
+
+            try {
+                const response = await fetch(`/api/patients/${patientId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert('Изменения успешно сохранены!');
+                    window.location.href = "{{ url_for('patient_list') }}";
+                } else {
+                    alert('Ошибка сохранения: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Ошибка сохранения:', error);
+                alert('Ошибка сохранения данных');
+            }
+        });
+
+        // Загружаем данные пациента при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            loadPatientDataToForm();
+        });
+    </script>
+</body>
+
+</html>

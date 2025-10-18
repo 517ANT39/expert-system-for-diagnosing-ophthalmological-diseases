@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ОфтальмоЭксперт - Экспертная система диагностики</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body>
+    <!-- Hero Section -->
+    <header class="hero">
+        <nav class="navbar">
+            <div class="container">
+                <div class="navbar-content">
+                    <a href="{{ url_for('index') }}" class="logo logo-link">
+                        <span class="logo-icon">👁️</span>
+                        <span class="logo-text">ОфтальмоЭксперт</span>
+                    </a>
+                    <div class="nav-links">
+                        <a href="#features" class="nav-link">Возможности</a>
+                        <a href="#about" class="nav-link">О системе</a>
+                        {% if logged_in %}
+                            <!-- Для авторизованных пользователей -->
+                            <div class="user-menu">
+                                <a href="{{ url_for('profile') }}" class="btn btn-primary">
+                                    👨‍⚕️ {{ doctor_name }}
+                                </a>
+                            </div>
+                        {% else %}
+                            <!-- Для неавторизованных пользователей -->
+                            <a href="{{ url_for('login') }}" class="btn btn-primary">Войти в систему</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1>Экспертная система поддержки врачебных решений в офтальмологии</h1>
+                    <p class="hero-description">
+                        Интеллектуальная платформа для начинающих врачей-офтальмологов и терапевтов. 
+                        Оказывайте качественную помощь даже в условиях ограниченного диагностического оборудования.
+                    </p>
+                    <div class="hero-actions">
+                        {% if logged_in %}
+                            <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg">Перейти в панель управления</a>
+                            <a href="{{ url_for('consultation') }}" class="btn btn-secondary btn-lg">Новая консультация</a>
+                        {% else %}
+                            <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg">Начать работу</a>
+                            <a href="#features" class="btn btn-secondary btn-lg">Узнать больше</a>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="hero-image">
+                    <div class="medical-illustration">
+                        <div class="illustration-item">
+                            <div class="icon">🔍</div>
+                            <span>Диагностика</span>
+                        </div>
+                        <div class="illustration-item">
+                            <div class="icon">📊</div>
+                            <span>Анализ</span>
+                        </div>
+                        <div class="illustration-item">
+                            <div class="icon">💡</div>
+                            <span>Рекомендации</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Features Section -->
+    <section id="features" class="features-section">
+        <div class="container">
+            <h2 class="section-title">Ключевые возможности</h2>
+            <div class="grid grid-3">
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3>Точная диагностика</h3>
+                    <p>Дифференциальная диагностика на основе графа принятия решений с алгоритмами BFS/DFS</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Быстрый старт</h3>
+                    <p>Интуитивный интерфейс для начинающих врачей без сложного обучения</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📱</div>
+                    <h3>Доступность</h3>
+                    <p>Работа в условиях ограниченного диагностического оборудования</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3>Безопасность</h3>
+                    <p>Надежное хранение данных пациентов и истории консультаций</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📋</div>
+                    <h3>Документирование</h3>
+                    <p>Автоматическое ведение истории болезни и экспорт результатов</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔄</div>
+                    <h3>Обновляемая база</h3>
+                    <p>Регулярное обновление диагностических алгоритмов и знаний</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about-section">
+        <div class="container">
+            <div class="about-content">
+                <div class="about-text">
+                    <h2>О системе</h2>
+                    <p>
+                        <strong>ОфтальмоЭксперт</strong> - это интеллектуальная информационная платформа, 
+                        разработанная для поддержки принятия врачебных решений в области офтальмологии.
+                    </p>
+                    <p>
+                        Система использует современные технологии включая графовую базу данных Neo4j 
+                        для хранения диагностических моделей и реляционную PostgreSQL для учета пациентов.
+                    </p>
+                    <div class="tech-stack">
+                        <div class="tech-item">
+                            <span class="tech-name">Backend:</span>
+                            <span class="tech-value">Flask, Python</span>
+                        </div>
+                        <div class="tech-item">
+                            <span class="tech-name">Базы данных:</span>
+                            <span class="tech-value">PostgreSQL, Neo4j</span>
+                        </div>
+                        <div class="tech-item">
+                            <span class="tech-name">Frontend:</span>
+                            <span class="tech-value">HTML5, CSS3, JavaScript</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="about-stats">
+                    <div class="stat">
+                        <div class="stat-number">50+</div>
+                        <div class="stat-label">Диагностических правил</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">15+</div>
+                        <div class="stat-label">Офтальмологических заболеваний</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">100%</div>
+                        <div class="stat-label">Прозрачность логики</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Готовы начать работу?</h2>
+                <p>Присоединяйтесь к сообществу врачей, использующих современные технологии для улучшения качества медицинской помощи</p>
+                {% if logged_in %}
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg">Перейти в панель управления</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg">Войти в систему</a>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <div class="logo">
+                        <span class="logo-icon">👁️</span>
+                        <span class="logo-text">ОфтальмоЭксперт</span>
+                    </div>
+                    <p class="text-muted">Экспертная система поддержки врачебных решений</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h4>Система</h4>
+                        <a href="{{ url_for('login') }}">Вход</a>
+                        <a href="#features">Возможности</a>
+                        <a href="#about">Технологии</a>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Поддержка</h4>
+                        <a href="#">Документация</a>
+                        <a href="#">Обратная связь</a>
+                        <a href="#">Обучение</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 ОфтальмоЭксперт. Все права защищены.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

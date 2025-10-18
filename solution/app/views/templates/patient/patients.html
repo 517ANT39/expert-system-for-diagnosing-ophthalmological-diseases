@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Пациенты - ОфтальмоЭксперт</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/patients.css') }}">
+</head>
+<body class="dashboard-page">
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-content">
+                <a href="{{ url_for('dashboard') }}" class="logo logo-link">
+                    <span class="logo-icon">👁️</span>
+                    <span class="logo-text">ОфтальмоЭксперт</span>
+                </a>
+                <div class="nav-links">
+                    <a href="{{ url_for('dashboard') }}" class="nav-link">Главная</a>
+                    <a href="{{ url_for('patient_list') }}" class="nav-link active">Пациенты</a>
+                    <a href="{{ url_for('consultation') }}" class="nav-link">Консультации</a>
+                    <div class="user-menu">
+                        <a href="{{ url_for('profile') }}" class="user-name" id="userName">Загрузка...</a>
+                        <a href="{{ url_for('logout') }}" class="btn btn-sm btn-secondary">Выйти</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container main-content">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="header-content">
+                <h1>Управление пациентами</h1>
+                <p class="text-muted">Все пациенты в системе</p>
+            </div>
+            <div class="header-actions">
+                <a href="{{ url_for('patient_new') }}" class="btn btn-primary">
+                    👥 Добавить пациента
+                </a>
+            </div>
+        </div>
+
+        <!-- Search and Filters -->
+        <div class="card">
+            <div class="card-header">
+                <h2>Поиск и фильтры</h2>
+            </div>
+            <div class="card-content">
+                <div class="patients-filters-grid">
+                    <div class="search-box">
+                        <input type="text" id="patientSearch" class="form-control" 
+                               placeholder="Поиск по ФИО, ID или диагнозу...">
+                        <button class="btn btn-primary" onclick="searchPatients()">
+                            🔍 Поиск
+                        </button>
+                    </div>
+                    <div class="filter-options">
+                        <select id="statusFilter" class="form-control">
+                            <option value="">Все статусы</option>
+                            <option value="active">Активные</option>
+                            <option value="archived">В архиве</option>
+                        </select>
+                        <select id="sortBy" class="form-control">
+                            <option value="name">Сортировка по имени</option>
+                            <option value="date">Сортировка по дате</option>
+                            <option value="lastVisit">Сортировка по последнему визиту</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Patients List -->
+        <div class="card">
+            <div class="card-header">
+                <div class="patients-header-content">
+                    <h2>Список пациентов</h2>
+                    <div class="patient-count text-muted">
+                        Найдено: <span id="patientCount">{{ patients|length if patients else 0 }}</span> пациентов
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card-content">
+                {% if patients %}
+                <div class="table-responsive">
+                    <table class="table" id="patientsTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>ФИО</th>
+                                <th>Дата рождения</th>
+                                <th>Возраст</th>
+                                <th>Пол</th>
+                                <th>Телефон</th>
+                                <th>Email</th>
+                                <th>Дата регистрации</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for patient in patients %}
+                            <tr>
+                                <td>#{{ patient.id }}</td>
+                                <td>
+                                    <div class="patient-info">
+                                        <strong>{{ patient.last_name }} {{ patient.first_name }} {{ patient.middle_name or '' }}</strong>
+                                        {% if patient.email %}
+                                        <span class="text-muted text-sm">{{ patient.email }}</span>
+                                        {% elif patient.phone %}
+                                        <span class="text-muted text-sm">{{ patient.phone }}</span>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td>{{ patient.birthday.strftime('%d.%m.%Y') if patient.birthday else 'Не указана' }}</td>
+                                <td>{{ patient.age }} лет</td>
+                                <td>{{ 'Мужской' if patient.sex.value == 'M' else 'Женский' }}</td>
+                                <td>{{ patient.phone or 'Не указан' }}</td>
+                                <td>{{ patient.email or 'Не указан' }}</td>
+                                <td>{{ patient.registered_at.strftime('%d.%m.%Y') if patient.registered_at else 'Не указана' }}</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <a href="{{ url_for('patient_history', patient_id=patient.id) }}" class="btn btn-sm btn-secondary">
+                                            📋 История
+                                        </a>
+                                        <a href="{{ url_for('consultation', patient_id=patient.id) }}" class="btn btn-sm btn-primary">
+                                            🆕 Консультация
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination">
+                    <button class="btn btn-secondary" disabled>← Назад</button>
+                    <span class="page-info text-muted">Страница 1 из 1</span>
+                    <button class="btn btn-secondary" disabled>Вперед →</button>
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-state-icon">👥</div>
+                    <h3>Список пациентов пуст</h3>
+                    <p class="text-muted">В системе пока нет пациентов. Добавьте первого пациента, чтобы начать работу.</p>
+                    <a href="{{ url_for('patient_new') }}" class="btn btn-primary">
+                        👥 Добавить первого пациента
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function searchPatients() {
+            const searchTerm = document.getElementById('patientSearch').value;
+            
+            // AJAX запрос для поиска пациентов
+            fetch(`/api/patients/search?term=${encodeURIComponent(searchTerm)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        updatePatientsTable(data.patients);
+                    } else {
+                        console.error('Ошибка поиска:', data.message);
+                        alert('Ошибка при поиске пациентов');
+                    }
+                })
+                .catch(error => {
+                    console.error('Ошибка:', error);
+                    alert('Ошибка при выполнении поиска');
+                });
+        }
+
+        function updatePatientsTable(patients) {
+            const tbody = document.querySelector('#patientsTable tbody');
+            const patientCount = document.getElementById('patientCount');
+            
+            if (!patients || patients.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="9" class="text-center text-muted">
+                            Пациенты не найдены
+                        </td>
+                    </tr>
+                `;
+                patientCount.textContent = '0';
+                return;
+            }
+            
+            let html = '';
+            patients.forEach(patient => {
+                const fullName = `${patient.last_name} ${patient.first_name} ${patient.middle_name || ''}`;
+                const contactInfo = patient.email || patient.phone;
+                const birthday = patient.birthday ? new Date(patient.birthday).toLocaleDateString('ru-RU') : 'Не указана';
+                const registeredAt = patient.registered_at ? new Date(patient.registered_at).toLocaleDateString('ru-RU') : 'Не указана';
+                const sex = patient.sex === 'M' ? 'Мужской' : 'Женский';
+                
+                html += `
+                    <tr>
+                        <td>#${patient.id}</td>
+                        <td>
+                            <div class="patient-info">
+                                <strong>${fullName}</strong>
+                                ${contactInfo ? `<span class="text-muted text-sm">${contactInfo}</span>` : ''}
+                            </div>
+                        </td>
+                        <td>${birthday}</td>
+                        <td>${patient.age || 'Не указан'} лет</td>
+                        <td>${sex}</td>
+                        <td>${patient.phone || 'Не указан'}</td>
+                        <td>${patient.email || 'Не указан'}</td>
+                        <td>${registeredAt}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <a href="/patient/${patient.id}/history" class="btn btn-sm btn-secondary">
+                                    📋 История
+                                </a>
+                                <a href="/consultation?patient_id=${patient.id}" class="btn btn-sm btn-primary">
+                                    🆕 Консультация
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            tbody.innerHTML = html;
+            patientCount.textContent = patients.length;
+        }
+    </script>
+    <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+</body>
+</html>
