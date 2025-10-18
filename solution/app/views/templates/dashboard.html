@@ -66,6 +66,76 @@
             </div>
         </div>
 
+        <!-- Recent Patients -->
+        <div class="card">
+            <div class="card-header">
+                <h2>Список пациентов</h2>
+            </div>
+            <div class="card-content">
+                {% if patients %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>ФИО</th>
+                                <th>Дата рождения</th>
+                                <th>Возраст</th>
+                                <th>Пол</th>
+                                <th>Телефон</th>
+                                <th>Email</th>
+                                <th>Дата регистрации</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for patient in patients %}
+                            <tr>
+                                <td>#{{ patient.id }}</td>
+                                <td>
+                                    <div class="patient-info">
+                                        <strong>{{ patient.last_name }} {{ patient.first_name }} {{ patient.middle_name or '' }}</strong>
+                                        {% if patient.email %}
+                                        <span class="text-muted text-sm">{{ patient.email }}</span>
+                                        {% elif patient.phone %}
+                                        <span class="text-muted text-sm">{{ patient.phone }}</span>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td>{{ patient.birthday.strftime('%d.%m.%Y') if patient.birthday else 'Не указана' }}</td>
+                                <td>{{ patient.age }} лет</td>
+                                <td>{{ 'Мужской' if patient.sex == 'M' else 'Женский' }}</td>
+                                <td>{{ patient.phone or 'Не указан' }}</td>
+                                <td>{{ patient.email or 'Не указан' }}</td>
+                                <td>{{ patient.registered_at.strftime('%d.%m.%Y') if patient.registered_at else 'Не указана' }}</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <a href="{{ url_for('patient_history', patient_id=patient.id) }}" class="btn btn-sm btn-secondary">
+                                            📋 История
+                                        </a>
+                                        <a href="{{ url_for('consultation', patient_id=patient.id) }}" class="btn btn-sm btn-primary">
+                                            🆕 Консультация
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-state-icon">👥</div>
+                    <h3>Список пациентов пуст</h3>
+                    <p class="text-muted">В системе пока нет пациентов. Добавьте первого пациента, чтобы начать работу.</p>
+                    <a href="{{ url_for('patient_new') }}" class="btn btn-primary">
+                        👥 Добавить первого пациента
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
         <!-- Recent Consultations -->
         <div class="card">
             <div class="card-header">

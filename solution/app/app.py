@@ -11,7 +11,7 @@ project_root = os.path.join(current_dir, '..', '..')
 sys.path.insert(0, project_root)
 
 # Абсолютные импорты с полным путем
-from solution.app.models.database_models import Doctor
+from solution.app.models.database_models import Doctor, Consultation, Patient
 from solution.app.controllers.patient_controller import patient_controller
 from solution.app.services.auth_service import AuthService
 from solution.app.services.patient_service import PatientService
@@ -185,10 +185,10 @@ def registration():
 # Регистрируем контроллер пациентов
 patient_controller(app)
 
-@app.route('/dashboard')
-@login_required
-def dashboard():
-    return render_template('dashboard.html')
+#@app.route('/dashboard')
+#@login_required
+#def dashboard():
+    #return render_template('dashboard.html')
 
 @app.route('/profile')
 @login_required
@@ -446,6 +446,34 @@ def diagnosis_questions():
 @login_required
 def diagnosis_result():
     return render_template('diagnosis/result.html')
+
+# ... существующий код ...
+
+@app.route('/dashboard')
+@login_required
+def dashboard():
+    """Главная панель управления"""
+    try:
+        db_session = get_db_session()
+        
+        # Получаем всех пациентов напрямую из таблицы patients
+        patients = db_session.query(Patient).all()
+        
+        # Добавляем возраст для отображения
+        for patient in patients:
+            if patient.birthday:
+                patient.age = _calculate_age(patient.birthday)
+            else:
+                patient.age = None
+        
+        db_session.close()
+        
+        return render_template('dashboard.html', patients=patients)
+        
+    except Exception as e:
+        print(f"Ошибка при загрузке dashboard: {str(e)}")
+        # В случае ошибки показываем пустой список
+        return render_template('dashboard.html', patients=[])
 
 @app.route('/health')
 def health():
