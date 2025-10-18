@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install -y \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Копируем весь проект
+# Копируем остальные файлы (этот шаг будет кэшироваться лучше)
 COPY . .
 
 # Создаем точку входа
