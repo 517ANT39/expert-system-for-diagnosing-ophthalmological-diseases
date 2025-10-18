@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
 </head>
+
 <body class="dashboard-page">
     <!-- Navigation -->
     <nav class="navbar">
@@ -54,7 +56,7 @@
                     <a href="{{ url_for('patient_new') }}" class="btn btn-secondary">Добавить пациента</a>
                 </div>
             </div>
-            
+
             <!-- Убран блок "Статистика" с помощью display:none -->
             <div class="action-card" style="display:none">
                 <div class="action-icon">📊</div>
@@ -94,7 +96,8 @@
                                 <td>#{{ patient.id }}</td>
                                 <td>
                                     <div class="patient-info">
-                                        <strong>{{ patient.last_name }} {{ patient.first_name }} {{ patient.middle_name or '' }}</strong>
+                                        <strong>{{ patient.last_name }} {{ patient.first_name }} {{ patient.middle_name
+                                            or '' }}</strong>
                                         {% if patient.email %}
                                         <span class="text-muted text-sm">{{ patient.email }}</span>
                                         {% elif patient.phone %}
@@ -102,19 +105,23 @@
                                         {% endif %}
                                     </div>
                                 </td>
-                                <td>{{ patient.birthday.strftime('%d.%m.%Y') if patient.birthday else 'Не указана' }}</td>
+                                <td>{{ patient.birthday.strftime('%d.%m.%Y') if patient.birthday else 'Не указана' }}
+                                </td>
                                 <td>{{ patient.age }} лет</td>
-                                
+
                                 <td>{{ 'Мужской' if patient.sex.value == 'M' else 'Женский' }}</td>
                                 <td>{{ patient.phone or 'Не указан' }}</td>
                                 <td>{{ patient.email or 'Не указан' }}</td>
-                                <td>{{ patient.registered_at.strftime('%d.%m.%Y') if patient.registered_at else 'Не указана' }}</td>
+                                <td>{{ patient.registered_at.strftime('%d.%m.%Y') if patient.registered_at else 'Не
+                                    указана' }}</td>
                                 <td>
                                     <div class="action-buttons">
-                                        <a href="{{ url_for('patient_history', patient_id=patient.id) }}" class="btn btn-sm btn-secondary">
+                                        <a href="{{ url_for('patient_history', patient_id=patient.id) }}"
+                                            class="btn btn-sm btn-secondary">
                                             📋 История
                                         </a>
-                                        <a href="{{ url_for('consultation', patient_id=patient.id) }}" class="btn btn-sm btn-primary">
+                                        <a href="{{ url_for('consultation', patient_id=patient.id) }}"
+                                            class="btn btn-sm btn-primary">
                                             🆕 Консультация
                                         </a>
                                     </div>
@@ -128,7 +135,8 @@
                 <div class="empty-state">
                     <div class="empty-state-icon">👥</div>
                     <h3>Список пациентов пуст</h3>
-                    <p class="text-muted">В системе пока нет пациентов. Добавьте первого пациента, чтобы начать работу.</p>
+                    <p class="text-muted">В системе пока нет пациентов. Добавьте первого пациента, чтобы начать работу.
+                    </p>
                     <a href="{{ url_for('patient_new') }}" class="btn btn-primary">
                         👥 Добавить первого пациента
                     </a>
@@ -163,7 +171,8 @@
                                 <td>Острый конъюнктивит</td>
                                 <td><span class="status-badge status-completed">Завершена</span></td>
                                 <td>
-                                    <a href="{{ url_for('consultation_result') }}" class="btn btn-sm btn-secondary">Просмотр</a>
+                                    <a href="{{ url_for('consultation_result') }}"
+                                        class="btn btn-sm btn-secondary">Просмотр</a>
                                 </td>
                             </tr>
                             <tr>
@@ -173,7 +182,8 @@
                                 <td>Миопия</td>
                                 <td><span class="status-badge status-completed">Завершена</span></td>
                                 <td>
-                                    <a href="{{ url_for('consultation_result') }}" class="btn btn-sm btn-secondary">Просмотр</a>
+                                    <a href="{{ url_for('consultation_result') }}"
+                                        class="btn btn-sm btn-secondary">Просмотр</a>
                                 </td>
                             </tr>
                         </tbody>
@@ -185,4 +195,5 @@
 
     <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
 </body>
+
 </html>

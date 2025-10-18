@@ -32,6 +32,7 @@
 
     <!-- Main Content -->
     <main class="container main-content">
+        {% if patient %}
         <!-- Patient Header -->
         <div class="card patient-header">
             <div class="card-content">
@@ -40,29 +41,46 @@
                         <div class="avatar-placeholder">👤</div>
                     </div>
                     <div class="patient-details">
-                        <h1>Петров Иван Сергеевич</h1>
+                        <h1>{{ patient.last_name }} {{ patient.first_name }} {{ patient.middle_name or '' }}</h1>
                         <div class="patient-meta">
                             <span class="meta-item">
-                                <strong>Дата рождения:</strong> 15.03.1985 (38 лет)
+                                <strong>Дата рождения:</strong> 
+                                {% if patient.birthday %}
+                                    {{ patient.birthday.strftime('%d.%m.%Y') }} ({{ patient.age }} лет)
+                                {% else %}
+                                    Не указана
+                                {% endif %}
                             </span>
                             <span class="meta-item">
-                                <strong>Пол:</strong> Мужской
+                                <strong>Пол:</strong> 
+                                {% if patient.sex.value == 'M' %}
+                                    Мужской
+                                {% else %}
+                                    Женский
+                                {% endif %}
                             </span>
                             <span class="meta-item">
-                                <strong>ID пациента:</strong> #001
+                                <strong>ID пациента:</strong> #{{ patient.id }}
                             </span>
                         </div>
                         <div class="patient-contact">
-                            <span class="contact-item">📧 ivan.petrov@email.com</span>
-                            <span class="contact-item">📞 +7 (912) 345-67-89</span>
+                            {% if patient.email %}
+                            <span class="contact-item">📧 {{ patient.email }}</span>
+                            {% endif %}
+                            {% if patient.phone %}
+                            <span class="contact-item">📞 {{ patient.phone }}</span>
+                            {% endif %}
+                            {% if patient.address %}
+                            <span class="contact-item">📍 {{ patient.address }}</span>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
                 <div class="patient-actions">
-                    <a href="{{ url_for('consultation') }}?patientId=001" class="btn btn-primary">
+                    <a href="{{ url_for('consultation', patient_id=patient.id) }}" class="btn btn-primary">
                         🆕 Новая консультация
                     </a>
-                    <a href="{{ url_for('patient_new') }}?edit=001" class="btn btn-secondary">
+                    <a href="{{ url_for('patient_new') }}?edit={{ patient.id }}" class="btn btn-secondary">
                         ✏️ Редактировать
                     </a>
                 </div>
@@ -75,7 +93,7 @@
                 <div class="card-content">
                     <div class="summary-icon">📋</div>
                     <div class="summary-content">
-                        <div class="summary-number">8</div>
+                        <div class="summary-number">{{ consultations|length }}</div>
                         <div class="summary-label">Всего консультаций</div>
                     </div>
                 </div>
@@ -84,17 +102,29 @@
                 <div class="card-content">
                     <div class="summary-icon">📅</div>
                     <div class="summary-content">
-                        <div class="summary-number">20.01.2024</div>
+                        <div class="summary-number">
+                            {% if consultations %}
+                                {{ consultations[0].consultation_date.strftime('%d.%m.%Y') }}
+                            {% else %}
+                                Нет визитов
+                            {% endif %}
+                        </div>
                         <div class="summary-label">Последний визит</div>
                     </div>
                 </div>
             </div>
             <div class="card summary-card">
                 <div class="card-content">
-                    <div class="summary-icon">⚠️</div>
+                    <div class="summary-icon">👁️</div>
                     <div class="summary-content">
-                        <div class="summary-number">2</div>
-                        <div class="summary-label">Активные назначения</div>
+                        <div class="summary-number">
+                            {% if consultations %}
+                                {{ consultations|selectattr('final_diagnosis')|list|length }}
+                            {% else %}
+                                0
+                            {% endif %}
+                        </div>
+                        <div class="summary-label">Установленных диагнозов</div>
                     </div>
                 </div>
             </div>
@@ -117,96 +147,50 @@
             </div>
 
             <div class="card-content">
+                {% if consultations %}
                 <div class="consultations-timeline" id="timelineView">
-                    <!-- Consultation 1 -->
+                    {% for consultation in consultations %}
                     <div class="timeline-item">
                         <div class="timeline-marker"></div>
                         <div class="timeline-content">
                             <div class="consultation-header">
                                 <div class="consultation-date">
-                                    <strong>20.01.2024</strong>
-                                    <span class="text-muted">14:30</span>
+                                    <strong>{{ consultation.consultation_date.strftime('%d.%m.%Y') }}</strong>
+                                    <span class="text-muted">{{ consultation.consultation_date.strftime('%H:%M') }}</span>
                                 </div>
                                 <div class="consultation-actions">
-                                    <a href="{{ url_for('consultation_result') }}" class="btn btn-sm btn-secondary">
+                                    <a href="{{ url_for('consultation_result', consultation_id=consultation.id) }}" class="btn btn-sm btn-secondary">
                                         Просмотр
                                     </a>
-                                    <button class="btn btn-sm btn-secondary" onclick="exportConsultation(1)">
+                                    <button class="btn btn-sm btn-secondary" onclick="exportConsultation({{ consultation.id }})">
                                         📄 PDF
                                     </button>
                                 </div>
                             </div>
                             <div class="consultation-diagnosis">
-                                <strong>Диагноз:</strong> Острый конъюнктивит
+                                <strong>Диагноз:</strong> 
+                                {{ consultation.final_diagnosis or 'Диагноз не установлен' }}
                             </div>
-                            <div class="consultation-symptoms">
-                                <strong>Симптомы:</strong> Покраснение, боль, слезотечение
+                            <div class="consultation-status">
+                                <strong>Статус:</strong> 
+                                {% if consultation.status.value == 'completed' %}
+                                    <span class="status-badge status-completed">Завершена</span>
+                                {% elif consultation.status.value == 'active' %}
+                                    <span class="status-badge status-active">Активна</span>
+                                {% elif consultation.status.value == 'draft' %}
+                                    <span class="status-badge status-draft">Черновик</span>
+                                {% else %}
+                                    <span class="status-badge status-canceled">Отменена</span>
+                                {% endif %}
                             </div>
+                            {% if consultation.notes %}
                             <div class="consultation-notes">
-                                <strong>Назначения:</strong> Ципрофлоксацин 0.3% - по 1-2 капли 4 раза в день
+                                <strong>Примечания:</strong> {{ consultation.notes }}
                             </div>
+                            {% endif %}
                         </div>
                     </div>
-
-                    <!-- Consultation 2 -->
-                    <div class="timeline-item">
-                        <div class="timeline-marker"></div>
-                        <div class="timeline-content">
-                            <div class="consultation-header">
-                                <div class="consultation-date">
-                                    <strong>15.12.2023</strong>
-                                    <span class="text-muted">11:15</span>
-                                </div>
-                                <div class="consultation-actions">
-                                    <a href="{{ url_for('consultation_result') }}" class="btn btn-sm btn-secondary">
-                                        Просмотр
-                                    </a>
-                                    <button class="btn btn-sm btn-secondary" onclick="exportConsultation(2)">
-                                        📄 PDF
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="consultation-diagnosis">
-                                <strong>Диагноз:</strong> Миопия средней степени
-                            </div>
-                            <div class="consultation-symptoms">
-                                <strong>Симптомы:</strong> Ухудшение зрения вдаль
-                            </div>
-                            <div class="consultation-notes">
-                                <strong>Назначения:</strong> Очки для дали -2.5D, контроль через 6 месяцев
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Consultation 3 -->
-                    <div class="timeline-item">
-                        <div class="timeline-marker"></div>
-                        <div class="timeline-content">
-                            <div class="consultation-header">
-                                <div class="consultation-date">
-                                    <strong>10.09.2023</strong>
-                                    <span class="text-muted">16:45</span>
-                                </div>
-                                <div class="consultation-actions">
-                                    <a href="{{ url_for('consultation_result') }}" class="btn btn-sm btn-secondary">
-                                        Просмотр
-                                    </a>
-                                    <button class="btn btn-sm btn-secondary" onclick="exportConsultation(3)">
-                                        📄 PDF
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="consultation-diagnosis">
-                                <strong>Диагноз:</strong> Синдром сухого глаза
-                            </div>
-                            <div class="consultation-symptoms">
-                                <strong>Симптомы:</strong> Сухость, ощущение песка в глазах
-                            </div>
-                            <div class="consultation-notes">
-                                <strong>Назначения:</strong> Искусственная слеза 4 раза в день
-                            </div>
-                        </div>
-                    </div>
+                    {% endfor %}
                 </div>
 
                 <!-- List View (Hidden by default) -->
@@ -217,65 +201,61 @@
                                 <tr>
                                     <th>Дата</th>
                                     <th>Диагноз</th>
-                                    <th>Симптомы</th>
+                                    <th>Статус</th>
                                     <th>Врач</th>
                                     <th>Действия</th>
                                 </tr>
                             </thead>
                             <tbody>
+                                {% for consultation in consultations %}
                                 <tr>
-                                    <td>20.01.2024 14:30</td>
-                                    <td>Острый конъюнктивит</td>
-                                    <td>Покраснение, боль, слезотечение</td>
-                                    <td>Доктор Иванов</td>
+                                    <td>{{ consultation.consultation_date.strftime('%d.%m.%Y %H:%M') }}</td>
+                                    <td>{{ consultation.final_diagnosis or 'Диагноз не установлен' }}</td>
                                     <td>
-                                        <a href="{{ url_for('consultation_result') }}" class="btn btn-sm btn-secondary">
+                                        {% if consultation.status.value == 'completed' %}
+                                            <span class="status-badge status-completed">Завершена</span>
+                                        {% elif consultation.status.value == 'active' %}
+                                            <span class="status-badge status-active">Активна</span>
+                                        {% elif consultation.status.value == 'draft' %}
+                                            <span class="status-badge status-draft">Черновик</span>
+                                        {% else %}
+                                            <span class="status-badge status-canceled">Отменена</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if consultation.doctor %}
+                                            {{ consultation.doctor.last_name }} {{ consultation.doctor.first_name }} {{ consultation.doctor.middle_name or '' }}
+                                        {% else %}
+                                            Врач не указан
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('consultation_result', consultation_id=consultation.id) }}" class="btn btn-sm btn-secondary">
                                             Просмотр
                                         </a>
                                     </td>
                                 </tr>
-                                <tr>
-                                    <td>15.12.2023 11:15</td>
-                                    <td>Миопия средней степени</td>
-                                    <td>Ухудшение зрения вдаль</td>
-                                    <td>Доктор Иванов</td>
-                                    <td>
-                                        <a href="{{ url_for('consultation_result') }}" class="btn btn-sm btn-secondary">
-                                            Просмотр
-                                        </a>
-                                    </td>
-                                </tr>
+                                {% endfor %}
                             </tbody>
                         </table>
                     </div>
                 </div>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-state-icon">📋</div>
+                    <h3>Консультации не найдены</h3>
+                    <p class="text-muted">У этого пациента пока нет консультаций.</p>
+                    <a href="{{ url_for('consultation', patient_id=patient.id) }}" class="btn btn-primary">
+                        🆕 Начать первую консультацию
+                    </a>
+                </div>
+                {% endif %}
             </div>
         </div>
 
         <!-- Medical Information -->
         <div class="grid grid-2">
-            <!-- Active Medications -->
-            <div class="card">
-                <div class="card-header">
-                    <h3>💊 Активные назначения</h3>
-                </div>
-                <div class="card-content">
-                    <div class="medications-list">
-                        <div class="medication-item">
-                            <div class="medication-name">Ципрофлоксацин 0.3%</div>
-                            <div class="medication-dosage">По 1-2 капли 4 раза в день</div>
-                            <div class="medication-period">С 20.01.2024 по 27.01.2024</div>
-                        </div>
-                        <div class="medication-item">
-                            <div class="medication-name">Искусственная слеза</div>
-                            <div class="medication-dosage">По 1 капле 4 раза в день</div>
-                            <div class="medication-period">Постоянно</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Allergies and Conditions -->
+            <!-- Patient Medical Information -->
             <div class="card">
                 <div class="card-header">
                     <h3>🏥 Медицинская информация</h3>
@@ -284,20 +264,78 @@
                     <div class="medical-info">
                         <div class="info-section">
                             <h4>Аллергии</h4>
-                            <p class="text-muted">Пенициллин</p>
+                            <p class="text-muted">{{ patient.allergies or 'Не указаны' }}</p>
                         </div>
                         <div class="info-section">
                             <h4>Хронические заболевания</h4>
-                            <p class="text-muted">Гипертония</p>
+                            <p class="text-muted">{{ patient.chronic_diseases or 'Не указаны' }}</p>
                         </div>
                         <div class="info-section">
                             <h4>Регулярные лекарства</h4>
-                            <p class="text-muted">Лозартан 50мг ежедневно</p>
+                            <p class="text-muted">{{ patient.current_medications or 'Не указаны' }}</p>
+                        </div>
+                        <div class="info-section">
+                            <h4>Семейный анамнез</h4>
+                            <p class="text-muted">{{ patient.family_anamnes or 'Не указан' }}</p>
+                        </div>
+                        {% if patient.notes %}
+                        <div class="info-section">
+                            <h4>Дополнительные примечания</h4>
+                            <p class="text-muted">{{ patient.notes }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Registration Information -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>📊 Информация о регистрации</h3>
+                </div>
+                <div class="card-content">
+                    <div class="registration-info">
+                        <div class="info-section">
+                            <h4>Дата регистрации</h4>
+                            <p class="text-muted">
+                                {% if patient.registered_at %}
+                                    {{ patient.registered_at.strftime('%d.%m.%Y %H:%M') }}
+                                {% else %}
+                                    Не указана
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="info-section">
+                            <h4>Статус пациента</h4>
+                            <p class="text-muted">
+                                <span class="status-badge status-completed">Активный</span>
+                            </p>
+                        </div>
+                        <div class="info-section">
+                            <h4>Последнее обновление</h4>
+                            <p class="text-muted">
+                                {% if patient.registered_at %}
+                                    {{ patient.registered_at.strftime('%d.%m.%Y %H:%M') }}
+                                {% else %}
+                                    Не указано
+                                {% endif %}
+                            </p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        {% else %}
+        <!-- Сообщение об ошибке если пациент не найден -->
+        <div class="error-state">
+            <div class="error-state-icon">❌</div>
+            <h3>Пациент не найден</h3>
+            <p class="text-muted">Не удалось загрузить данные пациента. Возможно, пациент был удален или произошла ошибка.</p>
+            <a href="{{ url_for('patient_list') }}" class="btn btn-primary">
+                ← Вернуться к списку пациентов
+            </a>
+        </div>
+        {% endif %}
     </main>
     <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
     <script src="{{ url_for('static', filename='js/patient-history.js') }}"></script>

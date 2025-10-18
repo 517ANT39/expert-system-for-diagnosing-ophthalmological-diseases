@@ -431,11 +431,6 @@ def patient_new():
     today = datetime.now().strftime('%Y-%m-%d')
     return render_template('patient/patient-new.html', today=today)
 
-@app.route('/patient/history')
-@login_required
-def patient_history():
-    return render_template('patient/patient-history.html')
-
 # Диагностика (требуют авторизации)
 @app.route('/diagnosis/questions')
 @login_required

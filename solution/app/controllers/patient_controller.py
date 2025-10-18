@@ -4,7 +4,7 @@ import os
 import sys
 from datetime import datetime
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, joinedload
 
 # Добавляем путь к корню проекта в sys.path
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -13,7 +13,7 @@ sys.path.insert(0, project_root)
 
 # Абсолютные импорты
 from solution.app.services.patient_service import PatientService
-from solution.app.models.database_models import Consultation
+from solution.app.models.database_models import Consultation, Patient
 
 def get_db_session():
     """Создание сессии БД"""
@@ -72,6 +72,49 @@ def patient_controller(app):
             print(f"Ошибка при загрузке списка пациентов: {str(e)}")
             # В случае ошибки показываем пустой список
             return render_template('patient/patients.html', patients=[])
+    
+    # HTML маршрут для страницы истории пациента
+    @app.route('/patient/<int:patient_id>/history')
+    @login_required
+    def patient_history(patient_id):
+        """Страница истории пациента"""
+        db_session = None
+        try:
+            db_session = get_db_session()
+            
+            # Получаем данные пациента
+            patient = db_session.query(Patient).filter(Patient.id == patient_id).first()
+            if not patient:
+                db_session.close()
+                return "Пациент не найден", 404
+            
+            # Добавляем возраст для отображения
+            if patient.birthday:
+                patient.age = _calculate_age(patient.birthday)
+            else:
+                patient.age = None
+            
+            # Получаем консультации пациента - ИСПРАВЛЕННЫЙ ЗАПРОС
+            consultations = db_session.query(Consultation).options(
+                joinedload(Consultation.doctor)  # ИСПРАВЛЕНО: используем joinedload напрямую
+            ).filter(
+                Consultation.patient_id == patient_id
+            ).order_by(
+                Consultation.consultation_date.desc()
+            ).all()
+            
+            db_session.close()
+            
+            return render_template('patient/patient-history.html', 
+                                 patient=patient, 
+                                 consultations=consultations)
+            
+        except Exception as e:
+            print(f"Ошибка при загрузке истории пациента: {str(e)}")
+            if db_session:
+                db_session.close()
+            # В случае ошибки возвращаем ошибку 500
+            return "Ошибка при загрузке страницы", 500
     
     # API маршрут для поиска пациентов
     @app.route('/api/patients/search')
