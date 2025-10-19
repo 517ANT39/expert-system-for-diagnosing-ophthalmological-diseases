@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
             first_name: document.getElementById('firstName').value.trim(),
             middle_name: document.getElementById('middleName').value.trim(),
             birthday: document.getElementById('birthDate').value,
-            sex: genderInput.value,
+            sex: genderInput.value === 'male' ? 'M' : 'F',
             phone: document.getElementById('phone').value.trim(),
             email: document.getElementById('email').value.trim(),
             address: document.getElementById('address').value.trim(),

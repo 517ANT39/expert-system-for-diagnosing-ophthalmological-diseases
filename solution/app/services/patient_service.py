@@ -34,11 +34,11 @@ class PatientService:
         if patient_data['sex'] not in ['M', 'F', 'male', 'female']:
             raise ValueError("Некорректное значение пола")
         
-        # Приводим пол к формату Enum
+        # Приводим пол к формату строки - ИСПРАВЛЕНИЕ ЗДЕСЬ
         if patient_data['sex'] in ['male', 'M']:
-            patient_data['sex'] = SexEnum.M
+            patient_data['sex'] = 'M'  # Просто строка 'M'
         else:
-            patient_data['sex'] = SexEnum.F
+            patient_data['sex'] = 'F'  # Просто строка 'F'
 
         # Валидация email если указан
         if patient_data.get('email') and not self._validate_email(patient_data['email']):
@@ -96,6 +96,13 @@ class PatientService:
 
         if 'phone' in patient_data and patient_data['phone'] and not self._validate_phone(patient_data['phone']):
             raise ValueError("Некорректный формат телефона")
+
+        # Обработка пола при обновлении - ИСПРАВЛЕНИЕ ЗДЕСЬ
+        if 'sex' in patient_data:
+            if patient_data['sex'] in ['male', 'M']:
+                patient_data['sex'] = 'M'  # Просто строка 'M'
+            elif patient_data['sex'] in ['female', 'F']:
+                patient_data['sex'] = 'F'  # Просто строка 'F'
 
         return self.patient_repository.update_patient(patient_id, patient_data)
 
