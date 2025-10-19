@@ -28,7 +28,6 @@ class Doctor(Base):
     password = Column(String(255), nullable=False)
     registered_at = Column(DateTime, default=datetime.utcnow)
     
-    # Связи
     consultations = relationship("Consultation", back_populates="doctor")
     
     def to_dict(self):
@@ -50,7 +49,7 @@ class Patient(Base):
     first_name = Column(String(100), nullable=False)
     middle_name = Column(String(100))
     birthday = Column(Date, nullable=False)
-    sex = Column(Enum(SexEnum), nullable=False)
+    sex = Column(String(1), nullable=False)  # Простая строка вместо ENUM
     phone = Column(String(20))
     email = Column(String(255))
     address = Column(String(500))
@@ -61,8 +60,11 @@ class Patient(Base):
     notes = Column(String(2000))
     registered_at = Column(DateTime, default=datetime.utcnow)
     
-    # Связи
     consultations = relationship("Consultation", back_populates="patient")
+    
+    def get_sex_enum(self):
+        """Конвертируем строку в Enum при необходимости"""
+        return SexEnum(self.sex) if self.sex else None
 
 class Consultation(Base):
     __tablename__ = 'consultations'
@@ -71,11 +73,14 @@ class Consultation(Base):
     doctor_id = Column(Integer, ForeignKey('doctors.id'), nullable=False)
     patient_id = Column(Integer, ForeignKey('patients.id'), nullable=False)
     consultation_date = Column(DateTime, default=datetime.utcnow)
-    sub_graph_find_diagnosis = Column(JSON)  # JSON дерево диагностики
+    sub_graph_find_diagnosis = Column(JSON)
     final_diagnosis = Column(String(500))
-    status = Column(Enum(ConsultationStatusEnum), default=ConsultationStatusEnum.draft)
+    status = Column(String(20), default='draft')  # Простая строка вместо ENUM
     notes = Column(String(2000))
     
-    # Связи
     doctor = relationship("Doctor", back_populates="consultations")
     patient = relationship("Patient", back_populates="consultations")
+    
+    def get_status_enum(self):
+        """Конвертируем строку в Enum при необходимости"""
+        return ConsultationStatusEnum(self.status) if self.status else None

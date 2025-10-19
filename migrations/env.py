@@ -32,7 +32,6 @@ def run_migrations_offline() -> None:
         context.run_migrations()
 
 def run_migrations_online() -> None:
-    # ПРОСТОЙ И РАБОЧИЙ СПОСОБ - создаем engine напрямую
     connectable = create_engine(get_url())
 
     with connectable.connect() as connection:

@@ -13,6 +13,15 @@ def check_and_fix_migrations():
             existing_tables = inspector.get_table_names()
             print(f"Found {len(existing_tables)} existing tables")
             
+            # Проверяем существование ENUM типов
+            result = conn.execute(text("SELECT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'sex_enum')"))
+            sex_enum_exists = result.scalar()
+            print(f"sex_enum exists: {sex_enum_exists}")
+            
+            result = conn.execute(text("SELECT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'status_enum')"))
+            status_enum_exists = result.scalar()
+            print(f"status_enum exists: {status_enum_exists}")
+            
             # Основные таблицы приложения
             core_tables = ['doctors', 'patients', 'consultations']
             core_tables_exist = all(table in existing_tables for table in core_tables)
