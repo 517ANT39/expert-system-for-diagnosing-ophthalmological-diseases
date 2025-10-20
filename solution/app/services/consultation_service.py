@@ -227,14 +227,29 @@ class ConsultationService:
                 'timestamp': qa.get('timestamp')
             })
         
+        # Генерируем рекомендации на основе диагноза
+        recommendations = self._generate_recommendations(final_diagnosis)
+        
+        # Формируем объяснение диагноза
+        explanation = self._generate_explanation(qa_history, final_diagnosis)
+        
+        # Формируем список симптомов для отображения
+        symptoms_evidence = []
+        for qa in qa_history:
+            symptoms_evidence.append({
+                'name': qa['question'],
+                'present': qa['answer'] == 'yes'
+            })
+        
         return {
             'consultation': consultation,
             'diagnosis_result': {
                 'primary_diagnosis': final_diagnosis,
                 'confidence': self._calculate_confidence(qa_history),
-                'explanation': self._generate_explanation(qa_history, final_diagnosis),
+                'explanation': explanation,
                 'qa_history': qa_history,
-                'recommendations': self._generate_recommendations(final_diagnosis)
+                'recommendations': recommendations,
+                'symptoms_evidence': symptoms_evidence
             }
         }
 

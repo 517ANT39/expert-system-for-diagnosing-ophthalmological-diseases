@@ -28,6 +28,12 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+def _calculate_age(birthday):
+    """Расчет возраста по дате рождения"""
+    from datetime import date
+    today = date.today()
+    return today.year - birthday.year - ((today.month, today.day) < (birthday.month, birthday.day))
+
 def consultation_controller(app):
     """Регистрация маршрутов для работы с консультациями"""
     
@@ -108,11 +114,41 @@ def consultation_controller(app):
                 db_session.close()
                 return "Консультация не найдена", 404
             
+            # Форматируем данные для шаблона
+            consultation_data = result['consultation']
+            diagnosis_result = result['diagnosis_result']
+            
+            # Подготавливаем данные пациента
+            patient = consultation_data.patient
+            patient_data = {
+                'name': f"{patient.last_name} {patient.first_name} {patient.middle_name or ''}".strip(),
+                'birth_date': patient.birthday.strftime('%d.%m.%Y') if patient.birthday else 'Не указана',
+                'gender': 'Мужской' if patient.sex == 'M' else 'Женский',
+                'age': _calculate_age(patient.birthday) if patient.birthday else None
+            }
+            
+            # Подготавливаем данные врача
+            doctor = consultation_data.doctor
+            doctor_data = {
+                'name': f"{doctor.last_name} {doctor.first_name} {doctor.middle_name or ''}".strip(),
+                'qualification': "Врач-офтальмолог"
+            }
+            
+            # Подготавливаем данные консультации
+            consultation_info = {
+                'date': consultation_data.consultation_date.strftime('%d.%m.%Y %H:%M') if consultation_data.consultation_date else datetime.now().strftime('%d.%m.%Y %H:%M'),
+                'final_diagnosis': consultation_data.final_diagnosis or diagnosis_result['primary_diagnosis'],
+                'notes': consultation_data.notes or ''
+            }
+            
             db_session.close()
             
             return render_template('consultation/consultation-result.html',
-                                 consultation=result['consultation'],
-                                 diagnosis_result=result['diagnosis_result'])
+                                consultation=consultation_data,
+                                patient=patient_data,
+                                doctor=doctor_data,
+                                consultation_info=consultation_info,
+                                diagnosis_result=diagnosis_result)
             
         except Exception as e:
             print(f"Ошибка при загрузке результатов консультации: {str(e)}")

@@ -40,12 +40,12 @@
                 <div class="consultation-progress-header">
                     <h2>Диагностическая консультация</h2>
                     <div class="patient-info">
-                        <strong>Пациент:</strong> 
+                        <strong>Пациент:</strong>
                         <span id="patientName">
                             {% if patient %}
-                                {{ patient.last_name }} {{ patient.first_name }} {{ patient.middle_name or '' }}
+                            {{ patient.last_name }} {{ patient.first_name }} {{ patient.middle_name or '' }}
                             {% else %}
-                                Выберите пациента
+                            Выберите пациента
                             {% endif %}
                         </span>
                     </div>
@@ -58,8 +58,8 @@
                         <span class="text-sm text-muted">Завершено</span>
                     </div>
                     <div class="progress-bar">
-                        <div class="progress-fill" id="progressFill" 
-                             style="width: {{ progress.progress_percent if progress else 0 }}%"></div>
+                        <div class="progress-fill" id="progressFill"
+                            style="width: {{ progress.progress_percent if progress else 0 }}%"></div>
                     </div>
                     <div class="progress-text text-muted" id="progressText">
                         {{ "%.0f"|format(progress.progress_percent) if progress else 0 }}% завершено
@@ -82,7 +82,8 @@
                         {% for patient_item in patients %}
                         <div class="patient-item">
                             <div class="patient-info">
-                                <strong>{{ patient_item.last_name }} {{ patient_item.first_name }} {{ patient_item.middle_name or '' }}</strong>
+                                <strong>{{ patient_item.last_name }} {{ patient_item.first_name }} {{
+                                    patient_item.middle_name or '' }}</strong>
                                 <div class="patient-meta">
                                     {% if patient_item.birthday %}
                                     Дата рождения: {{ patient_item.birthday.strftime('%d.%m.%Y') }}
@@ -116,7 +117,8 @@
             <div class="card-content">
                 <div class="question-content">
                     <div class="question-text" id="questionText">
-                        {{ consultation.sub_graph_find_diagnosis.current_question if consultation and consultation.sub_graph_find_diagnosis else "Загрузка вопроса..." }}
+                        {{ consultation.sub_graph_find_diagnosis.current_question if consultation and
+                        consultation.sub_graph_find_diagnosis else "Загрузка вопроса..." }}
                     </div>
 
                     <div class="answer-buttons">
@@ -136,12 +138,13 @@
         <!-- Diagnosis Preview (показывается при достижении диагноза) -->
         <div class="card diagnosis-preview-card" id="diagnosisPreview" style="display: none;">
             <div class="card-header">
-                <h3>🎯 Предварительный диагноз</h3>
+                <h3>🎯 Окончательный диагноз</h3> <!-- Изменили с "Предварительный" на "Окончательный" -->
             </div>
             <div class="card-content">
                 <div class="diagnosis-preview-content">
                     <h4 id="previewDiagnosisText"></h4>
-                    <p class="text-muted">Для завершения консультации и получения полных рекомендаций нажмите "Завершить консультацию"</p>
+                    <p class="text-muted">Для завершения консультации и получения полных рекомендаций нажмите "Завершить
+                        консультацию"</p>
                     <button class="btn btn-primary" id="btnCompleteConsultation">
                         ✅ Завершить консультацию
                     </button>
@@ -161,17 +164,18 @@
             </div>
             <div class="card-content">
                 <div class="answers-list" id="answersList">
-                    {% if consultation and consultation.sub_graph_find_diagnosis and consultation.sub_graph_find_diagnosis.answers %}
-                        {% for key, qa in consultation.sub_graph_find_diagnosis.answers.items() %}
-                        <div class="answer-item answer-{{ qa.answer }}">
-                            <span class="answer-icon">{{ '✅' if qa.answer == 'yes' else '❌' }}</span>
-                            <span class="answer-text">{{ qa.question }} - {{ 'Да' if qa.answer == 'yes' else 'Нет' }}</span>
-                        </div>
-                        {% endfor %}
+                    {% if consultation and consultation.sub_graph_find_diagnosis and
+                    consultation.sub_graph_find_diagnosis.answers %}
+                    {% for key, qa in consultation.sub_graph_find_diagnosis.answers.items() %}
+                    <div class="answer-item answer-{{ qa.answer }}">
+                        <span class="answer-icon">{{ '✅' if qa.answer == 'yes' else '❌' }}</span>
+                        <span class="answer-text">{{ qa.question }} - {{ 'Да' if qa.answer == 'yes' else 'Нет' }}</span>
+                    </div>
+                    {% endfor %}
                     {% else %}
-                        <div class="empty-state">
-                            <p class="text-muted">Ответы пока отсутствуют</p>
-                        </div>
+                    <div class="empty-state">
+                        <p class="text-muted">Ответы пока отсутствуют</p>
+                    </div>
                     {% endif %}
                 </div>
             </div>

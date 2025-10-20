@@ -38,7 +38,7 @@
         <div class="page-header">
             <div class="header-content">
                 <h1>Результаты диагностики</h1>
-                <p class="text-muted">Консультация от 20.01.2024</p>
+                <p class="text-muted">Консультация от {{ consultation_info.date }}</p>
             </div>
             <div class="header-actions">
                 <button class="btn btn-primary" onclick="exportToPDF()">
@@ -55,17 +55,35 @@
             <div class="card-content">
                 <div class="patient-details">
                     <div class="detail-item">
-                        <strong>ФИО:</strong> Петров Иван Сергеевич
+                        <strong>ФИО:</strong> {{ patient.name }}
                     </div>
                     <div class="detail-item">
-                        <strong>Дата рождения:</strong> 15.03.1985
+                        <strong>Дата рождения:</strong> {{ patient.birth_date }}
+                        {% if patient.age %}
+                        ({{ patient.age }} лет)
+                        {% endif %}
                     </div>
                     <div class="detail-item">
-                        <strong>Пол:</strong> Мужской
+                        <strong>Пол:</strong> {{ patient.gender }}
                     </div>
                     <div class="detail-item">
-                        <strong>Дата консультации:</strong> 20.01.2024 14:30
+                        <strong>Дата консультации:</strong> {{ consultation_info.date }}
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Doctor Info -->
+        <div class="card doctor-info-card">
+            <div class="card-header">
+                <h3>Врач-консультант</h3>
+            </div>
+            <div class="card-content">
+                <div class="doctor-details">
+                    <div class="detail-item">
+                        <strong>ФИО врача:</strong> {{ doctor.name }}
+                    </div>
+                    
                 </div>
             </div>
         </div>
@@ -74,18 +92,17 @@
         <div class="card diagnosis-card">
             <div class="card-header">
                 <div class="diagnosis-header">
-                    <h2>🎯 Вероятный диагноз</h2>
+                    <h2>🎯 Окончательный диагноз</h2>
                     <div class="confidence-badge">
-                        Уверенность: 85%
+                        Уверенность: {{ diagnosis_result.confidence }}%
                     </div>
                 </div>
             </div>
             <div class="card-content">
                 <div class="primary-diagnosis">
-                    <h3>Острый конъюнктивит</h3>
+                    <h3>{{ diagnosis_result.primary_diagnosis }}</h3>
                     <p class="diagnosis-description">
-                        Воспаление конъюнктивы - слизистой оболочки, покрывающей
-                        внутреннюю поверхность век и переднюю поверхность глазного яблока.
+                        {{ diagnosis_result.explanation }}
                     </p>
                 </div>
             </div>
@@ -102,16 +119,12 @@
                         Диагноз основан на следующих выявленных симптомах:
                     </p>
                     <ul class="symptoms-evidence">
-                        <li class="evidence-positive">✅ Покраснение глаза</li>
-                        <li class="evidence-positive">✅ Слезотечение</li>
-                        <li class="evidence-positive">✅ Боль в глазу</li>
-                        <li class="evidence-negative">❌ Отсутствие светобоязни</li>
-                        <li class="evidence-negative">❌ Отсутствие выделений</li>
+                        {% for symptom in diagnosis_result.symptoms_evidence %}
+                        <li class="evidence-{{ 'positive' if symptom.present else 'negative' }}">
+                            {{ '✅' if symptom.present else '❌' }} {{ symptom.name }}
+                        </li>
+                        {% endfor %}
                     </ul>
-                    <p class="reasoning-text">
-                        Сочетание боли, покраснения и слезотечения при отсутствии светобоязни
-                        и гнойных выделений характерно для острой формы конъюнктивита.
-                    </p>
                 </div>
             </div>
         </div>
@@ -123,57 +136,57 @@
             </div>
             <div class="card-content">
                 <div class="recommendations-content">
+                    {% if diagnosis_result.recommendations.medication %}
                     <div class="recommendation-category">
                         <h4>💊 Медикаментозное лечение</h4>
                         <ul>
-                            <li>Антибактериальные капли: Ципрофлоксацин 0.3% - по 1-2 капли 4 раза в день</li>
-                            <li>Противовоспалительные капли: Диклофенак 0.1% - по 1 капле 3 раза в день</li>
+                            {% for med in diagnosis_result.recommendations.medication %}
+                            <li>{{ med }}</li>
+                            {% endfor %}
                         </ul>
                     </div>
+                    {% endif %}
 
+                    {% if diagnosis_result.recommendations.general %}
                     <div class="recommendation-category">
                         <h4>📋 Общие рекомендации</h4>
                         <ul>
-                            <li>Избегать трения глаз</li>
-                            <li>Частое мытье рук</li>
-                            <li>Использование отдельного полотенца</li>
-                            <li>Отказ от контактных линз на период лечения</li>
+                            {% for rec in diagnosis_result.recommendations.general %}
+                            <li>{{ rec }}</li>
+                            {% endfor %}
                         </ul>
                     </div>
+                    {% endif %}
 
+                    {% if diagnosis_result.recommendations.follow_up %}
                     <div class="recommendation-category">
                         <h4>📅 Наблюдение</h4>
                         <ul>
-                            <li>Повторный осмотр через 3 дня</li>
-                            <li>Обратиться немедленно при ухудшении состояния</li>
+                            {% for followup in diagnosis_result.recommendations.follow_up %}
+                            <li>{{ followup }}</li>
+                            {% endfor %}
                         </ul>
                     </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
 
-        <!-- Differential Diagnosis -->
-        <div class="card differential-card">
+        <!-- Questions History -->
+        <div class="card history-card">
             <div class="card-header">
-                <h3>Дифференциальный диагноз</h3>
+                <h3>История вопросов и ответов</h3>
             </div>
             <div class="card-content">
-                <div class="differential-list">
-                    <div class="differential-item">
-                        <strong>Кератит</strong>
-                        <span class="probability">25%</span>
-                        <p class="diff-reason">Менее вероятен из-за отсутствия светобоязни</p>
+                <div class="qa-history">
+                    {% for qa in diagnosis_result.qa_history %}
+                    <div class="qa-item">
+                        <div class="qa-question">{{ loop.index }}. {{ qa.question }}</div>
+                        <div class="qa-answer answer-{{ qa.answer }}">
+                            {{ '✅ Да' if qa.answer == 'yes' else '❌ Нет' }}
+                        </div>
                     </div>
-                    <div class="differential-item">
-                        <strong>Иридоциклит</strong>
-                        <span class="probability">15%</span>
-                        <p class="diff-reason">Исключен из-за нормальной реакции зрачка</p>
-                    </div>
-                    <div class="differential-item">
-                        <strong>Синдром сухого глаза</strong>
-                        <span class="probability">10%</span>
-                        <p class="diff-reason">Менее вероятен из-за наличия слезотечения</p>
-                    </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
@@ -184,55 +197,76 @@
                 <h3>Заключение врача</h3>
             </div>
             <div class="card-content">
-                <form class="doctor-notes-form">
-                    <div class="form-group">
-                        <label for="finalDiagnosis" class="form-label">Окончательный диагноз</label>
-                        <input type="text" id="finalDiagnosis" class="form-control" value="Острый конъюнктивит"
-                            placeholder="Введите окончательный диагноз">
+                <div class="doctor-final-notes">
+                    <div class="final-diagnosis">
+                        <strong>Окончательный диагноз:</strong> {{ consultation_info.final_diagnosis }}
                     </div>
-
-                    <div class="form-group">
-                        <label for="doctorNotes" class="form-label">Примечания и назначения</label>
-                        <textarea id="doctorNotes" class="form-control" rows="4"
-                            placeholder="Дополнительные примечания и назначения...">
-Назначены антибактериальные капли. Рекомендован осмотр через 3 дня. Выдан больничный лист на 5 дней.
-                        </textarea>
+                    {% if consultation_info.notes %}
+                    <div class="additional-notes">
+                        <strong>Дополнительные примечания:</strong> 
+                        <p>{{ consultation_info.notes }}</p>
                     </div>
-
-                    <div class="form-actions">
-                        <button type="button" class="btn btn-secondary" onclick="saveDraft()">
-                            💾 Сохранить черновик
-                        </button>
-                        <button type="submit" class="btn btn-primary" onclick="completeConsultation()">
-                            ✅ Завершить консультацию
-                        </button>
-                        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
-                            ← Назад в панель управления
-                        </a>
-                    </div>
-                </form>
+                    {% endif %}
+                </div>
+                
+                <div class="form-actions" style="margin-top: 20px;">
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-primary">
+                        ← Назад в панель управления
+                    </a>
+                    <a href="{{ url_for('consultation') }}" class="btn btn-secondary">
+                        🆕 Новая консультация
+                    </a>
+                </div>
             </div>
         </div>
     </main>
 
     <script>
-        function completeConsultation(event) {
-            if (event) {
-                event.preventDefault();
-            }
-            // Здесь может быть логика сохранения данных
-            window.location.href = "{{ url_for('dashboard') }}";
-        }
-
-        function saveDraft() {
-            // Логика сохранения черновика
-            alert('Черновик сохранен');
-        }
-
         function exportToPDF() {
-            // Логика экспорта в PDF
-            alert('Экспорт в PDF (функция в разработке)');
+            const patientName = "{{ patient.name }}";
+            const diagnosis = "{{ diagnosis_result.primary_diagnosis }}";
+            
+            alert(`Генерация PDF для пациента: ${patientName}\nДиагноз: ${diagnosis}\n\nВ реальной системе здесь будет создан PDF документ с полными результатами консультации.`);
+            
+            // Здесь можно добавить реальную логику генерации PDF
+            showToast('PDF документ готов к скачиванию', 'success');
         }
+
+        function showToast(message, type = 'info') {
+            // Простая реализация toast уведомления
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = message;
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? '#4CAF50' : type === 'error' ? '#f44336' : '#2196F3'};
+                color: white;
+                padding: 12px 20px;
+                border-radius: 4px;
+                z-index: 1000;
+            `;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // Загрузка имени пользователя
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('/api/profile')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('userName').textContent = data.doctor.last_name + ' ' + data.doctor.first_name;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading profile:', error);
+                });
+        });
     </script>
     
     <!-- ПОДКЛЮЧАЕМ СКРИПТ ПОСЛЕ ВСЕХ ОСНОВНЫХ ФУНКЦИЙ -->
