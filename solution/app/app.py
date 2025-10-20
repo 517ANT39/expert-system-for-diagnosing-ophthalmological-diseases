@@ -15,6 +15,7 @@ from solution.app.models.database_models import Doctor, Consultation, Patient
 from solution.app.controllers.patient_controller import patient_controller
 from solution.app.services.auth_service import AuthService
 from solution.app.services.patient_service import PatientService
+from solution.app.controllers.consultation_controller import consultation_controller
 from solution.app.controllers.patient_controller import get_db_session, _calculate_age
 
 # В Docker рабочая директория /app, поэтому пути другие
@@ -38,6 +39,8 @@ app.config['SESSION_TYPE'] = 'filesystem'
 database_url = os.getenv("DATABASE_URL", "postgresql://admin:password@db:5432/ophthalmology_db")
 engine = create_engine(database_url)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+consultation_controller(app)
 
 def login_required(f):
     """Декоратор для проверки авторизации"""
@@ -331,11 +334,11 @@ def logout():
     return redirect(url_for('index'))  # После выхода - на главную страницу
 
 # Защищенные маршруты (требуют авторизации)
-@app.route('/consultation')
-@login_required
-def consultation():
-    return render_template('consultation/consultation.html')
-
+#@app.route('/consultation')
+#@login_required
+#def consultation():
+   # return render_template('consultation/consultation.html')
+"""
 @app.route('/consultation/result')
 @login_required
 def consultation_result():
@@ -344,7 +347,7 @@ def consultation_result():
 @app.route('/consultation/history')
 @login_required
 def consultation_history():
-    return render_template('consultation/consultation-history.html')
+    return render_template('consultation/consultation-history.html')"""
 
 """
 # Пациенты (требуют авторизации)

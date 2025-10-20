@@ -40,7 +40,14 @@
                 <div class="consultation-progress-header">
                     <h2>Диагностическая консультация</h2>
                     <div class="patient-info">
-                        <strong>Пациент:</strong> Петров Иван Сергеевич
+                        <strong>Пациент:</strong> 
+                        <span id="patientName">
+                            {% if patient %}
+                                {{ patient.last_name }} {{ patient.first_name }} {{ patient.middle_name or '' }}
+                            {% else %}
+                                Выберите пациента
+                            {% endif %}
+                        </span>
                     </div>
                 </div>
             </div>
@@ -51,26 +58,65 @@
                         <span class="text-sm text-muted">Завершено</span>
                     </div>
                     <div class="progress-bar">
-                        <div class="progress-fill" style="width: 40%"></div>
+                        <div class="progress-fill" id="progressFill" 
+                             style="width: {{ progress.progress_percent if progress else 0 }}%"></div>
                     </div>
-                    <div class="progress-text text-muted">40% завершено</div>
+                    <div class="progress-text text-muted" id="progressText">
+                        {{ "%.0f"|format(progress.progress_percent) if progress else 0 }}% завершено
+                        ({{ progress.questions_answered if progress else 0 }} вопросов)
+                    </div>
                 </div>
             </div>
         </div>
 
+        <!-- Patient Selection (если пациент не выбран) -->
+        {% if not patient %}
+        <div class="card patient-selection-card">
+            <div class="card-header">
+                <h3>Выбор пациента</h3>
+            </div>
+            <div class="card-content">
+                <div class="patient-selection">
+                    <p class="text-muted">Пожалуйста, выберите пациента для начала консультации:</p>
+                    <div class="patient-list" id="patientList">
+                        {% for patient_item in patients %}
+                        <div class="patient-item">
+                            <div class="patient-info">
+                                <strong>{{ patient_item.last_name }} {{ patient_item.first_name }} {{ patient_item.middle_name or '' }}</strong>
+                                <div class="patient-meta">
+                                    {% if patient_item.birthday %}
+                                    Дата рождения: {{ patient_item.birthday.strftime('%d.%m.%Y') }}
+                                    {% endif %}
+                                    {% if patient_item.age %}
+                                    ({{ patient_item.age }} лет)
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <a href="/consultation?patient_id={{ patient_item.id }}" class="btn btn-primary btn-sm">
+                                Начать консультацию
+                            </a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
         <!-- Current Question -->
         <div class="card question-card">
             <div class="card-header">
                 <div class="question-header">
                     <h2>Текущий вопрос</h2>
-                    <div class="question-number">Вопрос 5 из 12</div>
+                    <div class="question-number" id="questionNumber">
+                        Вопрос {{ progress.questions_answered + 1 if progress else 1 }}
+                    </div>
                 </div>
             </div>
 
             <div class="card-content">
                 <div class="question-content">
-                    <div class="question-text">
-                        ❓ Пациент жалуется на боль в глазу?
+                    <div class="question-text" id="questionText">
+                        {{ consultation.sub_graph_find_diagnosis.current_question if consultation and consultation.sub_graph_find_diagnosis else "Загрузка вопроса..." }}
                     </div>
 
                     <div class="answer-buttons">
@@ -87,40 +133,51 @@
             </div>
         </div>
 
-        <!-- Collected Symptoms -->
-        <div class="card symptoms-card">
+        <!-- Diagnosis Preview (показывается при достижении диагноза) -->
+        <div class="card diagnosis-preview-card" id="diagnosisPreview" style="display: none;">
             <div class="card-header">
-                <div class="symptoms-header">
-                    <h3>Собранные симптомы</h3>
-                    <button class="btn btn-sm btn-secondary" id="toggleSymptoms">
+                <h3>🎯 Предварительный диагноз</h3>
+            </div>
+            <div class="card-content">
+                <div class="diagnosis-preview-content">
+                    <h4 id="previewDiagnosisText"></h4>
+                    <p class="text-muted">Для завершения консультации и получения полных рекомендаций нажмите "Завершить консультацию"</p>
+                    <button class="btn btn-primary" id="btnCompleteConsultation">
+                        ✅ Завершить консультацию
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Collected Answers -->
+        <div class="card answers-card">
+            <div class="card-header">
+                <div class="answers-header">
+                    <h3>История вопросов и ответов</h3>
+                    <button class="btn btn-sm btn-secondary" id="toggleAnswers">
                         Свернуть
                     </button>
                 </div>
             </div>
             <div class="card-content">
-                <div class="symptoms-list" id="symptomsList">
-                    <div class="symptom-item symptom-positive">
-                        <span class="symptom-icon">✓</span>
-                        <span class="symptom-text">Покраснение глаза - Да</span>
-                    </div>
-                    <div class="symptom-item symptom-negative">
-                        <span class="symptom-icon">✗</span>
-                        <span class="symptom-text">Выделения из глаза - Нет</span>
-                    </div>
-                    <div class="symptom-item symptom-positive">
-                        <span class="symptom-icon">✓</span>
-                        <span class="symptom-text">Слезотечение - Да</span>
-                    </div>
-                    <div class="symptom-item symptom-negative">
-                        <span class="symptom-icon">✗</span>
-                        <span class="symptom-text">Светобоязнь - Нет</span>
-                    </div>
+                <div class="answers-list" id="answersList">
+                    {% if consultation and consultation.sub_graph_find_diagnosis and consultation.sub_graph_find_diagnosis.answers %}
+                        {% for key, qa in consultation.sub_graph_find_diagnosis.answers.items() %}
+                        <div class="answer-item answer-{{ qa.answer }}">
+                            <span class="answer-icon">{{ '✅' if qa.answer == 'yes' else '❌' }}</span>
+                            <span class="answer-text">{{ qa.question }} - {{ 'Да' if qa.answer == 'yes' else 'Нет' }}</span>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-state">
+                            <p class="text-muted">Ответы пока отсутствуют</p>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
 
         <!-- Navigation -->
-        
         <div class="consultation-navigation">
             <button class="btn btn-secondary" id="btnBack">
                 ← Назад к предыдущему вопросу
@@ -130,12 +187,19 @@
             </button>
         </div>
 
+        <!-- Consultation Info (скрыто) -->
+        <input type="hidden" id="consultationId" value="{{ consultation.id if consultation else '' }}">
+        <input type="hidden" id="patientId" value="{{ patient.id if patient else '' }}">
+        {% endif %}
+
         <!-- Keyboard shortcuts hint -->
+        {% if patient %}
         <div class="keyboard-hint text-muted text-sm text-center">
             Подсказка: используйте клавиши
             <span class="keyboard-shortcut">Y</span> для "Да" и
             <span class="keyboard-shortcut">N</span> для "Нет"
         </div>
+        {% endif %}
     </main>
 
     <script src="{{ url_for('static', filename='js/consultation.js') }}"></script>

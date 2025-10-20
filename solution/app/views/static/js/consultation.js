@@ -1,16 +1,34 @@
-// Consultation process logic
+// Consultation process logic with decision graph
 class ConsultationProcess {
     constructor() {
-        this.currentQuestion = 1;
-        this.totalQuestions = 12;
-        this.symptoms = [];
+        this.consultationId = document.getElementById('consultationId')?.value;
+        this.patientId = document.getElementById('patientId')?.value;
+        this.isDiagnosisReached = false;
         this.init();
     }
 
     init() {
+        if (!this.consultationId || !this.patientId) {
+            return; // Нет активной консультации
+        }
+        
         this.bindEvents();
         this.setupKeyboardNavigation();
-        this.updateProgress();
+        this.loadConsultationData();
+    }
+
+    async loadConsultationData() {
+        try {
+            const response = await fetch(`/api/consultation/${this.consultationId}`);
+            const result = await response.json();
+            
+            if (result.success) {
+                this.updateUI(result.consultation, result.progress, result.current_question);
+            }
+        } catch (error) {
+            console.error('Ошибка загрузки данных консультации:', error);
+            this.showToast('Ошибка загрузки данных консультации', 'error');
+        }
     }
 
     bindEvents() {
@@ -26,7 +44,7 @@ class ConsultationProcess {
         const backBtn = document.getElementById('btnBack');
         if (backBtn) {
             backBtn.addEventListener('click', () => {
-                this.goToPreviousQuestion();
+                this.showToast('Функция возврата находится в разработке', 'warning');
             });
         }
 
@@ -38,61 +56,179 @@ class ConsultationProcess {
             });
         }
 
-        // Toggle symptoms
-        const toggleBtn = document.getElementById('toggleSymptoms');
+        // Complete consultation button
+        const completeBtn = document.getElementById('btnCompleteConsultation');
+        if (completeBtn) {
+            completeBtn.addEventListener('click', () => {
+                this.completeConsultation();
+            });
+        }
+
+        // Toggle answers
+        const toggleBtn = document.getElementById('toggleAnswers');
         if (toggleBtn) {
             toggleBtn.addEventListener('click', () => {
-                this.toggleSymptoms();
+                this.toggleAnswers();
             });
         }
     }
 
     setupKeyboardNavigation() {
         document.addEventListener('keydown', (e) => {
-            // Prevent default behavior only for our shortcuts
-            if (e.key === '1' || e.key === '2' || e.key === ' ') {
-                e.preventDefault();
-            }
-
-            switch(e.key) {
-                case '1':
-                case ' ':
+            if (!this.consultationId || this.isDiagnosisReached) return;
+            
+            switch(e.key.toLowerCase()) {
+                case 'y':
+                case 'н': // Русская раскладка
+                    e.preventDefault();
                     this.handleAnswer('yes');
                     break;
-                case '2':
+                case 'n':
+                case 'т': // Русская раскладка
+                    e.preventDefault();
                     this.handleAnswer('no');
                     break;
-                case 'Escape':
+                case 'escape':
                     this.cancelConsultation();
-                    break;
-                case 'Backspace':
-                    this.goToPreviousQuestion();
                     break;
             }
         });
     }
 
-    handleAnswer(answer) {
+    async handleAnswer(answer) {
+        if (this.isDiagnosisReached) return;
+        
         // Add visual feedback
         this.showAnswerFeedback(answer);
 
-        // Simulate API call delay
-        setTimeout(() => {
-            this.symptoms.push({
-                question: this.currentQuestion,
-                answer: answer,
-                timestamp: new Date()
+        try {
+            const response = await fetch('/api/consultation/save-answer', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    consultation_id: parseInt(this.consultationId),
+                    answer: answer
+                })
             });
 
-            this.currentQuestion++;
-            this.updateProgress();
+            const result = await response.json();
 
-            if (this.currentQuestion > this.totalQuestions) {
-                this.completeConsultation();
+            if (result.success) {
+                this.showToast('Ответ сохранен', 'success');
+                
+                // Обновляем UI
+                this.updateUIAfterAnswer(result);
+                
+                // Проверяем, достигли ли диагноза
+                if (result.diagnosis_candidate) {
+                    this.showDiagnosisPreview(result.diagnosis_candidate);
+                }
             } else {
-                this.updateQuestion();
+                this.showToast('Ошибка сохранения ответа: ' + result.message, 'error');
             }
-        }, 500);
+        } catch (error) {
+            console.error('Ошибка сохранения ответа:', error);
+            this.showToast('Ошибка сохранения ответа', 'error');
+        }
+    }
+
+    updateUI(consultation, progress, currentQuestion) {
+        // Обновляем прогресс
+        this.updateProgress(progress);
+        
+        // Обновляем текущий вопрос
+        if (currentQuestion && currentQuestion.text) {
+            document.getElementById('questionText').textContent = currentQuestion.text;
+        }
+        
+        // Обновляем номер вопроса
+        const questionNumber = document.getElementById('questionNumber');
+        if (questionNumber && progress) {
+            questionNumber.textContent = `Вопрос ${progress.questions_answered + 1}`;
+        }
+        
+        // Обновляем историю ответов
+        this.updateAnswersHistory(consultation.sub_graph_find_diagnosis?.answers);
+    }
+
+    updateUIAfterAnswer(result) {
+        if (result.progress) {
+            this.updateProgress(result.progress);
+        }
+        
+        if (result.next_question) {
+            document.getElementById('questionText').textContent = result.next_question.text;
+            
+            // Обновляем номер вопроса
+            const questionNumber = document.getElementById('questionNumber');
+            if (questionNumber && result.progress) {
+                questionNumber.textContent = `Вопрос ${result.progress.questions_answered + 1}`;
+            }
+        }
+        
+        // Перезагружаем полные данные для обновления истории
+        this.loadConsultationData();
+    }
+
+    updateProgress(progress) {
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+
+        if (progressFill && progress.progress_percent !== undefined) {
+            progressFill.style.width = `${progress.progress_percent}%`;
+        }
+        if (progressText) {
+            progressText.textContent = `${Math.round(progress.progress_percent)}% завершено (${progress.questions_answered} вопросов)`;
+        }
+    }
+
+    updateAnswersHistory(answers) {
+        const answersList = document.getElementById('answersList');
+        if (!answersList) return;
+
+        answersList.innerHTML = '';
+        
+        if (!answers || Object.keys(answers).length === 0) {
+            answersList.innerHTML = '<div class="empty-state"><p class="text-muted">Ответы пока отсутствуют</p></div>';
+            return;
+        }
+
+        // Сортируем ответы по ключу (q1, q2, ...)
+        const sortedAnswers = Object.entries(answers)
+            .sort(([keyA], [keyB]) => {
+                const numA = parseInt(keyA.replace('q', ''));
+                const numB = parseInt(keyB.replace('q', ''));
+                return numA - numB;
+            });
+
+        sortedAnswers.forEach(([key, qa]) => {
+            const answerItem = document.createElement('div');
+            answerItem.className = `answer-item answer-${qa.answer}`;
+            answerItem.innerHTML = `
+                <span class="answer-icon">${qa.answer === 'yes' ? '✅' : '❌'}</span>
+                <span class="answer-text">${qa.question} - ${qa.answer === 'yes' ? 'Да' : 'Нет'}</span>
+            `;
+            answersList.appendChild(answerItem);
+        });
+    }
+
+    showDiagnosisPreview(diagnosis) {
+        this.isDiagnosisReached = true;
+        
+        const preview = document.getElementById('diagnosisPreview');
+        const diagnosisText = document.getElementById('previewDiagnosisText');
+        
+        if (preview && diagnosisText) {
+            diagnosisText.textContent = diagnosis;
+            preview.style.display = 'block';
+            
+            // Прокручиваем к превью диагноза
+            preview.scrollIntoView({ behavior: 'smooth' });
+            
+            this.showToast('Достигнут предварительный диагноз!', 'success');
+        }
     }
 
     showAnswerFeedback(answer) {
@@ -106,95 +242,67 @@ class ConsultationProcess {
         if (selectedBtn) {
             selectedBtn.style.transform = 'scale(1.1)';
             selectedBtn.style.opacity = '1';
+            
+            // Сбрасываем стиль через 500ms
+            setTimeout(() => {
+                selectedBtn.style.transform = '';
+                selectedBtn.style.opacity = '';
+            }, 500);
         }
     }
 
-    updateProgress() {
-        const progress = (this.currentQuestion / this.totalQuestions) * 100;
-        const progressFill = document.querySelector('.progress-fill');
-        const progressText = document.querySelector('.progress-text');
-        const questionNumber = document.querySelector('.question-number');
+    async completeConsultation() {
+        try {
+            const response = await fetch('/api/consultation/complete', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    consultation_id: parseInt(this.consultationId)
+                })
+            });
 
-        if (progressFill) {
-            progressFill.style.width = `${progress}%`;
-        }
-        if (progressText) {
-            progressText.textContent = `${Math.round(progress)}% завершено`;
-        }
-        if (questionNumber) {
-            questionNumber.textContent = `Вопрос ${this.currentQuestion} из ${this.totalQuestions}`;
-        }
-    }
+            const result = await response.json();
 
-    updateQuestion() {
-        // In a real app, this would fetch the next question from the server
-        const questions = [
-            "❓ Пациент жалуется на боль в глазу?",
-            "❓ Есть ли покраснение глаза?",
-            "❓ Наблюдаются ли выделения из глаза?",
-            "❓ Есть ли слезотечение?",
-            "❓ Беспокоит ли светобоязнь?",
-            "❓ Отмечается ли ухудшение зрения?",
-            "❓ Есть ли ощущение инородного тела?",
-            "❓ Беспокоит ли зуд в области глаз?",
-            "❓ Наблюдается ли отечность век?",
-            "❓ Есть ли головная боль?",
-            "❓ Отмечается ли тошнота?",
-            "❓ Были ли травмы глаза в последнее время?"
-        ];
-
-        const questionText = document.querySelector('.question-text');
-        if (questionText && questions[this.currentQuestion - 1]) {
-            questionText.textContent = questions[this.currentQuestion - 1];
-        }
-
-        // Reset button styles
-        document.querySelectorAll('.btn-answer').forEach(btn => {
-            btn.style.transform = '';
-            btn.style.opacity = '';
-        });
-    }
-
-    goToPreviousQuestion() {
-        if (this.currentQuestion > 1) {
-            this.currentQuestion--;
-            this.symptoms.pop(); // Remove last answer
-            this.updateProgress();
-            this.updateQuestion();
-        } else {
-            this.showToast('Это первый вопрос', 'warning');
+            if (result.success) {
+                this.showToast('Консультация завершена!', 'success');
+                
+                // Переходим на страницу результатов
+                setTimeout(() => {
+                    window.location.href = `/consultation/result?consultation_id=${this.consultationId}`;
+                }, 1500);
+            } else {
+                this.showToast('Ошибка завершения консультации: ' + result.message, 'error');
+            }
+        } catch (error) {
+            console.error('Ошибка завершения консультации:', error);
+            this.showToast('Ошибка завершения консультации', 'error');
         }
     }
 
     cancelConsultation() {
         if (confirm('Вы уверены, что хотите отменить консультацию? Все несохраненные данные будут потеряны.')) {
-            // Используем Flask route для dashboard
             window.location.href = '/dashboard';
         }
     }
 
-    completeConsultation() {
-        // Используем Flask route для consultation result
-        window.location.href = '/consultation/result';
-    }
-
-    toggleSymptoms() {
-        const symptomsList = document.getElementById('symptomsList');
-        const toggleBtn = document.getElementById('toggleSymptoms');
+    toggleAnswers() {
+        const answersList = document.getElementById('answersList');
+        const toggleBtn = document.getElementById('toggleAnswers');
         
-        if (!symptomsList || !toggleBtn) return;
+        if (!answersList || !toggleBtn) return;
         
-        if (symptomsList.style.display === 'none') {
-            symptomsList.style.display = 'grid';
+        if (answersList.style.display === 'none') {
+            answersList.style.display = 'block';
             toggleBtn.textContent = 'Свернуть';
         } else {
-            symptomsList.style.display = 'none';
+            answersList.style.display = 'none';
             toggleBtn.textContent = 'Развернуть';
         }
     }
 
     showToast(message, type = 'info') {
-        // Simple toast notification
         const toast = document.createElement('div');
         toast.className = `toast toast-${type}`;
         toast.textContent = message;
@@ -203,19 +311,30 @@ class ConsultationProcess {
             position: 'fixed',
             top: '20px',
             right: '20px',
-            background: type === 'warning' ? '#FEF3C7' : '#DBEAFE',
-            color: type === 'warning' ? '#D97706' : '#1E40AF',
+            background: type === 'warning' ? '#FEF3C7' : 
+                       type === 'error' ? '#FEE2E2' : 
+                       type === 'success' ? '#D1FAE5' : '#DBEAFE',
+            color: type === 'warning' ? '#D97706' : 
+                   type === 'error' ? '#DC2626' : 
+                   type === 'success' ? '#059669' : '#1E40AF',
             padding: '1rem 1.5rem',
             borderRadius: 'var(--border-radius)',
-            border: `1px solid ${type === 'warning' ? '#FCD34D' : '#93C5FD'}`,
+            border: `1px solid ${
+                type === 'warning' ? '#FCD34D' : 
+                type === 'error' ? '#FECACA' : 
+                type === 'success' ? '#A7F3D0' : '#93C5FD'
+            }`,
             zIndex: '1000',
-            boxShadow: 'var(--shadow-md)'
+            boxShadow: 'var(--shadow-md)',
+            fontSize: '14px'
         });
 
         document.body.appendChild(toast);
 
         setTimeout(() => {
-            toast.remove();
+            if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
         }, 3000);
     }
 }
@@ -224,21 +343,3 @@ class ConsultationProcess {
 document.addEventListener('DOMContentLoaded', () => {
     new ConsultationProcess();
 });
-
-// Utility functions
-const ConsultationUtils = {
-    // Format symptoms for display
-    formatSymptom(symptom, answer) {
-        return {
-            text: `${symptom} - ${answer ? 'Да' : 'Нет'}`,
-            type: answer ? 'positive' : 'negative'
-        };
-    },
-
-    // Calculate diagnosis probability (simplified)
-    calculateProbability(symptoms) {
-        // This would be replaced with actual graph traversal logic
-        const positiveSymptoms = symptoms.filter(s => s.answer === 'yes').length;
-        return (positiveSymptoms / symptoms.length) * 100;
-    }
-};
