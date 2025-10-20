@@ -1,7 +1,11 @@
 from flask import request, jsonify, session, render_template
+from ..services.consultation_service import ConsultationService, get_diagnosis_service
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import os
+
+# Предварительная инициализация сервиса
+_diagnosis_service = get_diagnosis_service()
 
 def get_db_session():
     """Создание сессии БД"""
@@ -120,15 +124,13 @@ def consultation_controller(app):
     @app.route('/api/consultation/save-answer', methods=['POST'])
     @login_required
     def api_save_answer():
-        """Сохранение ответа на вопрос консультации"""
         db_session = None
         try:
             db_session = get_db_session()
-            from ..services.consultation_service import ConsultationService
-            
-            consultation_service = ConsultationService(db_session)
+            consultation_service = ConsultationService(db_session)  # Будет использовать единственный diagnosis_service
             
             data = request.get_json()
+            print(f"📨 Save answer request: {data}")
             
             if not data or 'consultation_id' not in data or 'answer' not in data:
                 return jsonify({
@@ -136,35 +138,44 @@ def consultation_controller(app):
                     'message': 'Отсутствуют обязательные данные'
                 }), 400
             
+            # Сохраняем ответ
             consultation = consultation_service.save_consultation_answer(
                 data['consultation_id'],
                 data['answer']
             )
             
-            # Получаем обновленный прогресс
+            # Получаем обновленные данные
             progress = consultation_service.get_consultation_progress(data['consultation_id'])
             next_question = consultation_service.get_current_question(data['consultation_id'])
+            
+            print(f"📊 Progress after save: {progress}")
+            print(f"❓ Next question after save: {next_question}")
             
             response_data = {
                 'success': True,
                 'message': 'Ответ сохранен',
                 'progress': progress,
-                'next_question': next_question
+                'next_question': next_question  # Используем next_question из сервиса
             }
             
-            # Если достигли диагноза, добавляем его в ответ
+            # Если достигли диагноза
             if next_question and next_question.get('is_final'):
                 diagnosis_data = consultation.sub_graph_find_diagnosis or {}
                 response_data['diagnosis_candidate'] = diagnosis_data.get('final_diagnosis_candidate')
+                print(f"🎯 Diagnosis candidate: {response_data['diagnosis_candidate']}")
             
             return jsonify(response_data), 200
             
         except ValueError as e:
+            print(f"❌ ValueError: {str(e)}")
             return jsonify({
                 'success': False,
                 'message': str(e)
             }), 400
         except Exception as e:
+            print(f"❌ Exception: {str(e)}")
+            import traceback
+            traceback.print_exc()
             return jsonify({
                 'success': False,
                 'message': f'Ошибка при сохранении ответа: {str(e)}'

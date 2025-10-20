@@ -27,22 +27,6 @@ class ConsultationRepository:
             .filter(Consultation.id == consultation_id)\
             .first()
 
-    def get_patient_consultations(self, patient_id: int):
-        """Получение всех консультаций пациента"""
-        return self.db_session.query(Consultation)\
-            .options(joinedload(Consultation.doctor))\
-            .filter(Consultation.patient_id == patient_id)\
-            .order_by(Consultation.consultation_date.desc())\
-            .all()
-
-    def get_doctor_consultations(self, doctor_id: int):
-        """Получение всех консультаций врача"""
-        return self.db_session.query(Consultation)\
-            .options(joinedload(Consultation.patient))\
-            .filter(Consultation.doctor_id == doctor_id)\
-            .order_by(Consultation.consultation_date.desc())\
-            .all()
-
     def update_consultation(self, consultation_id: int, consultation_data: dict):
         """Обновление данных консультации"""
         try:
@@ -50,16 +34,30 @@ class ConsultationRepository:
             if not consultation:
                 return None
             
+            print(f"🔄 REPOSITORY: Updating consultation {consultation_id} with data: {consultation_data}")
+            
             for key, value in consultation_data.items():
                 if hasattr(consultation, key):
+                    old_value = getattr(consultation, key)
                     setattr(consultation, key, value)
+                    print(f"🔄 REPOSITORY: Set {key} = {value} (was: {old_value})")
             
             self.db_session.commit()
             self.db_session.refresh(consultation)
+            
+            print(f"✅ REPOSITORY: Successfully updated consultation {consultation_id}")
+            print(f"✅ REPOSITORY: New sub_graph_find_diagnosis: {consultation.sub_graph_find_diagnosis}")
+            
             return consultation
             
         except Exception as e:
             self.db_session.rollback()
+            print(f"❌ REPOSITORY: Error updating consultation: {e}")
+            raise e
+                
+        except Exception as e:
+            self.db_session.rollback()
+            print(f"❌ REPOSITORY: Error updating consultation: {e}")
             raise e
 
     def update_consultation_status(self, consultation_id: int, status: str):

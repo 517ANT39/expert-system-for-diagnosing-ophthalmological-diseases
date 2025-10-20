@@ -10,6 +10,7 @@ services:
       - FLASK_ENV=development
     volumes:
       - .:/app
+      - ./solution/statistics:/app/solution/statistics
     depends_on:
       - db
     networks:

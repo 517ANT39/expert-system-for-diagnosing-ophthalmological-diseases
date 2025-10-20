@@ -495,6 +495,75 @@ def debug():
     <p>User name: {session.get('doctor_name')}</p>
     """
 
+@app.route('/debug/consultation/<int:consultation_id>')
+@login_required
+def debug_consultation(consultation_id):
+    """Диагностический маршрут для проверки консультации"""
+    try:
+        db_session = get_db_session()
+        from solution.app.services.consultation_service import ConsultationService
+        from solution.app.services.diagnosis_service import DiagnosisService
+        
+        consultation_service = ConsultationService(db_session)
+        diagnosis_service = DiagnosisService()
+        
+        consultation = consultation_service.consultation_repository.get_consultation_by_id(consultation_id)
+        
+        result = {
+            'consultation': {
+                'id': consultation.id,
+                'status': consultation.status,
+                'sub_graph_find_diagnosis': consultation.sub_graph_find_diagnosis
+            },
+            'knowledge_graph_loaded': bool(diagnosis_service.knowledge_graph),
+            'initial_question': diagnosis_service.get_initial_question(),
+            'current_question': consultation_service.get_current_question(consultation_id)
+        }
+        
+        db_session.close()
+        return jsonify(result)
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    
+@app.route('/debug/services')
+def debug_services():
+    """Проверка версий сервисов"""
+    import importlib
+    import solution.app.services.consultation_service as cs
+    import solution.app.services.diagnosis_service as ds
+    
+    return jsonify({
+        'consultation_service_file': cs.__file__,
+        'diagnosis_service_file': ds.__file__,
+        'consultation_service_reload': importlib.reload(cs).__file__,
+        'diagnosis_service_reload': importlib.reload(ds).__file__
+    })
+
+@app.route('/debug/db/consultation/<int:consultation_id>')
+@login_required
+def debug_db_consultation(consultation_id):
+    """Проверка данных консультации в БД"""
+    try:
+        db_session = get_db_session()
+        consultation = db_session.query(Consultation).filter(Consultation.id == consultation_id).first()
+        
+        if consultation:
+            result = {
+                'id': consultation.id,
+                'status': consultation.status,
+                'sub_graph_find_diagnosis': consultation.sub_graph_find_diagnosis,
+                'raw_data': str(consultation.sub_graph_find_diagnosis)  # Для отладки
+            }
+        else:
+            result = {'error': 'Consultation not found'}
+        
+        db_session.close()
+        return jsonify(result)
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 if __name__ == '__main__':
     print("=== Starting Flask Application ===")
     print(f"Base directory: {base_dir}")
