@@ -109,7 +109,7 @@
                                 </td>
                                 <td>{{ patient.age }} лет</td>
 
-                                <td>{{ 'Мужской' if patient.sex.value == 'M' else 'Женский' }}</td>
+                                <td>{{ 'Мужской' if patient.sex == 'M' else 'Женский' }}</td>
                                 <td>{{ patient.phone or 'Не указан' }}</td>
                                 <td>{{ patient.email or 'Не указан' }}</td>
                                 <td>{{ patient.registered_at.strftime('%d.%m.%Y') if patient.registered_at else 'Не

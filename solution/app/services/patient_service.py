@@ -31,8 +31,8 @@ class PatientService:
             raise ValueError("Некорректная дата рождения")
 
         # Валидация пола
-        if patient_data['sex'] not in ['M', 'F', 'male', 'female']:
-            raise ValueError("Некорректное значение пола")
+        if patient_data['sex'] not in ['M', 'F']:
+            raise ValueError("Некорректное значение пола. Допустимые значения: M, F")
         
         # Приводим пол к формату строки - ИСПРАВЛЕНИЕ ЗДЕСЬ
         if patient_data['sex'] in ['male', 'M']:
@@ -97,12 +97,9 @@ class PatientService:
         if 'phone' in patient_data and patient_data['phone'] and not self._validate_phone(patient_data['phone']):
             raise ValueError("Некорректный формат телефона")
 
-        # Обработка пола при обновлении - ИСПРАВЛЕНИЕ ЗДЕСЬ
         if 'sex' in patient_data:
-            if patient_data['sex'] in ['male', 'M']:
-                patient_data['sex'] = 'M'  # Просто строка 'M'
-            elif patient_data['sex'] in ['female', 'F']:
-                patient_data['sex'] = 'F'  # Просто строка 'F'
+            if patient_data['sex'] not in ['M', 'F']:
+                raise ValueError("Некорректное значение пола. Допустимые значения: M, F")
 
         return self.patient_repository.update_patient(patient_id, patient_data)
 

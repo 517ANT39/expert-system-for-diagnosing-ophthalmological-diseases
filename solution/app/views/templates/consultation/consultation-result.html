@@ -64,7 +64,11 @@
                         {% endif %}
                     </div>
                     <div class="detail-item">
-                        <strong>Пол:</strong> {{ patient.gender }}
+                        <strong>Пол:</strong> {% if patient.sex == 'M' %}
+                        Мужской
+                        {% else %}
+                        Женский
+                        {% endif %}
                     </div>
                     <div class="detail-item">
                         <strong>Дата консультации:</strong> {{ consultation_info.date }}
@@ -83,7 +87,7 @@
                     <div class="detail-item">
                         <strong>ФИО врача:</strong> {{ doctor.name }}
                     </div>
-                    
+
                 </div>
             </div>
         </div>
@@ -203,12 +207,12 @@
                     </div>
                     {% if consultation_info.notes %}
                     <div class="additional-notes">
-                        <strong>Дополнительные примечания:</strong> 
+                        <strong>Дополнительные примечания:</strong>
                         <p>{{ consultation_info.notes }}</p>
                     </div>
                     {% endif %}
                 </div>
-                
+
                 <div class="form-actions" style="margin-top: 20px;">
                     <a href="{{ url_for('dashboard') }}" class="btn btn-primary">
                         ← Назад в панель управления
@@ -225,9 +229,9 @@
         function exportToPDF() {
             const patientName = "{{ patient.name }}";
             const diagnosis = "{{ diagnosis_result.primary_diagnosis }}";
-            
+
             alert(`Генерация PDF для пациента: ${patientName}\nДиагноз: ${diagnosis}\n\nВ реальной системе здесь будет создан PDF документ с полными результатами консультации.`);
-            
+
             // Здесь можно добавить реальную логику генерации PDF
             showToast('PDF документ готов к скачиванию', 'success');
         }
@@ -248,14 +252,14 @@
                 z-index: 1000;
             `;
             document.body.appendChild(toast);
-            
+
             setTimeout(() => {
                 toast.remove();
             }, 3000);
         }
 
         // Загрузка имени пользователя
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             fetch('/api/profile')
                 .then(response => response.json())
                 .then(data => {
@@ -268,7 +272,7 @@
                 });
         });
     </script>
-    
+
     <!-- ПОДКЛЮЧАЕМ СКРИПТ ПОСЛЕ ВСЕХ ОСНОВНЫХ ФУНКЦИЙ -->
     <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
 </body>
