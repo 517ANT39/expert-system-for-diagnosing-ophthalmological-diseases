@@ -8,6 +8,13 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/forms.css') }}">
+    <style>
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+    </style>
 </head>
 
 <body class="dashboard-page">
@@ -41,7 +48,7 @@
                 <p class="text-muted">Добавление нового пациента в базу данных</p>
             </div>
             <div class="header-actions">
-                <a href="{{ url_for('patient_list') }}" class="btn btn-secondary">
+                <a href="{{ url_for('patient_list') }}" class="btn btn-secondary btn-sm">
                     ← Назад к списку
                 </a>
             </div>
@@ -51,7 +58,7 @@
             <!-- Personal Information -->
             <div class="card">
                 <div class="card-header">
-                    <h2>👤 Персональная информация</h2>
+                    <h2>Персональная информация</h2>
                 </div>
                 <div class="card-content">
                     <div class="form-grid">
@@ -98,7 +105,7 @@
             <!-- Contact Information -->
             <div class="card">
                 <div class="card-header">
-                    <h2>📞 Контактная информация</h2>
+                    <h2>Контактная информация</h2>
                 </div>
                 <div class="card-content">
                     <div class="form-grid">
@@ -123,7 +130,7 @@
             <!-- Medical Information -->
             <div class="card">
                 <div class="card-header">
-                    <h2>🏥 Медицинская информация</h2>
+                    <h2>Медицинская информация</h2>
                 </div>
                 <div class="card-content">
                     <div class="form-grid">
@@ -157,7 +164,7 @@
             <!-- Additional Notes -->
             <div class="card">
                 <div class="card-header">
-                    <h2>📝 Дополнительные примечания</h2>
+                    <h2>Дополнительные примечания</h2>
                 </div>
                 <div class="card-content">
                     <div class="form-group">
@@ -170,14 +177,14 @@
 
             <!-- Form Actions -->
             <div class="form-actions">
-                <button type="button" class="btn btn-secondary" onclick="window.history.back()">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="window.history.back()">
                     Отмена
                 </button>
-                <button type="button" class="btn btn-secondary" id="saveDraftBtn">
-                    💾 Сохранить черновик
+                <button type="button" class="btn btn-secondary btn-sm" id="saveDraftBtn">
+                    Сохранить черновик
                 </button>
-                <button type="submit" class="btn btn-primary">
-                    ✅ Сохранить пациента
+                <button type="submit" class="btn btn-primary btn-sm">
+                    Сохранить пациента
                 </button>
             </div>
         </form>

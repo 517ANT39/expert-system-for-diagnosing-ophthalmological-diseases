@@ -8,6 +8,14 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/consultation.css') }}">
+    <style>
+       
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+    </style>
 </head>
 
 <body class="dashboard-page">
@@ -41,8 +49,8 @@
                 <p class="text-muted">Консультация от {{ consultation_info.date }}</p>
             </div>
             <div class="header-actions">
-                <button class="btn btn-primary" onclick="exportToPDF()">
-                    📄 Экспорт в PDF
+                <button class="btn btn-primary btn-sm" onclick="exportToPDF()">
+                    Экспорт в PDF
                 </button>
             </div>
         </div>
@@ -109,7 +117,7 @@
         <div class="card diagnosis-card">
             <div class="card-header">
                 <div class="diagnosis-header">
-                    <h2>🎯 Окончательный диагноз</h2>
+                    <h2>Окончательный диагноз</h2>
                     <div class="confidence-badge">
                         Уверенность: {{ diagnosis_result.confidence }}%
                     </div>
@@ -155,7 +163,7 @@
                 <div class="recommendations-content">
                     {% if diagnosis_result.recommendations.medication %}
                     <div class="recommendation-category">
-                        <h4>💊 Медикаментозное лечение</h4>
+                        <h4>Медикаментозное лечение</h4>
                         <ul>
                             {% for med in diagnosis_result.recommendations.medication %}
                             <li>{{ med }}</li>
@@ -166,7 +174,7 @@
 
                     {% if diagnosis_result.recommendations.general %}
                     <div class="recommendation-category">
-                        <h4>📋 Общие рекомендации</h4>
+                        <h4>Общие рекомендации</h4>
                         <ul>
                             {% for rec in diagnosis_result.recommendations.general %}
                             <li>{{ rec }}</li>
@@ -177,7 +185,7 @@
 
                     {% if diagnosis_result.recommendations.follow_up %}
                     <div class="recommendation-category">
-                        <h4>📅 Наблюдение</h4>
+                        <h4>Наблюдение</h4>
                         <ul>
                             {% for followup in diagnosis_result.recommendations.follow_up %}
                             <li>{{ followup }}</li>
@@ -227,11 +235,11 @@
                 </div>
 
                 <div class="form-actions" style="margin-top: 20px;">
-                    <a href="{{ url_for('dashboard') }}" class="btn btn-primary">
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-sm">
                         ← Назад в панель управления
                     </a>
-                    <a href="{{ url_for('consultation') }}" class="btn btn-secondary">
-                        🆕 Новая консультация
+                    <a href="{{ url_for('consultation') }}" class="btn btn-secondary btn-sm">
+                        Новая консультация
                     </a>
                 </div>
             </div>
