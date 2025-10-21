@@ -90,7 +90,6 @@
         <!-- Quick Actions -->
         <div class="grid grid-2">
             <div class="action-card">
-                <div class="action-icon">👥</div>
                 <div class="action-content">
                     <h3>Новый пациент</h3>
                     <p class="text-muted">Добавить нового пациента в базу данных</p>
@@ -101,7 +100,6 @@
             </div>
 
             <div class="action-card">
-                <div class="action-icon">📊</div>
                 <div class="action-content">
                     <h3>Быстрая консультация</h3>
                     <p class="text-muted">Начать диагностику без выбора пациента</p>
@@ -133,6 +131,7 @@
                                 <th>Возраст</th>
                                 <th>Пол</th>
                                 <th>Телефон</th>
+                                <th>EMAIL</th>
                                 <th>Действия</th>
                             </tr>
                         </thead>
@@ -160,11 +159,12 @@
                                             лет
                                         {% endif %}
                                     {% else %}
-                                        Не указан
+                                        -
                                     {% endif %}
                                 </td>
                                 <td>{{ 'Мужской' if patient.sex == 'M' else 'Женский' }}</td>
-                                <td>{{ patient.phone or 'Не указан' }}</td>
+                                <td>{{ patient.phone or '-' }}</td>
+                                <td>{{ patient.email or '-' }}</td>
                                 <td>
                                     <div class="action-buttons">
                                         <a href="{{ url_for('patient_history', patient_id=patient.id) }}"
@@ -189,7 +189,6 @@
                 {% endif %}
                 {% else %}
                 <div class="empty-state">
-                    <div class="empty-state-icon">👥</div>
                     <h3>Список пациентов пуст</h3>
                     <p class="text-muted">В системе пока нет пациентов. Добавьте первого пациента, чтобы начать работу.</p>
                     <a href="{{ url_for('patient_new') }}" class="btn btn-primary btn-sm">

@@ -21,6 +21,41 @@
             gap: 8px;
             align-items: center;
         }
+
+        /* Стили для блока активной консультации */
+        .active-consultation-alert {
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            border: 1px solid #90caf9;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .active-consultation-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .active-consultation-info {
+            flex: 1;
+        }
+
+        .active-consultation-title {
+            font-weight: 600;
+            color: #1565c0;
+            margin-bottom: 0.25rem;
+        }
+
+        .active-consultation-date {
+            color: #546e7a;
+            font-size: 0.875rem;
+        }
+
+        .active-consultation-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
     </style>
 </head>
 
@@ -49,6 +84,34 @@
     <!-- Main Content -->
     <main class="container main-content">
         {% if patient %}
+
+        <!-- Active Consultation Alert -->
+        {% if active_consultation %}
+        <div class="active-consultation-alert">
+            <div class="active-consultation-content">
+                <div class="active-consultation-info">
+                    <div class="active-consultation-title">
+                        📝 Есть незавершенная консультация
+                    </div>
+                    <div class="active-consultation-date">
+                        Начата: {{ active_consultation.created_at.strftime('%d.%m.%Y в %H:%M') if
+                        active_consultation.created_at else active_consultation.consultation_date.strftime('%d.%m.%Y в
+                        %H:%M') }}
+                    </div>
+                </div>
+                <div class="active-consultation-actions">
+                    <a href="{{ url_for('consultation', consultation_id=active_consultation.id) }}"
+                        class="btn btn-primary btn-sm">
+                        Продолжить консультацию
+                    </a>
+                    <button class="btn btn-secondary btn-sm" onclick="cancelConsultation({{ active_consultation.id }})">
+                        Отменить консультацию
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
         <!-- Patient Header -->
         <div class="card patient-header">
             <div class="card-content">
@@ -109,7 +172,7 @@
                 </div>
                 <div class="patient-actions">
                     <a href="{{ url_for('consultation', patient_id=patient.id) }}" class="btn btn-primary btn-sm">
-                        Консультация
+                        Новая консультация
                     </a>
                     <a href="{{ url_for('edit_patient', patient_id=patient.id) }}" class="btn btn-secondary btn-sm">
                         Редактировать
@@ -191,15 +254,32 @@
                                         }}</span>
                                 </div>
                                 <div class="consultation-actions">
+                                    {% if consultation.status == 'draft' %}
+                                    <a href="{{ url_for('consultation', patient_id=patient.id) }}"
+                                        class="btn btn-sm btn-primary">
+                                        Продолжить
+                                    </a>
+                                    {% else %}
                                     <a href="{{ url_for('consultation_result', consultation_id=consultation.id) }}"
                                         class="btn btn-sm btn-secondary">
                                         Просмотр
                                     </a>
+                                    {% endif %}
+
                                     <button class="btn btn-sm btn-secondary"
                                         onclick="exportConsultation({{ consultation.id }})">
                                         📄 PDF
                                     </button>
                                 </div>
+                            </div>
+                            <div class="consultation-doctor">
+                                <strong>Врач:</strong>
+                                {% if consultation.doctor %}
+                                {{ consultation.doctor.last_name }} {{ consultation.doctor.first_name }} {{
+                                consultation.doctor.middle_name or '' }}
+                                {% else %}
+                                Врач не указан
+                                {% endif %}
                             </div>
                             <div class="consultation-diagnosis">
                                 <strong>Диагноз:</strong>
@@ -265,10 +345,18 @@
                                         {% endif %}
                                     </td>
                                     <td>
+                                        {% if consultation.status == 'draft' %}
+                                        <a href="{{ url_for('consultation', patient_id=patient.id) }}"
+                                            class="btn btn-sm btn-primary">
+                                            {% if active_consultation %}Продолжить{% else %}Продолжить{% endif %}
+                                        </a>
+
+                                        {% else %}
                                         <a href="{{ url_for('consultation_result', consultation_id=consultation.id) }}"
                                             class="btn btn-sm btn-secondary">
                                             Просмотр
                                         </a>
+                                        {% endif %}
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -342,10 +430,10 @@
                             </p>
                         </div>
                         <div class="info-section">
-                            <h4>Статус пациента</h4>
+                            <!--<h4>Статус пациента</h4>
                             <p class="text-muted">
                                 <span class="status-badge status-completed">Активный</span>
-                            </p>
+                            </p>-->
                         </div>
                         <div class="info-section">
                             <h4>Последнее обновление</h4>
@@ -376,6 +464,36 @@
     </main>
     <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
     <script src="{{ url_for('static', filename='js/patient-history.js') }}"></script>
+    <script>
+        function cancelConsultation(consultationId) {
+            if (confirm('Вы уверены, что хотите отменить эту консультацию? Все данные будут удалены.')) {
+                // Здесь будет запрос на отмену консультации
+                fetch(`/consultation/${consultationId}/cancel`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Консультация отменена');
+                            location.reload();
+                        } else {
+                            alert('Ошибка при отмене консультации');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Ошибка при отмене консультации');
+                    });
+            }
+        }
+
+        function exportConsultation(consultationId) {
+            alert(`Экспорт консультации #${consultationId} в PDF будет реализован позже`);
+        }
+    </script>
 
 </body>
 
