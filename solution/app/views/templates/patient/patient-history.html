@@ -8,6 +8,20 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/patient-history.css') }}">
+    <style>
+        /* Единый стиль для кнопок */
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+
+        .patient-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+    </style>
 </head>
 
 <body class="dashboard-page">
@@ -48,10 +62,25 @@
                             <span class="meta-item">
                                 <strong>Дата рождения:</strong>
                                 {% if patient.birthday %}
-                                {{ patient.birthday.strftime('%d.%m.%Y') }} ({{ patient.age }} лет)
-                                {% else %}
-                                Не указана
-                                {% endif %}
+                                {{ patient.birthday.strftime('%d.%m.%Y') }}
+                                (
+                                {% if patient.age %}
+                                {{ patient.age }}
+                                {% set age = patient.age %}
+                                {% if age % 10 == 1 and age % 100 != 11 %}
+                                год
+                                {% elif age % 10 >= 2 and age % 10 <= 4 and (age % 100 < 10 or age % 100>= 20) %}
+                                    года
+                                    {% else %}
+                                    лет
+                                    {% endif %}
+                                    {% else %}
+                                    возраст не указан
+                                    {% endif %}
+                                    )
+                                    {% else %}
+                                    Не указана
+                                    {% endif %}
                             </span>
                             <span class="meta-item">
                                 <strong>Пол:</strong>
@@ -79,12 +108,12 @@
                     </div>
                 </div>
                 <div class="patient-actions">
-                    <a href="{{ url_for('consultation', patient_id=patient.id) }}" class="btn btn-primary">
-                        🆕 Новая консультация
+                    <a href="{{ url_for('consultation', patient_id=patient.id) }}" class="btn btn-primary btn-sm">
+                        Консультация
                     </a>
-                    <!-- ИСПРАВЛЕННАЯ ССЫЛКА - добавлен вызов функции edit_patient -->
-                    <a href="{{ url_for('edit_patient', patient_id=patient.id) }}" class="btn btn-sm btn-primary">✏️
-                        Редактировать</a>
+                    <a href="{{ url_for('edit_patient', patient_id=patient.id) }}" class="btn btn-secondary btn-sm">
+                        Редактировать
+                    </a>
                 </div>
             </div>
         </div>
@@ -252,8 +281,8 @@
                     <div class="empty-state-icon">📋</div>
                     <h3>Консультации не найдены</h3>
                     <p class="text-muted">У этого пациента пока нет консультаций.</p>
-                    <a href="{{ url_for('consultation', patient_id=patient.id) }}" class="btn btn-primary">
-                        🆕 Начать первую консультацию
+                    <a href="{{ url_for('consultation', patient_id=patient.id) }}" class="btn btn-primary btn-sm">
+                        Консультация
                     </a>
                 </div>
                 {% endif %}
@@ -339,7 +368,7 @@
             <h3>Пациент не найден</h3>
             <p class="text-muted">Не удалось загрузить данные пациента. Возможно, пациент был удален или произошла
                 ошибка.</p>
-            <a href="{{ url_for('patient_list') }}" class="btn btn-primary">
+            <a href="{{ url_for('patient_list') }}" class="btn btn-primary btn-sm">
                 ← Вернуться к списку пациентов
             </a>
         </div>

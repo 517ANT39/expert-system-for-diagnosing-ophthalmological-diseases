@@ -8,6 +8,20 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/consultation.css') }}">
+    <style>
+        /* Единый стиль для кнопок */
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+        
+        .consultation-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+    </style>
 </head>
 
 <body class="dashboard-page">
@@ -94,7 +108,7 @@
                                 </div>
                             </div>
                             <a href="/consultation?patient_id={{ patient_item.id }}" class="btn btn-primary btn-sm">
-                                Начать консультацию
+                                Консультация
                             </a>
                         </div>
                         {% endfor %}
@@ -138,15 +152,15 @@
         <!-- Diagnosis Preview (показывается при достижении диагноза) -->
         <div class="card diagnosis-preview-card" id="diagnosisPreview" style="display: none;">
             <div class="card-header">
-                <h3>🎯 Окончательный диагноз</h3> <!-- Изменили с "Предварительный" на "Окончательный" -->
+                <h3>Окончательный диагноз</h3>
             </div>
             <div class="card-content">
                 <div class="diagnosis-preview-content">
                     <h4 id="previewDiagnosisText"></h4>
                     <p class="text-muted">Для завершения консультации и получения полных рекомендаций нажмите "Завершить
                         консультацию"</p>
-                    <button class="btn btn-primary" id="btnCompleteConsultation">
-                        ✅ Завершить консультацию
+                    <button class="btn btn-primary btn-sm" id="btnCompleteConsultation">
+                        Завершить консультацию
                     </button>
                 </div>
             </div>
@@ -183,15 +197,15 @@
 
         <!-- Navigation -->
         <div class="consultation-navigation">
-            <button class="btn btn-secondary" id="btnBack" disabled>
-                ← Назад к предыдущему вопросу
+            <button class="btn btn-secondary btn-sm" id="btnBack" disabled>
+                ← Назад
             </button>
             <div class="consultation-actions">
-                <button class="btn btn-warning" id="btnSaveDraft">
-                    💾 Сохранить черновик
+                <button class="btn btn-warning btn-sm" id="btnSaveDraft">
+                    Сохранить черновик
                 </button>
-                <button class="btn btn-danger" id="btnCancel">
-                    🗙 Отменить консультацию
+                <button class="btn btn-danger btn-sm" id="btnCancel">
+                    Отменить
                 </button>
             </div>
         </div>

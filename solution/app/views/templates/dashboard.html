@@ -7,6 +7,51 @@
     <title>Панель управления - ОфтальмоЭксперт</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <style>
+        /* Стили для ограниченной высоты таблицы с прокруткой */
+        .table-container {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+        }
+        
+        .table-container table {
+            margin-bottom: 0;
+        }
+        
+        .table-container thead th {
+            position: sticky;
+            top: 0;
+            background: #f8f9fa;
+            z-index: 10;
+        }
+        
+        /* Уменьшаем размер кнопок */
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+        
+        /* Убираем лишние отступы в ячейках */
+        .compact-table td {
+            padding: 0.5rem;
+        }
+        
+        /* Компактные кнопки действий */
+        .action-buttons {
+            display: flex;
+            gap: 4px;
+            flex-wrap: nowrap;
+        }
+        
+        /* Единый стиль для кнопок в action-card */
+        .action-card .btn {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.875rem;
+        }
+    </style>
 </head>
 
 <body class="dashboard-page">
@@ -39,11 +84,7 @@
                 <h1>Панель управления</h1>
                 <p class="text-muted" id="welcomeMessage">Добро пожаловать</p>
             </div>
-            <div class="header-actions">
-                <a href="{{ url_for('consultation') }}" class="btn btn-primary">
-                    🆕 Новая консультация
-                </a>
-            </div>
+            
         </div>
 
         <!-- Quick Actions -->
@@ -53,17 +94,20 @@
                 <div class="action-content">
                     <h3>Новый пациент</h3>
                     <p class="text-muted">Добавить нового пациента в базу данных</p>
-                    <a href="{{ url_for('patient_new') }}" class="btn btn-secondary">Добавить пациента</a>
+                    <a href="{{ url_for('patient_new') }}" class="btn btn-secondary btn-sm">
+                        Добавить пациента
+                    </a>
                 </div>
             </div>
 
-            <!-- Убран блок "Статистика" с помощью display:none -->
-            <div class="action-card" style="display:none">
+            <div class="action-card">
                 <div class="action-icon">📊</div>
                 <div class="action-content">
-                    <h3>Статистика</h3>
-                    <p class="text-muted">Просмотр статистики и отчетов</p>
-                    <button class="btn btn-secondary">Открыть статистику</button>
+                    <h3>Быстрая консультация</h3>
+                    <p class="text-muted">Начать диагностику без выбора пациента</p>
+                    <a href="{{ url_for('consultation') }}" class="btn btn-secondary btn-sm">
+                        Начать консультацию
+                    </a>
                 </div>
             </div>
         </div>
@@ -71,58 +115,65 @@
         <!-- Recent Patients -->
         <div class="card">
             <div class="card-header">
-                <h2>Список пациентов</h2>
+                <div class="card-header-content">
+                    <h2>Последние пациенты</h2>
+                    <a href="{{ url_for('patient_list') }}" class="btn btn-sm btn-secondary">
+                        Все пациенты →
+                    </a>
+                </div>
             </div>
             <div class="card-content">
                 {% if patients %}
-                <div class="table-responsive">
-                    <table class="table">
+                <div class="table-container">
+                    <table class="table compact-table">
                         <thead>
                             <tr>
                                 <th>ID</th>
                                 <th>ФИО</th>
-                                <th>Дата рождения</th>
                                 <th>Возраст</th>
                                 <th>Пол</th>
                                 <th>Телефон</th>
-                                <th>Email</th>
-                                <th>Дата регистрации</th>
                                 <th>Действия</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for patient in patients %}
+                            {% for patient in patients[:5] %}
                             <tr>
                                 <td>#{{ patient.id }}</td>
                                 <td>
                                     <div class="patient-info">
-                                        <strong>{{ patient.last_name }} {{ patient.first_name }} {{ patient.middle_name
-                                            or '' }}</strong>
+                                        <strong>{{ patient.last_name }} {{ patient.first_name }} {{ patient.middle_name or '' }}</strong>
                                         {% if patient.email %}
                                         <span class="text-muted text-sm">{{ patient.email }}</span>
-                                        {% elif patient.phone %}
-                                        <span class="text-muted text-sm">{{ patient.phone }}</span>
                                         {% endif %}
                                     </div>
                                 </td>
-                                <td>{{ patient.birthday.strftime('%d.%m.%Y') if patient.birthday else 'Не указана' }}
+                                <td>
+                                    {% if patient.age %}
+                                        {{ patient.age }}
+                                        {% set age = patient.age %}
+                                        {% if age % 10 == 1 and age % 100 != 11 %}
+                                            год
+                                        {% elif age % 10 >= 2 and age % 10 <= 4 and (age % 100 < 10 or age % 100 >= 20) %}
+                                            года
+                                        {% else %}
+                                            лет
+                                        {% endif %}
+                                    {% else %}
+                                        Не указан
+                                    {% endif %}
                                 </td>
-                                <td>{{ patient.age }} лет</td>
-
                                 <td>{{ 'Мужской' if patient.sex == 'M' else 'Женский' }}</td>
                                 <td>{{ patient.phone or 'Не указан' }}</td>
-                                <td>{{ patient.email or 'Не указан' }}</td>
-                                <td>{{ patient.registered_at.strftime('%d.%m.%Y') if patient.registered_at else 'Не
-                                    указана' }}</td>
                                 <td>
                                     <div class="action-buttons">
                                         <a href="{{ url_for('patient_history', patient_id=patient.id) }}"
                                             class="btn btn-sm btn-secondary">
-                                            📋 История
+                                            История
                                         </a>
                                         <a href="{{ url_for('consultation', patient_id=patient.id) }}"
                                             class="btn btn-sm btn-primary">
-                                            🆕 Консультация
+                                            Консультация
                                         </a>
                                     </div>
                                 </td>
@@ -131,14 +182,18 @@
                         </tbody>
                     </table>
                 </div>
+                {% if patients|length > 5 %}
+                <div class="text-center mt-3">
+                    <small class="text-muted">Показано 5 из {{ patients|length }} пациентов</small>
+                </div>
+                {% endif %}
                 {% else %}
                 <div class="empty-state">
                     <div class="empty-state-icon">👥</div>
                     <h3>Список пациентов пуст</h3>
-                    <p class="text-muted">В системе пока нет пациентов. Добавьте первого пациента, чтобы начать работу.
-                    </p>
-                    <a href="{{ url_for('patient_new') }}" class="btn btn-primary">
-                        👥 Добавить первого пациента
+                    <p class="text-muted">В системе пока нет пациентов. Добавьте первого пациента, чтобы начать работу.</p>
+                    <a href="{{ url_for('patient_new') }}" class="btn btn-primary btn-sm">
+                        Добавить пациента
                     </a>
                 </div>
                 {% endif %}

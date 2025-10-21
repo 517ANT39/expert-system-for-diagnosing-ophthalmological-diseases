@@ -7,6 +7,20 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/patients.css') }}">
+    <style>
+        /* Компактные кнопки действий */
+        .action-buttons {
+            display: flex;
+            gap: 4px;
+            flex-wrap: nowrap;
+        }
+        
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+    </style>
 </head>
 <body class="dashboard-page">
     <!-- Navigation -->
@@ -39,8 +53,8 @@
                 <p class="text-muted">Все пациенты в системе</p>
             </div>
             <div class="header-actions">
-                <a href="{{ url_for('patient_new') }}" class="btn btn-primary">
-                    👥 Добавить пациента
+                <a href="{{ url_for('patient_new') }}" class="btn btn-primary btn-sm">
+                    Добавить пациента
                 </a>
             </div>
         </div>
@@ -55,8 +69,8 @@
                     <div class="search-box">
                         <input type="text" id="patientSearch" class="form-control" 
                                placeholder="Поиск по ФИО, ID или диагнозу...">
-                        <button class="btn btn-primary" onclick="searchPatients()">
-                            🔍 Поиск
+                        <button class="btn btn-primary btn-sm" onclick="searchPatients()">
+                            Поиск
                         </button>
                     </div>
                     <div class="filter-options">
@@ -94,7 +108,6 @@
                             <tr>
                                 <th>ID</th>
                                 <th>ФИО</th>
-                                <th>Дата рождения</th>
                                 <th>Возраст</th>
                                 <th>Пол</th>
                                 <th>Телефон</th>
@@ -117,8 +130,21 @@
                                         {% endif %}
                                     </div>
                                 </td>
-                                <td>{{ patient.birthday.strftime('%d.%m.%Y') if patient.birthday else 'Не указана' }}</td>
-                                <td>{{ patient.age }} лет</td>
+                                <td>
+                                    {% if patient.age %}
+                                        {{ patient.age }}
+                                        {% set age = patient.age %}
+                                        {% if age % 10 == 1 and age % 100 != 11 %}
+                                            год
+                                        {% elif age % 10 >= 2 and age % 10 <= 4 and (age % 100 < 10 or age % 100 >= 20) %}
+                                            года
+                                        {% else %}
+                                            лет
+                                        {% endif %}
+                                    {% else %}
+                                        Не указан
+                                    {% endif %}
+                                </td>
                                 <td>{{ 'Мужской' if patient.sex == 'M' else 'Женский' }}</td>
                                 <td>{{ patient.phone or 'Не указан' }}</td>
                                 <td>{{ patient.email or 'Не указан' }}</td>
@@ -126,10 +152,10 @@
                                 <td>
                                     <div class="action-buttons">
                                         <a href="{{ url_for('patient_history', patient_id=patient.id) }}" class="btn btn-sm btn-secondary">
-                                            📋 История
+                                            История
                                         </a>
                                         <a href="{{ url_for('consultation', patient_id=patient.id) }}" class="btn btn-sm btn-primary">
-                                            🆕 Консультация
+                                            Консультация
                                         </a>
                                     </div>
                                 </td>
@@ -141,17 +167,17 @@
 
                 <!-- Pagination -->
                 <div class="pagination">
-                    <button class="btn btn-secondary" disabled>← Назад</button>
+                    <button class="btn btn-secondary btn-sm" disabled>← Назад</button>
                     <span class="page-info text-muted">Страница 1 из 1</span>
-                    <button class="btn btn-secondary" disabled>Вперед →</button>
+                    <button class="btn btn-secondary btn-sm" disabled>Вперед →</button>
                 </div>
                 {% else %}
                 <div class="empty-state">
                     <div class="empty-state-icon">👥</div>
                     <h3>Список пациентов пуст</h3>
                     <p class="text-muted">В системе пока нет пациентов. Добавьте первого пациента, чтобы начать работу.</p>
-                    <a href="{{ url_for('patient_new') }}" class="btn btn-primary">
-                        👥 Добавить первого пациента
+                    <a href="{{ url_for('patient_new') }}" class="btn btn-primary btn-sm">
+                        Добавить пациента
                     </a>
                 </div>
                 {% endif %}
@@ -187,7 +213,7 @@
             if (!patients || patients.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="9" class="text-center text-muted">
+                        <td colspan="8" class="text-center text-muted">
                             Пациенты не найдены
                         </td>
                     </tr>
@@ -200,9 +226,21 @@
             patients.forEach(patient => {
                 const fullName = `${patient.last_name} ${patient.first_name} ${patient.middle_name || ''}`;
                 const contactInfo = patient.email || patient.phone;
-                const birthday = patient.birthday ? new Date(patient.birthday).toLocaleDateString('ru-RU') : 'Не указана';
                 const registeredAt = patient.registered_at ? new Date(patient.registered_at).toLocaleDateString('ru-RU') : 'Не указана';
                 const sex = patient.sex === 'M' ? 'Мужской' : 'Женский';
+                
+                // Правильное склонение возраста
+                let ageText = 'Не указан';
+                if (patient.age) {
+                    const age = patient.age;
+                    if (age % 10 == 1 && age % 100 != 11) {
+                        ageText = age + ' год';
+                    } else if (age % 10 >= 2 && age % 10 <= 4 && (age % 100 < 10 || age % 100 >= 20)) {
+                        ageText = age + ' года';
+                    } else {
+                        ageText = age + ' лет';
+                    }
+                }
                 
                 html += `
                     <tr>
@@ -213,8 +251,7 @@
                                 ${contactInfo ? `<span class="text-muted text-sm">${contactInfo}</span>` : ''}
                             </div>
                         </td>
-                        <td>${birthday}</td>
-                        <td>${patient.age || 'Не указан'} лет</td>
+                        <td>${ageText}</td>
                         <td>${sex}</td>
                         <td>${patient.phone || 'Не указан'}</td>
                         <td>${patient.email || 'Не указан'}</td>
@@ -222,10 +259,10 @@
                         <td>
                             <div class="action-buttons">
                                 <a href="/patient/${patient.id}/history" class="btn btn-sm btn-secondary">
-                                    📋 История
+                                    История
                                 </a>
                                 <a href="/consultation?patient_id=${patient.id}" class="btn btn-sm btn-primary">
-                                    🆕 Консультация
+                                    Консультация
                                 </a>
                             </div>
                         </td>
