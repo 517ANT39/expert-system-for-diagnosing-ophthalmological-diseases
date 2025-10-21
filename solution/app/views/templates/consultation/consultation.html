@@ -21,6 +21,86 @@
             gap: 8px;
             align-items: center;
         }
+        
+        /* Стили для списка пациентов */
+        .patient-selection-card {
+            margin-bottom: 1.5rem;
+        }
+        
+        .patient-list-container {
+            max-height: 350px;
+            overflow-y: auto;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 0.5rem;
+        }
+        
+        .patient-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background-color 0.2s;
+        }
+        
+        .patient-item:last-child {
+            border-bottom: none;
+        }
+        
+        .patient-item:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .patient-info {
+            flex: 1;
+        }
+        
+        .patient-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .patient-meta {
+            font-size: 0.875rem;
+            color: #6c757d;
+        }
+        
+        .patient-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .empty-patient-list {
+            text-align: center;
+            padding: 2rem;
+            color: #6c757d;
+        }
+        
+        .patient-count {
+            font-size: 0.875rem;
+            color: #6c757d;
+            margin-bottom: 0.75rem;
+        }
+        
+        /* Стили для скроллбара */
+        .patient-list-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .patient-list-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        .patient-list-container::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 10px;
+        }
+        
+        .patient-list-container::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
     </style>
 </head>
 
@@ -92,27 +172,44 @@
             <div class="card-content">
                 <div class="patient-selection">
                     <p class="text-muted">Пожалуйста, выберите пациента для начала консультации:</p>
-                    <div class="patient-list" id="patientList">
-                        {% for patient_item in patients %}
-                        <div class="patient-item">
-                            <div class="patient-info">
-                                <strong>{{ patient_item.last_name }} {{ patient_item.first_name }} {{
-                                    patient_item.middle_name or '' }}</strong>
-                                <div class="patient-meta">
-                                    {% if patient_item.birthday %}
-                                    Дата рождения: {{ patient_item.birthday.strftime('%d.%m.%Y') }}
-                                    {% endif %}
-                                    {% if patient_item.age %}
-                                    ({{ patient_item.age }} лет)
-                                    {% endif %}
+                    
+                    <div class="patient-count">
+                        Всего пациентов: {{ patients|length }}
+                    </div>
+                    
+                    {% if patients %}
+                    <div class="patient-list-container">
+                        <div class="patient-list" id="patientList">
+                            {% for patient_item in patients %}
+                            <div class="patient-item">
+                                <div class="patient-info">
+                                    <div class="patient-name">
+                                        {{ patient_item.last_name }} {{ patient_item.first_name }} {{ patient_item.middle_name or '' }}
+                                    </div>
+                                    <div class="patient-meta">
+                                        {% if patient_item.birthday %}
+                                        Дата рождения: {{ patient_item.birthday.strftime('%d.%m.%Y') }}
+                                        {% endif %}
+                                        {% if patient_item.age %}
+                                        ({{ patient_item.age }} лет)
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="patient-actions">
+                                    <a href="/consultation?patient_id={{ patient_item.id }}" class="btn btn-primary btn-sm">
+                                        Начать консультацию
+                                    </a>
                                 </div>
                             </div>
-                            <a href="/consultation?patient_id={{ patient_item.id }}" class="btn btn-primary btn-sm">
-                                Консультация
-                            </a>
+                            {% endfor %}
                         </div>
-                        {% endfor %}
                     </div>
+                    {% else %}
+                    <div class="empty-patient-list">
+                        <p>Нет доступных пациентов</p>
+                        <a href="{{ url_for('patient_list') }}" class="btn btn-primary">Добавить пациента</a>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>

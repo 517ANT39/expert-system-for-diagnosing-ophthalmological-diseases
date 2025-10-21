@@ -128,7 +128,7 @@
                     <table class="table compact-table">
                         <thead>
                             <tr>
-                                <th>ID</th>
+                                <!-- <th>ID</th>-->
                                 <th>ФИО</th>
                                 <th>Возраст</th>
                                 <th>Пол</th>
@@ -137,9 +137,9 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for patient in patients[:5] %}
+                            {% for patient in patients[-3:]|reverse %}
                             <tr>
-                                <td>#{{ patient.id }}</td>
+                                <!-- <td>#{{ patient.id }}</td>-->
                                 <td>
                                     <div class="patient-info">
                                         <strong>{{ patient.last_name }} {{ patient.first_name }} {{ patient.middle_name or '' }}</strong>
@@ -182,9 +182,9 @@
                         </tbody>
                     </table>
                 </div>
-                {% if patients|length > 5 %}
+                {% if patients|length > 3 %}
                 <div class="text-center mt-3">
-                    <small class="text-muted">Показано 5 из {{ patients|length }} пациентов</small>
+                    <small class="text-muted">Показано 3 из {{ patients|length }} пациентов</small>
                 </div>
                 {% endif %}
                 {% else %}
