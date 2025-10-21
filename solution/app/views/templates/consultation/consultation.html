@@ -183,12 +183,17 @@
 
         <!-- Navigation -->
         <div class="consultation-navigation">
-            <button class="btn btn-secondary" id="btnBack">
+            <button class="btn btn-secondary" id="btnBack" disabled>
                 ← Назад к предыдущему вопросу
             </button>
-            <button class="btn btn-danger" id="btnCancel">
-                🗙 Отменить консультацию
-            </button>
+            <div class="consultation-actions">
+                <button class="btn btn-warning" id="btnSaveDraft">
+                    💾 Сохранить черновик
+                </button>
+                <button class="btn btn-danger" id="btnCancel">
+                    🗙 Отменить консультацию
+                </button>
+            </div>
         </div>
 
         <!-- Consultation Info (скрыто) -->

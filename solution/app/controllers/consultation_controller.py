@@ -321,3 +321,93 @@ def consultation_controller(app):
         finally:
             if db_session:
                 db_session.close()
+
+        # API маршрут для отмены консультации
+    @app.route('/api/consultation/cancel', methods=['POST'])
+    @login_required
+    def api_cancel_consultation():
+        """Отмена консультации"""
+        db_session = None
+        try:
+            db_session = get_db_session()
+            from ..services.consultation_service import ConsultationService
+            
+            consultation_service = ConsultationService(db_session)
+            
+            data = request.get_json()
+            
+            if not data or 'consultation_id' not in data:
+                return jsonify({
+                    'success': False,
+                    'message': 'ID консультации обязателен'
+                }), 400
+            
+            consultation = consultation_service.cancel_consultation(data['consultation_id'])
+            
+            return jsonify({
+                'success': True,
+                'message': 'Консультация отменена',
+                'consultation': {
+                    'id': consultation.id,
+                    'status': consultation.status
+                }
+            }), 200
+            
+        except ValueError as e:
+            return jsonify({
+                'success': False,
+                'message': str(e)
+            }), 400
+        except Exception as e:
+            return jsonify({
+                'success': False,
+                'message': f'Ошибка при отмене консультации: {str(e)}'
+            }), 500
+        finally:
+            if db_session:
+                db_session.close()
+
+    # API маршрут для сохранения как черновика
+    @app.route('/api/consultation/save-draft', methods=['POST'])
+    @login_required
+    def api_save_draft():
+        """Сохранение консультации как черновика"""
+        db_session = None
+        try:
+            db_session = get_db_session()
+            from ..services.consultation_service import ConsultationService
+            
+            consultation_service = ConsultationService(db_session)
+            
+            data = request.get_json()
+            
+            if not data or 'consultation_id' not in data:
+                return jsonify({
+                    'success': False,
+                    'message': 'ID консультации обязателен'
+                }), 400
+            
+            consultation = consultation_service.save_as_draft(data['consultation_id'])
+            
+            return jsonify({
+                'success': True,
+                'message': 'Консультация сохранена как черновик',
+                'consultation': {
+                    'id': consultation.id,
+                    'status': consultation.status
+                }
+            }), 200
+            
+        except ValueError as e:
+            return jsonify({
+                'success': False,
+                'message': str(e)
+            }), 400
+        except Exception as e:
+            return jsonify({
+                'success': False,
+                'message': f'Ошибка при сохранении черновика: {str(e)}'
+            }), 500
+        finally:
+            if db_session:
+                db_session.close()

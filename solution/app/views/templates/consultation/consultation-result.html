@@ -73,6 +73,19 @@
                     <div class="detail-item">
                         <strong>Дата консультации:</strong> {{ consultation_info.date }}
                     </div>
+                    <!-- ДОБАВЬТЕ ЭТОТ БЛОК -->
+                    <div class="detail-item">
+                        <strong>Статус:</strong>
+                        {% if consultation.status == 'completed' %}
+                        <span class="status-badge status-completed">Завершена</span>
+                        {% elif consultation.status == 'active' %}
+                        <span class="status-badge status-active">Активна</span>
+                        {% elif consultation.status == 'draft' %}
+                        <span class="status-badge status-draft">Черновик</span>
+                        {% else %}
+                        <span class="status-badge status-canceled">Отменена</span>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </div>

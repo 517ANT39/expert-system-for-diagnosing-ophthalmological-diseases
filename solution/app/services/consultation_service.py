@@ -191,8 +191,9 @@ class ConsultationService:
         if not final_diagnosis and 'final_diagnosis_candidate' in diagnosis_data:
             final_diagnosis = diagnosis_data['final_diagnosis_candidate']
         
+        # ВАЖНО: Устанавливаем статус 'completed' при завершении
         consultation_data = {
-            'status': 'completed',
+            'status': 'completed',  # Исправлено: должно быть 'completed'
             'final_diagnosis': final_diagnosis,
             'notes': notes
         }
@@ -203,6 +204,33 @@ class ConsultationService:
         consultation_data['sub_graph_find_diagnosis'] = diagnosis_data
         
         return self.consultation_repository.update_consultation(consultation_id, consultation_data)
+
+    def cancel_consultation(self, consultation_id: int):
+        """Отмена консультации"""
+        consultation = self.consultation_repository.get_consultation_by_id(consultation_id)
+        if not consultation:
+            raise ValueError("Консультация не найдена")
+        
+        consultation_data = {
+            'status': 'canceled'
+        }
+        
+        return self.consultation_repository.update_consultation(consultation_id, consultation_data)
+
+    def save_as_draft(self, consultation_id: int):
+        """Сохранение консультации как черновика"""
+        consultation = self.consultation_repository.get_consultation_by_id(consultation_id)
+        if not consultation:
+            raise ValueError("Консультация не найдена")
+        
+        # Если консультация активна, но не завершена - сохраняем как черновик
+        if consultation.status == 'active':
+            consultation_data = {
+                'status': 'draft'
+            }
+            return self.consultation_repository.update_consultation(consultation_id, consultation_data)
+        
+        return consultation
 
     def get_consultation_result(self, consultation_id: int):
         """Получение результатов консультации"""

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/patient-history.css') }}">
 </head>
+
 <body class="dashboard-page">
     <!-- Navigation -->
     <nav class="navbar">
@@ -44,19 +46,19 @@
                         <h1>{{ patient.last_name }} {{ patient.first_name }} {{ patient.middle_name or '' }}</h1>
                         <div class="patient-meta">
                             <span class="meta-item">
-                                <strong>Дата рождения:</strong> 
+                                <strong>Дата рождения:</strong>
                                 {% if patient.birthday %}
-                                    {{ patient.birthday.strftime('%d.%m.%Y') }} ({{ patient.age }} лет)
+                                {{ patient.birthday.strftime('%d.%m.%Y') }} ({{ patient.age }} лет)
                                 {% else %}
-                                    Не указана
+                                Не указана
                                 {% endif %}
                             </span>
                             <span class="meta-item">
-                                <strong>Пол:</strong> 
+                                <strong>Пол:</strong>
                                 {% if patient.sex == 'M' %}
-                                    Мужской
+                                Мужской
                                 {% else %}
-                                    Женский
+                                Женский
                                 {% endif %}
                             </span>
                             <span class="meta-item">
@@ -81,7 +83,8 @@
                         🆕 Новая консультация
                     </a>
                     <!-- ИСПРАВЛЕННАЯ ССЫЛКА - добавлен вызов функции edit_patient -->
-                    <a href="{{ url_for('edit_patient', patient_id=patient.id) }}" class="btn btn-sm btn-primary">✏️ Редактировать</a>
+                    <a href="{{ url_for('edit_patient', patient_id=patient.id) }}" class="btn btn-sm btn-primary">✏️
+                        Редактировать</a>
                 </div>
             </div>
         </div>
@@ -103,9 +106,9 @@
                     <div class="summary-content">
                         <div class="summary-number">
                             {% if consultations %}
-                                {{ consultations[0].consultation_date.strftime('%d.%m.%Y') }}
+                            {{ consultations[0].consultation_date.strftime('%d.%m.%Y') }}
                             {% else %}
-                                Нет визитов
+                            Нет визитов
                             {% endif %}
                         </div>
                         <div class="summary-label">Последний визит</div>
@@ -118,9 +121,9 @@
                     <div class="summary-content">
                         <div class="summary-number">
                             {% if consultations %}
-                                {{ consultations|selectattr('final_diagnosis')|list|length }}
+                            {{ consultations|selectattr('final_diagnosis')|list|length }}
                             {% else %}
-                                0
+                            0
                             {% endif %}
                         </div>
                         <div class="summary-label">Установленных диагнозов</div>
@@ -155,31 +158,34 @@
                             <div class="consultation-header">
                                 <div class="consultation-date">
                                     <strong>{{ consultation.consultation_date.strftime('%d.%m.%Y') }}</strong>
-                                    <span class="text-muted">{{ consultation.consultation_date.strftime('%H:%M') }}</span>
+                                    <span class="text-muted">{{ consultation.consultation_date.strftime('%H:%M')
+                                        }}</span>
                                 </div>
                                 <div class="consultation-actions">
-                                    <a href="{{ url_for('consultation_result', consultation_id=consultation.id) }}" class="btn btn-sm btn-secondary">
+                                    <a href="{{ url_for('consultation_result', consultation_id=consultation.id) }}"
+                                        class="btn btn-sm btn-secondary">
                                         Просмотр
                                     </a>
-                                    <button class="btn btn-sm btn-secondary" onclick="exportConsultation({{ consultation.id }})">
+                                    <button class="btn btn-sm btn-secondary"
+                                        onclick="exportConsultation({{ consultation.id }})">
                                         📄 PDF
                                     </button>
                                 </div>
                             </div>
                             <div class="consultation-diagnosis">
-                                <strong>Диагноз:</strong> 
+                                <strong>Диагноз:</strong>
                                 {{ consultation.final_diagnosis or 'Диагноз не установлен' }}
                             </div>
                             <div class="consultation-status">
-                                <strong>Статус:</strong> 
-                                {% if consultation.status.value == 'completed' %}
-                                    <span class="status-badge status-completed">Завершена</span>
-                                {% elif consultation.status.value == 'active' %}
-                                    <span class="status-badge status-active">Активна</span>
-                                {% elif consultation.status.value == 'draft' %}
-                                    <span class="status-badge status-draft">Черновик</span>
+                                <strong>Статус:</strong>
+                                {% if consultation.status == 'completed' %}
+                                <span class="status-badge status-completed">Завершена</span>
+                                {% elif consultation.status == 'active' %}
+                                <span class="status-badge status-active">Активна</span>
+                                {% elif consultation.status == 'draft' %}
+                                <span class="status-badge status-draft">Черновик</span>
                                 {% else %}
-                                    <span class="status-badge status-canceled">Отменена</span>
+                                <span class="status-badge status-canceled">Отменена</span>
                                 {% endif %}
                             </div>
                             {% if consultation.notes %}
@@ -211,25 +217,27 @@
                                     <td>{{ consultation.consultation_date.strftime('%d.%m.%Y %H:%M') }}</td>
                                     <td>{{ consultation.final_diagnosis or 'Диагноз не установлен' }}</td>
                                     <td>
-                                        {% if consultation.status.value == 'completed' %}
-                                            <span class="status-badge status-completed">Завершена</span>
-                                        {% elif consultation.status.value == 'active' %}
-                                            <span class="status-badge status-active">Активна</span>
-                                        {% elif consultation.status.value == 'draft' %}
-                                            <span class="status-badge status-draft">Черновик</span>
+                                        {% if consultation.status == 'completed' %}
+                                        <span class="status-badge status-completed">Завершена</span>
+                                        {% elif consultation.status == 'active' %}
+                                        <span class="status-badge status-active">Активна</span>
+                                        {% elif consultation.status == 'draft' %}
+                                        <span class="status-badge status-draft">Черновик</span>
                                         {% else %}
-                                            <span class="status-badge status-canceled">Отменена</span>
+                                        <span class="status-badge status-canceled">Отменена</span>
                                         {% endif %}
                                     </td>
                                     <td>
                                         {% if consultation.doctor %}
-                                            {{ consultation.doctor.last_name }} {{ consultation.doctor.first_name }} {{ consultation.doctor.middle_name or '' }}
+                                        {{ consultation.doctor.last_name }} {{ consultation.doctor.first_name }} {{
+                                        consultation.doctor.middle_name or '' }}
                                         {% else %}
-                                            Врач не указан
+                                        Врач не указан
                                         {% endif %}
                                     </td>
                                     <td>
-                                        <a href="{{ url_for('consultation_result', consultation_id=consultation.id) }}" class="btn btn-sm btn-secondary">
+                                        <a href="{{ url_for('consultation_result', consultation_id=consultation.id) }}"
+                                            class="btn btn-sm btn-secondary">
                                             Просмотр
                                         </a>
                                     </td>
@@ -298,9 +306,9 @@
                             <h4>Дата регистрации</h4>
                             <p class="text-muted">
                                 {% if patient.registered_at %}
-                                    {{ patient.registered_at.strftime('%d.%m.%Y %H:%M') }}
+                                {{ patient.registered_at.strftime('%d.%m.%Y %H:%M') }}
                                 {% else %}
-                                    Не указана
+                                Не указана
                                 {% endif %}
                             </p>
                         </div>
@@ -314,9 +322,9 @@
                             <h4>Последнее обновление</h4>
                             <p class="text-muted">
                                 {% if patient.registered_at %}
-                                    {{ patient.registered_at.strftime('%d.%m.%Y %H:%M') }}
+                                {{ patient.registered_at.strftime('%d.%m.%Y %H:%M') }}
                                 {% else %}
-                                    Не указано
+                                Не указано
                                 {% endif %}
                             </p>
                         </div>
@@ -329,7 +337,8 @@
         <div class="error-state">
             <div class="error-state-icon">❌</div>
             <h3>Пациент не найден</h3>
-            <p class="text-muted">Не удалось загрузить данные пациента. Возможно, пациент был удален или произошла ошибка.</p>
+            <p class="text-muted">Не удалось загрузить данные пациента. Возможно, пациент был удален или произошла
+                ошибка.</p>
             <a href="{{ url_for('patient_list') }}" class="btn btn-primary">
                 ← Вернуться к списку пациентов
             </a>
@@ -338,6 +347,7 @@
     </main>
     <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
     <script src="{{ url_for('static', filename='js/patient-history.js') }}"></script>
-    
+
 </body>
+
 </html>

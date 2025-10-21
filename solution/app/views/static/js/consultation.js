@@ -253,3 +253,118 @@ document.addEventListener('DOMContentLoaded', function () {
     console.log('Initializing interface');
     updateAnswersHistory();
 });
+
+// Обработка завершения консультации
+document.getElementById('btnCompleteConsultation').addEventListener('click', async function () {
+    const consultationId = document.getElementById('consultationId').value;
+    const diagnosisText = document.getElementById('previewDiagnosisText').textContent;
+
+    try {
+        const response = await fetch('/api/consultation/complete', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                consultation_id: parseInt(consultationId),
+                final_diagnosis: diagnosisText
+            })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            alert('Консультация успешно завершена!');
+            // Перенаправляем на страницу результатов
+            window.location.href = `/consultation/result?consultation_id=${consultationId}`;
+        } else {
+            alert('Ошибка при завершении консультации: ' + result.message);
+        }
+    } catch (error) {
+        console.error('Ошибка:', error);
+        alert('Произошла ошибка при завершении консультации');
+    }
+});
+
+// Обработка отмены консультации
+document.getElementById('btnCancel').addEventListener('click', async function () {
+    if (!confirm('Вы уверены, что хотите отменить консультацию? Все данные будут потеряны.')) {
+        return;
+    }
+
+    const consultationId = document.getElementById('consultationId').value;
+
+    try {
+        const response = await fetch('/api/consultation/cancel', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                consultation_id: parseInt(consultationId)
+            })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            alert('Консультация отменена');
+            window.location.href = '/consultation';
+        } else {
+            alert('Ошибка при отмене консультации: ' + result.message);
+        }
+    } catch (error) {
+        console.error('Ошибка:', error);
+        alert('Произошла ошибка при отмене консультации');
+    }
+});
+
+// Автоматическое сохранение как черновика при уходе со страницы
+window.addEventListener('beforeunload', function (e) {
+    const consultationId = document.getElementById('consultationId').value;
+    const diagnosisPreview = document.getElementById('diagnosisPreview');
+
+    // Если консультация активна и не завершена, сохраняем как черновик
+    if (consultationId && diagnosisPreview.style.display === 'none') {
+        // Не блокируем уход, но пытаемся сохранить
+        fetch('/api/consultation/save-draft', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                consultation_id: parseInt(consultationId)
+            }),
+            keepalive: true // Позволяет выполнить запрос даже при уходе со страницы
+        }).catch(error => console.error('Ошибка автосохранения:', error));
+    }
+});
+
+// Обработка сохранения как черновика
+document.getElementById('btnSaveDraft').addEventListener('click', async function () {
+    const consultationId = document.getElementById('consultationId').value;
+
+    try {
+        const response = await fetch('/api/consultation/save-draft', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                consultation_id: parseInt(consultationId)
+            })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            alert('Консультация сохранена как черновик. Вы можете продолжить позже.');
+            window.location.href = '/consultation';
+        } else {
+            alert('Ошибка при сохранении черновика: ' + result.message);
+        }
+    } catch (error) {
+        console.error('Ошибка:', error);
+        alert('Произошла ошибка при сохранении черновика');
+    }
+});
