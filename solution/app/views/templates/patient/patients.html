@@ -11,14 +11,95 @@
         /* Компактные кнопки действий */
         .action-buttons {
             display: flex;
-            gap: 4px;
-            flex-wrap: nowrap;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 10px;
         }
         
         .btn-sm {
-            padding: 0.25rem 0.5rem;
+            padding: 0.4rem 0.8rem;
             font-size: 0.875rem;
             line-height: 1.5;
+        }
+
+        .patient-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .patient-header {
+            display: flex;
+            justify-content: between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .patient-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 0;
+        }
+
+        .patient-contact {
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 4px;
+        }
+
+        .patient-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-label {
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 2px;
+        }
+
+        .detail-value {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .card-actions {
+            border-top: 1px solid #f0f0f0;
+            padding-top: 12px;
+            margin-top: 12px;
+        }
+
+        @media (max-width: 768px) {
+            .patient-details {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .patient-details {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .action-buttons .btn {
+                width: 100%;
+                text-align: center;
+            }
         }
     </style>
 </head>
@@ -62,29 +143,12 @@
         <!-- Search and Filters -->
         <div class="card">
             <div class="card-header">
-                <h2>Поиск и фильтры</h2>
-            </div>
-            <div class="card-content">
-                <div class="patients-filters-grid">
-                    <div class="search-box">
-                        <input type="text" id="patientSearch" class="form-control" 
-                               placeholder="Поиск по ФИО, ID или диагнозу...">
-                        <button class="btn btn-primary btn-sm" onclick="searchPatients()">
-                            Поиск
-                        </button>
-                    </div>
-                    <div class="filter-options">
-                        <select id="statusFilter" class="form-control">
-                            <option value="">Все статусы</option>
-                            <option value="active">Активные</option>
-                            <option value="archived">В архиве</option>
-                        </select>
-                        <select id="sortBy" class="form-control">
-                            <option value="name">Сортировка по имени</option>
-                            <option value="date">Сортировка по дате</option>
-                            <option value="lastVisit">Сортировка по последнему визиту</option>
-                        </select>
-                    </div>
+                <div class="search-box">
+                    <input type="text" id="patientSearch" class="form-control" 
+                           placeholder="Поиск по ФИО ...">
+                    <button class="btn btn-primary btn-sm" onclick="searchPatients()">
+                        Поиск
+                    </button>
                 </div>
             </div>
         </div>
@@ -102,35 +166,28 @@
             
             <div class="card-content">
                 {% if patients %}
-                <div class="table-responsive">
-                    <table class="table" id="patientsTable">
-                        <thead>
-                            <tr>
-                                <!--<th>ID</th>-->
-                                <th>ФИО</th>
-                                <th>Возраст</th>
-                                <th>Пол</th>
-                                <th>Телефон</th>
-                                <th>Email</th>
-                                <th>Дата регистрации</th>
-                                <th>Действия</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for patient in patients %}
-                            <tr>
-                                <!--<td>#{{ patient.id }}</td>-->
-                                <td>
-                                    <div class="patient-info">
-                                        <strong>{{ patient.last_name }} {{ patient.first_name }} {{ patient.middle_name or '' }}</strong>
-                                        {% if patient.email %}
-                                        <span class="text-muted text-sm">{{ patient.email }}</span>
-                                        {% elif patient.phone %}
-                                        <span class="text-muted text-sm">{{ patient.phone }}</span>
-                                        {% endif %}
-                                    </div>
-                                </td>
-                                <td>
+                <div id="patientsList">
+                    {% for patient in patients %}
+                    <div class="patient-card">
+                        <div class="patient-header">
+                            <div>
+                                <h3 class="patient-name">
+                                    {{ patient.last_name }} {{ patient.first_name }} {{ patient.middle_name or '' }}
+                                </h3>
+                                {% if patient.email or patient.phone %}
+                                <div class="patient-contact">
+                                    {% if patient.email %}{{ patient.email }}{% endif %}
+                                    {% if patient.email and patient.phone %} • {% endif %}
+                                    {% if patient.phone %}{{ patient.phone }}{% endif %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="patient-details">
+                            <div class="detail-item">
+                                <span class="detail-label">Возраст</span>
+                                <span class="detail-value">
                                     {% if patient.age %}
                                         {{ patient.age }}
                                         {% set age = patient.age %}
@@ -144,25 +201,44 @@
                                     {% else %}
                                         -
                                     {% endif %}
-                                </td>
-                                <td>{{ 'Мужской' if patient.sex == 'M' else 'Женский' }}</td>
-                                <td>{{ patient.phone or '-' }}</td>
-                                <td>{{ patient.email or '-' }}</td>
-                                <td>{{ patient.registered_at.strftime('%d.%m.%Y') if patient.registered_at else '-' }}</td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <a href="{{ url_for('patient_history', patient_id=patient.id) }}" class="btn btn-sm btn-secondary">
-                                            История
-                                        </a>
-                                        <a href="{{ url_for('consultation', patient_id=patient.id) }}" class="btn btn-sm btn-primary">
-                                            Консультация
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                                </span>
+                            </div>
+                            
+                            <div class="detail-item">
+                                <span class="detail-label">Пол</span>
+                                <span class="detail-value">{{ 'Мужской' if patient.sex == 'M' else 'Женский' }}</span>
+                            </div>
+                            
+                            <div class="detail-item">
+                                <span class="detail-label">Телефон</span>
+                                <span class="detail-value">{{ patient.phone or '-' }}</span>
+                            </div>
+                            
+                            <div class="detail-item">
+                                <span class="detail-label">Email</span>
+                                <span class="detail-value">{{ patient.email or '-' }}</span>
+                            </div>
+                            
+                            <div class="detail-item">
+                                <span class="detail-label">Дата регистрации</span>
+                                <span class="detail-value">
+                                    {{ patient.registered_at.strftime('%d.%m.%Y') if patient.registered_at else '-' }}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="card-actions">
+                            <div class="action-buttons">
+                                <a href="{{ url_for('patient_history', patient_id=patient.id) }}" class="btn btn-sm btn-secondary">
+                                    История консультаций
+                                </a>
+                                <a href="{{ url_for('consultation', patient_id=patient.id) }}" class="btn btn-sm btn-primary">
+                                    Новая консультация
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
                 </div>
 
                 <!-- Pagination -->
@@ -193,7 +269,7 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        updatePatientsTable(data.patients);
+                        updatePatientsList(data.patients);
                     } else {
                         console.error('Ошибка поиска:', data.message);
                         alert('Ошибка при поиске пациентов');
@@ -205,17 +281,16 @@
                 });
         }
 
-        function updatePatientsTable(patients) {
-            const tbody = document.querySelector('#patientsTable tbody');
+        function updatePatientsList(patients) {
+            const patientsList = document.getElementById('patientsList');
             const patientCount = document.getElementById('patientCount');
             
             if (!patients || patients.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="8" class="text-center text-muted">
-                            Пациенты не найдены
-                        </td>
-                    </tr>
+                patientsList.innerHTML = `
+                    <div class="empty-state">
+                        <h3>Пациенты не найдены</h3>
+                        <p class="text-muted">Попробуйте изменить условия поиска</p>
+                    </div>
                 `;
                 patientCount.textContent = '0';
                 return;
@@ -225,11 +300,11 @@
             patients.forEach(patient => {
                 const fullName = `${patient.last_name} ${patient.first_name} ${patient.middle_name || ''}`;
                 const contactInfo = patient.email || patient.phone;
-                const registeredAt = patient.registered_at ? new Date(patient.registered_at).toLocaleDateString('ru-RU') : 'Не указана';
+                const registeredAt = patient.registered_at ? new Date(patient.registered_at).toLocaleDateString('ru-RU') : '-';
                 const sex = patient.sex === 'M' ? 'Мужской' : 'Женский';
                 
                 // Правильное склонение возраста
-                let ageText = 'Не указан';
+                let ageText = '-';
                 if (patient.age) {
                     const age = patient.age;
                     if (age % 10 == 1 && age % 100 != 11) {
@@ -242,36 +317,65 @@
                 }
                 
                 html += `
-                    <tr>
-                        <td>#${patient.id}</td>
-                        <td>
-                            <div class="patient-info">
-                                <strong>${fullName}</strong>
-                                ${contactInfo ? `<span class="text-muted text-sm">${contactInfo}</span>` : ''}
+                    <div class="patient-card">
+                        <div class="patient-header">
+                            <div>
+                                <h3 class="patient-name">${fullName}</h3>
+                                ${contactInfo ? `<div class="patient-contact">${contactInfo}</div>` : ''}
                             </div>
-                        </td>
-                        <td>${ageText}</td>
-                        <td>${sex}</td>
-                        <td>${patient.phone || 'Не указан'}</td>
-                        <td>${patient.email || 'Не указан'}</td>
-                        <td>${registeredAt}</td>
-                        <td>
+                        </div>
+                        
+                        <div class="patient-details">
+                            <div class="detail-item">
+                                <span class="detail-label">Возраст</span>
+                                <span class="detail-value">${ageText}</span>
+                            </div>
+                            
+                            <div class="detail-item">
+                                <span class="detail-label">Пол</span>
+                                <span class="detail-value">${sex}</span>
+                            </div>
+                            
+                            <div class="detail-item">
+                                <span class="detail-label">Телефон</span>
+                                <span class="detail-value">${patient.phone || '-'}</span>
+                            </div>
+                            
+                            <div class="detail-item">
+                                <span class="detail-label">Email</span>
+                                <span class="detail-value">${patient.email || '-'}</span>
+                            </div>
+                            
+                            <div class="detail-item">
+                                <span class="detail-label">Дата регистрации</span>
+                                <span class="detail-value">${registeredAt}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="card-actions">
                             <div class="action-buttons">
                                 <a href="/patient/${patient.id}/history" class="btn btn-sm btn-secondary">
-                                    История
+                                    История консультаций
                                 </a>
                                 <a href="/consultation?patient_id=${patient.id}" class="btn btn-sm btn-primary">
-                                    Консультация
+                                    Новая консультация
                                 </a>
                             </div>
-                        </td>
-                    </tr>
+                        </div>
+                    </div>
                 `;
             });
             
-            tbody.innerHTML = html;
+            patientsList.innerHTML = html;
             patientCount.textContent = patients.length;
         }
+
+        // Обработка нажатия Enter в поле поиска
+        document.getElementById('patientSearch').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchPatients();
+            }
+        });
     </script>
     <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
 </body>
