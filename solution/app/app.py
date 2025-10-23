@@ -642,4 +642,5 @@ if __name__ == '__main__':
     print(f"CSS exists: {os.path.exists(os.path.join(static_dir, 'css', 'main.css'))}")
     print(f"Index.html exists: {os.path.exists(os.path.join(template_dir, 'index.html'))}")
     print(f"Patient-new.html exists: {os.path.exists(os.path.join(template_dir, 'patient-new.html'))}")
-    app.run(host='0.0.0.0', port=5000, debug=False)
+    app.run(host='0.0.0.0', port=5000, debug=True)
+    #app.run(host='0.0.0.0', port=5000, debug=False) при сдаче изменить на False

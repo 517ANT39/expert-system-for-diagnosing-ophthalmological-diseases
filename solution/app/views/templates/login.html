@@ -18,8 +18,6 @@
                         <span class="logo-text">ОфтальмоЭксперт</span>
                     </a>
                     <div class="nav-links">
-                        <a href="#features" class="nav-link">Возможности</a>
-                        <a href="#about" class="nav-link">О системе</a>
                         <a href="{{ url_for('registration') }}" class="btn btn-primary">Регистрация</a>
                     </div>
                 </div>
@@ -48,14 +46,14 @@
                             <input type="password" id="password" class="form-control" placeholder="Введите ваш пароль" required>
                         </div>
                         
-                        <div class="form-options">
+                        <!--<div class="form-options">
                             <label class="checkbox-label">
                                 <input type="checkbox" id="remember">
                                 <span class="checkmark"></span>
                                 Запомнить меня
                             </label>
                             <a href="#" class="forgot-password">Забыли пароль?</a>
-                        </div>
+                        </div>-->
                         
                         <button type="submit" class="btn btn-primary btn-lg w-100">
                             Войти в систему
@@ -91,12 +89,7 @@
                         <a href="{{ url_for('registration') }}">Регистрация</a>
                         <a href="{{ url_for('index') }}">Главная</a>
                     </div>
-                    <div class="footer-column">
-                        <h4>Поддержка</h4>
-                        <a href="#">Документация</a>
-                        <a href="#">Обратная связь</a>
-                        <a href="#">Обучение</a>
-                    </div>
+                    
                 </div>
             </div>
             <div class="footer-bottom">
