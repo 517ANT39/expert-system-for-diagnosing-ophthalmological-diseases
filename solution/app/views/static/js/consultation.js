@@ -4,8 +4,8 @@ document.addEventListener('DOMContentLoaded', function () {
     // Элементы интерфейса
     const questionText = document.getElementById('questionText');
     const questionNumber = document.getElementById('questionNumber');
-    const progressFill = document.getElementById('progressFill');
-    const progressText = document.getElementById('progressText');
+    /*const progressFill = document.getElementById('progressFill');
+    const progressText = document.getElementById('progressText');*/
     const answersList = document.getElementById('answersList');
     const diagnosisPreview = document.getElementById('diagnosisPreview');
     const questionView = document.getElementById('questionView');
@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function updateInterface(data) {
         console.log('Updating interface with data:', data);
 
-        // Обновляем прогресс
+        /*Обновляем прогресс
         if (data.progress) {
             progressFill.style.width = data.progress.progress_percent + '%';
             progressText.textContent = `${Math.round(data.progress.progress_percent)}% завершено (${data.progress.questions_answered} вопросов)`;
@@ -119,15 +119,15 @@ document.addEventListener('DOMContentLoaded', function () {
         // Обновляем номер вопроса
         if (data.progress) {
             questionNumber.textContent = `Вопрос ${data.progress.questions_answered + 1}`;
-        }
+        }*/
 
         // Обновляем текст вопроса
         let newQuestionText = '';
         if (data.next_question && data.next_question.text) {
             newQuestionText = data.next_question.text;
-        } else if (data.progress && data.progress.current_question) {
+        } /*else if (data.progress && data.progress.current_question) {
             newQuestionText = data.progress.current_question;
-        }
+        }*/
 
         if (newQuestionText) {
             questionText.textContent = newQuestionText;
