@@ -8,11 +8,13 @@ document.addEventListener('DOMContentLoaded', function () {
     const progressText = document.getElementById('progressText');
     const answersList = document.getElementById('answersList');
     const diagnosisPreview = document.getElementById('diagnosisPreview');
+    const questionView = document.getElementById('questionView');
     const previewDiagnosisText = document.getElementById('previewDiagnosisText');
     const btnCompleteConsultation = document.getElementById('btnCompleteConsultation');
     const btnBack = document.getElementById('btnBack');
     const btnCancel = document.getElementById('btnCancel');
     const toggleAnswers = document.getElementById('toggleAnswers');
+    const btnSaveDraft = document.getElementById('btnSaveDraft');
 
     // Данные консультации
     const consultationId = document.getElementById('consultationId')?.value;
@@ -133,6 +135,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Если достигли диагноза, показываем превью и блокируем кнопки
         if (data.next_question && data.next_question.is_final) {
+
             const diagnosis = data.diagnosis_candidate || data.next_question.text;
             showDiagnosisPreview(diagnosis);
             // Блокируем кнопки ответов
@@ -140,6 +143,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 btn.disabled = true;
                 btn.style.opacity = '0.5';
             });
+            hideQuestionView();
+            btnSaveDraft.style.display = 'none';
         } else if (data.diagnosis_candidate) {
             showDiagnosisPreview(data.diagnosis_candidate);
             // Блокируем кнопки ответов
@@ -173,6 +178,11 @@ document.addEventListener('DOMContentLoaded', function () {
         diagnosisPreview.style.display = 'none';
         console.log('Diagnosis preview hidden');
     }
+
+    function hideQuestionView() {
+        questionView.style.display = 'none';
+        console.log('question view hidden');
+    } 
 
     async function updateAnswersHistory() {
         try {
@@ -341,7 +351,7 @@ window.addEventListener('beforeunload', function (e) {
 });
 
 // Обработка сохранения как черновика
-document.getElementById('btnSaveDraft').addEventListener('click', async function () {
+btnSaveDraft.addEventListener('click', async function () {
     const consultationId = document.getElementById('consultationId').value;
 
     try {
