@@ -5,9 +5,8 @@ services:
     build: .
     ports:
       - "5000:5000"
-    environment:
-      - DATABASE_URL=postgresql://admin:password@db:5432/ophthalmology_db
-      - FLASK_ENV=development
+    env_file:
+      - ./env/web.env
     volumes:
       - .:/app
       - ./solution/statistics:/app/solution/statistics
@@ -18,10 +17,8 @@ services:
 
   db:
     image: postgres:13
-    environment:
-      POSTGRES_DB: ophthalmology_db
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: password
+    env_file:
+      - ./env/db.env
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
