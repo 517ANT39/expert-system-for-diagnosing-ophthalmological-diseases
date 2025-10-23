@@ -56,6 +56,44 @@
             display: flex;
             gap: 0.5rem;
         }
+
+        /* Стили для кнопки экспорта */
+        .export-btn {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            line-height: 1.5;
+        }
+
+        .export-btn:hover {
+            background-color: #218838;
+        }
+
+        .export-btn:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .export-btn-disabled {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            opacity: 0.6;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
     </style>
 </head>
 
@@ -212,13 +250,10 @@
                     <div class="summary-icon">👁️</div>
                     <div class="summary-content">
                         <div class="summary-number">
-                            {% if consultations %}
-                            {{ consultations|selectattr('final_diagnosis')|list|length }}
-                            {% else %}
-                            0
-                            {% endif %}
+                            {% set completed_consultations = consultations|selectattr('status', 'equalto', 'completed')|list %}
+                            {{ completed_consultations|length }}
                         </div>
-                        <div class="summary-label">Установленных диагнозов</div>
+                        <div class="summary-label">Завершенных консультаций</div>
                     </div>
                 </div>
             </div>
@@ -266,11 +301,16 @@
                                     </a>
                                     {% endif %}
 
-
-                                    <button class="btn btn-sm btn-secondary"
-                                        onclick="exportConsultation({{ consultation.id }})">
+                                    <!-- Кнопка экспорта PDF - только для завершенных консультаций -->
+                                    {% if consultation.status == 'completed' %}
+                                    <button class="export-btn" onclick="exportConsultation({{ consultation.id }})">
                                         📄 PDF
                                     </button>
+                                    {% else %}
+                                    <span class="export-btn-disabled" title="Экспорт доступен только для завершенных консультаций">
+                                        📄 PDF
+                                    </span>
+                                    {% endif %}
                                 </div>
                             </div>
                             <div class="consultation-doctor">
@@ -349,14 +389,24 @@
                                         {% if consultation.status == 'draft' %}
                                         <a href="{{ url_for('consultation', patient_id=patient.id) }}"
                                             class="btn btn-sm btn-primary">
-                                            {% if active_consultation %}Продолжить{% else %}Продолжить{% endif %}
+                                            Продолжить
                                         </a>
-
                                         {% else %}
                                         <a href="{{ url_for('consultation_result', consultation_id=consultation.id) }}"
                                             class="btn btn-sm btn-secondary">
                                             Просмотр
                                         </a>
+                                        {% endif %}
+
+                                        <!-- Кнопка экспорта PDF в таблице - только для завершенных консультаций -->
+                                        {% if consultation.status == 'completed' %}
+                                        <button class="export-btn" onclick="exportConsultation({{ consultation.id }})">
+                                            📄 PDF
+                                        </button>
+                                        {% else %}
+                                        <span class="export-btn-disabled" title="Экспорт доступен только для завершенных консультаций">
+                                            📄 PDF
+                                        </span>
                                         {% endif %}
                                     </td>
                                 </tr>
@@ -371,7 +421,7 @@
                     <h3>Консультации не найдены</h3>
                     <p class="text-muted">У этого пациента пока нет консультаций.</p>
                     <a href="{{ url_for('consultation', patient_id=patient.id) }}" class="btn btn-primary btn-sm">
-                        Консультация
+                        Начать консультацию
                     </a>
                 </div>
                 {% endif %}
@@ -431,12 +481,6 @@
                             </p>
                         </div>
                         <div class="info-section">
-                            <!--<h4>Статус пациента</h4>
-                            <p class="text-muted">
-                                <span class="status-badge status-completed">Активный</span>
-                            </p>-->
-                        </div>
-                        <div class="info-section">
                             <h4>Последнее обновление</h4>
                             <p class="text-muted">
                                 {% if patient.registered_at %}
@@ -463,104 +507,129 @@
         </div>
         {% endif %}
     </main>
+
     <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
     <script src="{{ url_for('static', filename='js/patient-history.js') }}"></script>
     <script>
         function cancelConsultation(consultationId) {
             if (confirm('Вы уверены, что хотите отменить эту консультацию? Все данные будут удалены.')) {
-                // Здесь будет запрос на отмену консультации
-                fetch(`/consultation/${consultationId}/cancel`, {
+                fetch(`/api/consultation/cancel`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                    }
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            alert('Консультация отменена');
-                            location.reload();
-                        } else {
-                            alert('Ошибка при отмене консультации');
-                        }
+                    },
+                    body: JSON.stringify({
+                        consultation_id: consultationId
                     })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('Ошибка при отмене консультации');
-                    });
-            }
-        }
-
-        function exportConsultation(consultationId) {
-            alert(`Экспорт консультации #${consultationId} в PDF будет реализован позже`);
-        }
-    </script>
-    <script>
-    function cancelConsultation(consultationId) {
-        if (confirm('Вы уверены, что хотите отменить эту консультацию? Все данные будут удалены.')) {
-            fetch(`/consultation/${consultationId}/cancel`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            })
+                })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        alert('Консультация отменена');
-                        location.reload();
+                        showToast('Консультация отменена', 'success');
+                        setTimeout(() => {
+                            location.reload();
+                        }, 1500);
                     } else {
-                        alert('Ошибка при отмене консультации');
+                        showToast('Ошибка при отмене консультации: ' + data.message, 'error');
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert('Ошибка при отмене консультации');
+                    showToast('Ошибка при отмене консультации', 'error');
+                });
+            }
+        }
+
+        function exportConsultation(consultationId) {
+            // Проверяем статус консультации перед экспортом
+            fetch(`/api/consultation/${consultationId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.consultation.status === 'completed') {
+                        showToast('Генерация PDF документа...', 'info');
+                        window.open(`/consultation/${consultationId}/export-pdf`, '_blank');
+                    } else {
+                        showToast('Экспорт доступен только для завершенных консультаций', 'warning');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('Ошибка при проверке статуса консультации', 'error');
                 });
         }
-    }
 
-    function exportConsultation(consultationId) {
-        showToast('Генерация PDF документа...', 'info');
-        window.open(`/consultation/${consultationId}/export-pdf`, '_blank');
-    }
+        function showToast(message, type = 'info') {
+            // Удаляем существующие тосты
+            const existingToasts = document.querySelectorAll('.toast');
+            existingToasts.forEach(toast => toast.remove());
 
-    function showToast(message, type = 'info') {
-        const toast = document.createElement('div');
-        toast.className = `toast toast-${type}`;
-        toast.textContent = message;
-        toast.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: ${type === 'success' ? '#4CAF50' : type === 'error' ? '#f44336' : '#2196F3'};
-            color: white;
-            padding: 12px 20px;
-            border-radius: 4px;
-            z-index: 1000;
-        `;
-        document.body.appendChild(toast);
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = message;
+            
+            const colors = {
+                'success': '#4CAF50',
+                'error': '#f44336',
+                'warning': '#ff9800',
+                'info': '#2196F3'
+            };
 
-        setTimeout(() => {
-            toast.remove();
-        }, 3000);
-    }
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${colors[type] || colors.info};
+                color: white;
+                padding: 12px 20px;
+                border-radius: 4px;
+                z-index: 1000;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            `;
+            
+            document.body.appendChild(toast);
 
-    // Загрузка имени пользователя
-    document.addEventListener('DOMContentLoaded', function () {
-        fetch('/api/profile')
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    document.getElementById('userName').textContent = data.doctor.last_name + ' ' + data.doctor.first_name;
-                }
-            })
-            .catch(error => {
-                console.error('Error loading profile:', error);
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // Загрузка имени пользователя
+        document.addEventListener('DOMContentLoaded', function () {
+            fetch('/api/profile')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('userName').textContent = data.doctor.last_name + ' ' + data.doctor.first_name;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading profile:', error);
+                });
+
+            // Инициализация переключения видов
+            const viewButtons = document.querySelectorAll('[data-view]');
+            viewButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const view = this.getAttribute('data-view');
+                    
+                    // Обновляем активные кнопки
+                    viewButtons.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Переключаем виды
+                    const timelineView = document.getElementById('timelineView');
+                    const listView = document.getElementById('listView');
+                    
+                    if (view === 'timeline') {
+                        timelineView.style.display = 'block';
+                        listView.style.display = 'none';
+                    } else {
+                        timelineView.style.display = 'none';
+                        listView.style.display = 'block';
+                    }
+                });
             });
-    });
-</script>
-
+        });
+    </script>
 </body>
-
 </html>

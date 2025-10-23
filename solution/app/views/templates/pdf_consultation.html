@@ -140,14 +140,7 @@
             <div><strong>Дата рождения:</strong> {{ patient.birth_date }}</div>
             <div><strong>Пол:</strong> {% if patient.sex == 'M' %}Мужской{% else %}Женский{% endif %}</div>
             <div><strong>Дата консультации:</strong> {{ consultation.consultation_date.strftime('%d.%m.%Y') }}</div>
-            <div><strong>Статус консультации:</strong>
-                <span class="status-badge status-{{ consultation.status }}">
-                    {% if consultation.status == 'completed' %}Завершена
-                    {% elif consultation.status == 'active' %}Активна
-                    {% elif consultation.status == 'draft' %}Черновик
-                    {% else %}Отменена{% endif %}
-                </span>
-            </div>
+            
         </div>
     </div>
 

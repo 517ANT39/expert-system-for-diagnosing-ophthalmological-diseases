@@ -13,10 +13,10 @@ class PatientHistory {
     }
 
     bindEvents() {
-        // Export buttons
+        // Export buttons - только для завершенных консультаций
         document.addEventListener('click', (e) => {
-            if (e.target.closest('[onclick*="exportConsultation"]')) {
-                const consultationId = e.target.getAttribute('onclick').match(/\d+/)[0];
+            if (e.target.closest('.export-btn')) {
+                const consultationId = e.target.closest('.export-btn').getAttribute('onclick').match(/\d+/)[0];
                 this.exportConsultation(consultationId);
             }
         });
@@ -100,15 +100,21 @@ class PatientHistory {
     }
 
     exportConsultation(consultationId) {
-        // Simulate PDF export
-        const patientName = this.patientData.name;
-        
-        console.log(`Exporting consultation ${consultationId} for patient: ${patientName}`);
-        
-        this.showToast(`Консультация экспортирована в PDF`, 'success');
-        
-        // In a real app, this would generate and download a PDF
-        // this.generatePDF(consultationId);
+        // Проверяем статус консультации перед экспортом
+        fetch(`/api/consultation/${consultationId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.consultation.status === 'completed') {
+                    this.showToast('Генерация PDF документа...', 'info');
+                    window.open(`/consultation/${consultationId}/export-pdf`, '_blank');
+                } else {
+                    this.showToast('Экспорт доступен только для завершенных консультаций', 'warning');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                this.showToast('Ошибка при проверке статуса консультации', 'error');
+            });
     }
 
     generatePDF(consultationId) {
@@ -170,10 +176,14 @@ class PatientHistory {
         const consultations = document.querySelectorAll('.timeline-item');
         const totalConsultations = consultations.length;
         
-        // Calculate other statistics as needed
+        // Calculate completed consultations
+        const completedConsultations = Array.from(consultations).filter(consultation => {
+            return consultation.querySelector('.status-completed') !== null;
+        }).length;
+        
         return {
             totalConsultations,
-            // Add more stats
+            completedConsultations
         };
     }
 }
