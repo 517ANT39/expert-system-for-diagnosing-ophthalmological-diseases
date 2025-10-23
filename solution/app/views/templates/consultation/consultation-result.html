@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/consultation.css') }}">
     <style>
-       
         .btn-sm {
             padding: 0.25rem 0.5rem;
             font-size: 0.875rem;
@@ -49,7 +48,8 @@
                 <p class="text-muted">Консультация от {{ consultation_info.date }}</p>
             </div>
             <div class="header-actions">
-                <button class="btn btn-primary btn-sm" onclick="exportToPDF()">
+                <button class="btn btn-primary btn-sm" onclick="exportToPDF()"
+                    data-consultation-id="{{ consultation_info.id }}">
                     Экспорт в PDF
                 </button>
             </div>
@@ -117,10 +117,8 @@
         <div class="card diagnosis-card">
             <div class="card-header">
                 <div class="diagnosis-header">
-                    <h2>Окончательный диагноз</h2>
-                    <div class="confidence-badge">
-                        Уверенность: {{ diagnosis_result.confidence }}%
-                    </div>
+                    <h2>Вероятностный диагноз</h2>
+
                 </div>
             </div>
             <div class="card-content">
@@ -146,7 +144,7 @@
                     <ul class="symptoms-evidence">
                         {% for symptom in diagnosis_result.symptoms_evidence %}
                         <li class="evidence-{{ 'positive' if symptom.present else 'negative' }}">
-                            {{ '✅' if symptom.present else '❌' }} {{ symptom.name }}
+                            {{ symptom.name }}<br>{{ '✅ Да' if symptom.present else '❌ Нет' }}
                         </li>
                         {% endfor %}
                     </ul>
@@ -197,81 +195,63 @@
             </div>
         </div>
 
-        <!-- Questions History -->
-        <div class="card history-card">
-            <div class="card-header">
-                <h3>История вопросов и ответов</h3>
-            </div>
-            <div class="card-content">
-                <div class="qa-history">
-                    {% for qa in diagnosis_result.qa_history %}
-                    <div class="qa-item">
-                        <div class="qa-question">{{ loop.index }}. {{ qa.question }}</div>
-                        <div class="qa-answer answer-{{ qa.answer }}">
-                            {{ '✅ Да' if qa.answer == 'yes' else '❌ Нет' }}
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
+
+
+
+
+        <div class="form-actions" style="margin-top: 20px;">
+            <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-sm">
+                ← Назад в панель управления
+            </a>
+            <a href="{{ url_for('consultation') }}" class="btn btn-secondary btn-sm">
+                Новая консультация
+            </a>
         </div>
 
-        <!-- Doctor's Notes -->
-        <div class="card notes-card">
-            <div class="card-header">
-                <h3>Заключение врача</h3>
-            </div>
-            <div class="card-content">
-                <div class="doctor-final-notes">
-                    <div class="final-diagnosis">
-                        <strong>Окончательный диагноз:</strong> {{ consultation_info.final_diagnosis }}
-                    </div>
-                    {% if consultation_info.notes %}
-                    <div class="additional-notes">
-                        <strong>Дополнительные примечания:</strong>
-                        <p>{{ consultation_info.notes }}</p>
-                    </div>
-                    {% endif %}
-                </div>
-
-                <div class="form-actions" style="margin-top: 20px;">
-                    <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-sm">
-                        ← Назад в панель управления
-                    </a>
-                    <a href="{{ url_for('consultation') }}" class="btn btn-secondary btn-sm">
-                        Новая консультация
-                    </a>
-                </div>
-            </div>
-        </div>
     </main>
 
     <script>
         function exportToPDF() {
-            const patientName = "{{ patient.name }}";
-            const diagnosis = "{{ diagnosis_result.primary_diagnosis }}";
+            // Пробуем разные способы получить consultation_id
+            let consultationId;
 
-            alert(`Генерация PDF для пациента: ${patientName}\nДиагноз: ${diagnosis}\n\nВ реальной системе здесь будет создан PDF документ с полными результатами консультации.`);
+            // Способ 1: из data-attribute кнопки
+            const button = document.querySelector('.header-actions button');
+            if (button) {
+                consultationId = button.getAttribute('data-consultation-id');
+            }
 
-            // Здесь можно добавить реальную логику генерации PDF
-            showToast('PDF документ готов к скачиванию', 'success');
+            // Способ 2: из URL параметров
+            if (!consultationId) {
+                const urlParams = new URLSearchParams(window.location.search);
+                consultationId = urlParams.get('consultation_id');
+            }
+
+            if (!consultationId) {
+                showToast('Ошибка: ID консультации не найден', 'error');
+                return;
+            }
+
+            showToast('Генерация PDF документа...', 'info');
+
+            // Открываем PDF в новом окне
+            window.open(`/consultation/${consultationId}/export-pdf`, '_blank');
         }
 
         function showToast(message, type = 'info') {
-            // Простая реализация toast уведомления
             const toast = document.createElement('div');
             toast.className = `toast toast-${type}`;
             toast.textContent = message;
             toast.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: ${type === 'success' ? '#4CAF50' : type === 'error' ? '#f44336' : '#2196F3'};
-                color: white;
-                padding: 12px 20px;
-                border-radius: 4px;
-                z-index: 1000;
-            `;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: ${type === 'success' ? '#4CAF50' : type === 'error' ? '#f44336' : '#2196F3'};
+            color: white;
+            padding: 12px 20px;
+            border-radius: 4px;
+            z-index: 1000;
+        `;
             document.body.appendChild(toast);
 
             setTimeout(() => {

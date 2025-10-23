@@ -4,6 +4,9 @@ import sys
 from datetime import datetime
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from flask import make_response
+from weasyprint import HTML
+import tempfile
 
 # Добавляем путь к корню проекта в sys.path
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -472,6 +475,71 @@ def dashboard():
         print(f"Ошибка при загрузке dashboard: {str(e)}")
         # В случае ошибки показываем пустой список
         return render_template('dashboard.html', patients=[])
+    
+@app.route('/consultation/<int:consultation_id>/export-pdf')
+@login_required
+def export_consultation_pdf(consultation_id):
+    try:
+        # Используем существующую сессию базы данных
+        db_session = SessionLocal()
+        
+        # Получаем данные консультации
+        consultation = db_session.query(Consultation).filter_by(id=consultation_id).first()
+        if not consultation:
+            db_session.close()
+            return "Консультация не найдена", 404
+        
+        patient = consultation.patient
+        doctor = consultation.doctor
+        
+        # Получаем данные диагностики
+        diagnosis_data = consultation.sub_graph_find_diagnosis or {}
+        
+        # Формируем данные для PDF
+        diagnosis_result = {
+            'primary_diagnosis': consultation.final_diagnosis or diagnosis_data.get('primary_diagnosis', 'Диагноз не указан'),
+            'symptoms_evidence': diagnosis_data.get('symptoms_evidence', []),
+            'recommendations': diagnosis_data.get('recommendations', {})
+        }
+        
+        # Рассчитываем возраст пациента
+        birth_date = patient.birthday
+        today = datetime.now().date()
+        age = today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
+        
+        # Формируем HTML для PDF
+        html_content = render_template('pdf_consultation.html',
+            consultation=consultation,
+            patient={
+                'name': f"{patient.last_name} {patient.first_name} {patient.middle_name or ''}",
+                'birth_date': patient.birthday.strftime('%d.%m.%Y'),
+                'age': age,
+                'sex': patient.sex
+            },
+            doctor={
+                'name': f"{doctor.last_name} {doctor.first_name} {doctor.middle_name or ''}"
+            },
+            diagnosis_result=diagnosis_result,
+            current_date=datetime.now().strftime('%d.%m.%Y')
+        )
+        
+        # Создаем PDF
+        html = HTML(string=html_content)
+        pdf_file = html.write_pdf()
+        
+        # Создаем response
+        response = make_response(pdf_file)
+        response.headers['Content-Type'] = 'application/pdf'
+        response.headers['Content-Disposition'] = f'attachment; filename=consultation_{consultation_id}_{datetime.now().strftime("%Y%m%d")}.pdf'
+        
+        db_session.close()
+        return response
+        
+    except Exception as e:
+        print(f"Error generating PDF: {e}")
+        import traceback
+        traceback.print_exc()
+        return "Ошибка при генерации PDF", 500
 
 @app.route('/health')
 def health():
