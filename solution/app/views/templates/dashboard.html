@@ -51,6 +51,83 @@
             padding: 0.375rem 0.75rem;
             font-size: 0.875rem;
         }
+
+        /* Стили для карточек пациентов */
+        .patient-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .patient-header {
+            display: flex;
+            justify-content: between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .patient-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 0;
+        }
+
+        .patient-contact {
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 4px;
+        }
+
+        .patient-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-label {
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 2px;
+        }
+
+        .detail-value {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .card-actions {
+            border-top: 1px solid #f0f0f0;
+            padding-top: 12px;
+            margin-top: 12px;
+        }
+
+        .action-buttons-card {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 480px) {
+            .action-buttons-card {
+                flex-direction: column;
+            }
+            
+            .action-buttons-card .btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
     </style>
 </head>
 
@@ -122,32 +199,24 @@
             </div>
             <div class="card-content">
                 {% if patients %}
-                <div class="table-container">
-                    <table class="table compact-table">
-                        <thead>
-                            <tr>
-                                <!-- <th>ID</th>-->
-                                <th>ФИО</th>
-                                <th>Возраст</th>
-                                <th>Пол</th>
-                                <th>Телефон</th>
-                                <th>EMAIL</th>
-                                <th>Действия</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for patient in patients[-3:]|reverse %}
-                            <tr>
-                                <!-- <td>#{{ patient.id }}</td>-->
-                                <td>
-                                    <div class="patient-info">
-                                        <strong>{{ patient.last_name }} {{ patient.first_name }} {{ patient.middle_name or '' }}</strong>
-                                        {% if patient.email %}
-                                        <span class="text-muted text-sm">{{ patient.email }}</span>
-                                        {% endif %}
-                                    </div>
-                                </td>
-                                <td>
+                <div id="recentPatientsList">
+                    {% for patient in patients[-3:]|reverse %}
+                    <div class="patient-card">
+                        <div class="patient-header">
+                            <div>
+                                <h3 class="patient-name">
+                                    {{ patient.last_name }} {{ patient.first_name }} {{ patient.middle_name or '' }}
+                                </h3>
+                                {% if patient.email %}
+                                <div class="patient-contact">{{ patient.email }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="patient-details">
+                            <div class="detail-item">
+                                <span class="detail-label">Возраст</span>
+                                <span class="detail-value">
                                     {% if patient.age %}
                                         {{ patient.age }}
                                         {% set age = patient.age %}
@@ -161,27 +230,41 @@
                                     {% else %}
                                         -
                                     {% endif %}
-                                </td>
-                                <td>{{ 'Мужской' if patient.sex == 'M' else 'Женский' }}</td>
-                                <td>{{ patient.phone or '-' }}</td>
-                                <td>{{ patient.email or '-' }}</td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <a href="{{ url_for('patient_history', patient_id=patient.id) }}"
-                                            class="btn btn-sm btn-secondary">
-                                            История
-                                        </a>
-                                        <a href="{{ url_for('consultation', patient_id=patient.id) }}"
-                                            class="btn btn-sm btn-primary">
-                                            Консультация
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                                </span>
+                            </div>
+                            
+                            <div class="detail-item">
+                                <span class="detail-label">Пол</span>
+                                <span class="detail-value">{{ 'Мужской' if patient.sex == 'M' else 'Женский' }}</span>
+                            </div>
+                            
+                            <div class="detail-item">
+                                <span class="detail-label">Телефон</span>
+                                <span class="detail-value">{{ patient.phone or '-' }}</span>
+                            </div>
+                            
+                            <div class="detail-item">
+                                <span class="detail-label">Email</span>
+                                <span class="detail-value">{{ patient.email or '-' }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="card-actions">
+                            <div class="action-buttons-card">
+                                <a href="{{ url_for('patient_history', patient_id=patient.id) }}" 
+                                   class="btn btn-sm btn-secondary">
+                                    История консультаций
+                                </a>
+                                <a href="{{ url_for('consultation', patient_id=patient.id) }}" 
+                                   class="btn btn-sm btn-primary">
+                                    Новая консультация
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
                 </div>
+                
                 {% if patients|length > 3 %}
                 <div class="text-center mt-3">
                     <small class="text-muted">Показано 3 из {{ patients|length }} пациентов</small>
