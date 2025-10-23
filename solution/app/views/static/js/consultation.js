@@ -8,18 +8,22 @@ document.addEventListener('DOMContentLoaded', function () {
     const diagnosisPreview = document.getElementById('diagnosisPreview');
     const questionView = document.getElementById('questionView');
     const previewDiagnosisText = document.getElementById('previewDiagnosisText');
-    const btnCompleteConsultation = document.getElementById('btnCompleteConsultation');
     const btnBack = document.getElementById('btnBack');
     const btnCancel = document.getElementById('btnCancel');
     const toggleAnswers = document.getElementById('toggleAnswers');
     const btnSaveDraft = document.getElementById('btnSaveDraft');
-    
+
     // Новые элементы для рекомендаций
     const doctorRecommendationsCard = document.getElementById('doctorRecommendationsCard');
     const doctorNotes = document.getElementById('doctorNotes');
     const confirmRecommendationsBtn = document.getElementById('confirmRecommendationsBtn');
     const recommendationsStatus = document.getElementById('recommendationsStatus');
     const recommendationsConfirmed = document.getElementById('recommendationsConfirmed');
+
+    // Секция завершения консультации
+    const consultationCompletedSection = document.getElementById('consultationCompletedSection');
+    const viewResultsBtn = document.getElementById('viewResultsBtn');
+    const exportPdfBtn = document.getElementById('exportPdfBtn');
 
     // Данные консультации
     const consultationId = document.getElementById('consultationId')?.value;
@@ -33,9 +37,9 @@ document.addEventListener('DOMContentLoaded', function () {
         return;
     }
 
-    // Инициализация - скрываем кнопку завершения и карточку рекомендаций
-    hideCompleteButton();
+    // Инициализация - скрываем карточку рекомендаций и секцию завершения
     hideRecommendationsCard();
+    hideCompletionSection();
 
     // Обработчики ответов
     document.querySelectorAll('.btn-answer').forEach(btn => {
@@ -56,11 +60,6 @@ document.addEventListener('DOMContentLoaded', function () {
             saveAnswer('no');
         }
     });
-
-    // Завершение консультации
-    if (btnCompleteConsultation) {
-        btnCompleteConsultation.addEventListener('click', completeConsultation);
-    }
 
     // Отмена консультации
     if (btnCancel) {
@@ -83,11 +82,20 @@ document.addEventListener('DOMContentLoaded', function () {
         confirmRecommendationsBtn.addEventListener('click', confirmRecommendations);
     }
 
+    // Обработчик экспорта PDF
+    if (exportPdfBtn) {
+        exportPdfBtn.addEventListener('click', function () {
+            if (consultationId) {
+                window.open(`/consultation/${consultationId}/export-pdf`, '_blank');
+            }
+        });
+    }
+
     // Валидация поля рекомендаций (необязательное)
     if (doctorNotes) {
-        doctorNotes.addEventListener('input', function() {
+        doctorNotes.addEventListener('input', function () {
             const hasText = this.value.trim().length > 0;
-            
+
             if (recommendationsStatus) {
                 if (hasText) {
                     recommendationsStatus.textContent = 'Готово к сохранению';
@@ -161,16 +169,23 @@ document.addEventListener('DOMContentLoaded', function () {
         if (data.next_question && data.next_question.is_final) {
             const diagnosis = data.diagnosis_candidate || data.next_question.text;
             showDiagnosisPreview(diagnosis);
+
             // Блокируем кнопки ответов
             document.querySelectorAll('.btn-answer').forEach(btn => {
                 btn.disabled = true;
                 btn.style.opacity = '0.5';
             });
+
             hideQuestionView();
             if (btnSaveDraft) btnSaveDraft.style.display = 'none';
-            // ПОКАЗЫВАЕМ кнопку завершения и карточку рекомендаций
-            showCompleteButton();
+            if (btnCancel) btnCancel.style.display = 'none';
+
+            // ПОКАЗЫВАЕМ карточку рекомендаций
             showRecommendationsCard();
+
+            // Автоматически завершаем консультацию (только статус, без рекомендаций)
+            completeConsultationAutomatically(diagnosis);
+
         } else if (data.diagnosis_candidate) {
             showDiagnosisPreview(data.diagnosis_candidate);
             // Блокируем кнопки ответов
@@ -178,14 +193,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 btn.disabled = true;
                 btn.style.opacity = '0.5';
             });
-            // ПОКАЗЫВАЕМ кнопку завершения и карточку рекомендаций
-            showCompleteButton();
+            // ПОКАЗЫВАЕМ карточку рекомендаций
             showRecommendationsCard();
         } else {
             hideDiagnosisPreview();
             hideRecommendationsCard();
-            // СКРЫВАЕМ кнопку завершения
-            hideCompleteButton();
+            hideCompletionSection();
             // Разблокируем кнопки
             document.querySelectorAll('.btn-answer').forEach(btn => {
                 btn.disabled = false;
@@ -197,6 +210,45 @@ document.addEventListener('DOMContentLoaded', function () {
         updateAnswersHistory();
     }
 
+    async function completeConsultationAutomatically(diagnosis) {
+        console.log('Automatically completing consultation with diagnosis:', diagnosis);
+
+        try {
+            // Автоматически завершаем консультацию БЕЗ рекомендаций
+            const response = await fetch('/api/consultation/complete', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    consultation_id: parseInt(consultationId),
+                    final_diagnosis: diagnosis,
+                    notes: '' // Пустые рекомендации при автоматическом завершении
+                })
+            });
+
+            const result = await response.json();
+            console.log('Auto-complete consultation response:', result);
+
+            if (result.success) {
+                // Обновляем ссылку на результаты
+                if (viewResultsBtn) {
+                    viewResultsBtn.href = `/consultation/result?consultation_id=${consultationId}`;
+                }
+
+                console.log('Consultation automatically completed with status: completed');
+
+                // НЕ показываем секцию завершения сразу, ждем рекомендаций врача
+                // showCompletionSection();
+
+            } else {
+                console.error('Error auto-completing consultation:', result.message);
+            }
+        } catch (error) {
+            console.error('Ошибка при автоматическом завершении консультации:', error);
+        }
+    }
+
     function showDiagnosisPreview(diagnosis) {
         if (previewDiagnosisText) {
             previewDiagnosisText.textContent = diagnosis;
@@ -204,10 +256,10 @@ document.addEventListener('DOMContentLoaded', function () {
         if (diagnosisPreview) {
             diagnosisPreview.style.display = 'block';
         }
-        
+
         // Сбрасываем форму рекомендаций
         resetRecommendationsForm();
-        
+
         console.log('Diagnosis preview shown:', diagnosis);
 
         // Прокручиваем к превью диагноза
@@ -237,25 +289,28 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    function showCompletionSection() {
+        if (consultationCompletedSection) {
+            consultationCompletedSection.style.display = 'block';
+            console.log('Completion section shown');
+
+            // Прокручиваем к секции завершения
+            consultationCompletedSection.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+
+    function hideCompletionSection() {
+        if (consultationCompletedSection) {
+            consultationCompletedSection.style.display = 'none';
+            console.log('Completion section hidden');
+        }
+    }
+
     function hideQuestionView() {
         if (questionView) {
             questionView.style.display = 'none';
         }
         console.log('question view hidden');
-    }
-
-    function showCompleteButton() {
-        if (btnCompleteConsultation) {
-            btnCompleteConsultation.style.display = 'block';
-            console.log('Complete button shown');
-        }
-    }
-
-    function hideCompleteButton() {
-        if (btnCompleteConsultation) {
-            btnCompleteConsultation.style.display = 'none';
-            console.log('Complete button hidden');
-        }
     }
 
     function resetRecommendationsForm() {
@@ -265,7 +320,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         if (confirmRecommendationsBtn) {
             confirmRecommendationsBtn.disabled = false;
-            confirmRecommendationsBtn.textContent = '✅ Сохранить рекомендации';
+            confirmRecommendationsBtn.textContent = 'Сохранить рекомендации';
             confirmRecommendationsBtn.style.display = 'block';
         }
         if (recommendationsStatus) {
@@ -277,17 +332,19 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    function confirmRecommendations() {
+    async function confirmRecommendations() {
         console.log('Confirm recommendations button clicked');
-        
+
         if (!doctorNotes) {
             console.error('Doctor notes element not found');
             return;
         }
 
         const notes = doctorNotes.value.trim();
-        
+        const diagnosisText = document.getElementById('previewDiagnosisText').textContent;
+
         console.log('Saving recommendations:', notes);
+        console.log('Final diagnosis:', diagnosisText);
 
         // Показываем загрузку
         if (confirmRecommendationsBtn) {
@@ -299,35 +356,65 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         try {
-            // Сохраняем рекомендации временно в sessionStorage
-            sessionStorage.setItem(`consultation_${consultationId}_notes`, notes);
-            sessionStorage.setItem(`consultation_${consultationId}_notes_confirmed`, 'true');
-            
-            // Блокируем форму
-            if (doctorNotes) {
-                doctorNotes.disabled = true;
+            // Сохраняем рекомендации через API завершения консультации
+            const response = await fetch('/api/consultation/complete', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    consultation_id: parseInt(consultationId),
+                    final_diagnosis: diagnosisText,
+                    notes: notes
+                })
+            });
+
+            const result = await response.json();
+            console.log('Complete consultation response:', result);
+
+            if (result.success) {
+                // Блокируем форму
+                if (doctorNotes) {
+                    doctorNotes.disabled = true;
+                }
+                if (confirmRecommendationsBtn) {
+                    confirmRecommendationsBtn.style.display = 'none';
+                }
+
+                // Показываем секцию подтверждения
+                if (recommendationsConfirmed) {
+                    recommendationsConfirmed.style.display = 'block';
+                }
+                if (recommendationsStatus) {
+                    recommendationsStatus.textContent = '✅ Рекомендации сохранены';
+                    recommendationsStatus.className = 'recommendations-status status-confirmed';
+                }
+
+                // Показываем секцию завершения консультации
+                showCompletionSection();
+
+                // Обновляем ссылку на результаты
+                if (viewResultsBtn) {
+                    viewResultsBtn.href = `/consultation/result?consultation_id=${consultationId}`;
+                }
+
+                console.log('Recommendations confirmed and consultation completed:', notes);
+
+            } else {
+                throw new Error(result.message);
             }
-            if (confirmRecommendationsBtn) {
-                confirmRecommendationsBtn.style.display = 'none';
-            }
-            
-            // Показываем секцию подтверждения
-            if (recommendationsConfirmed) {
-                recommendationsConfirmed.style.display = 'block';
-            }
-            if (recommendationsStatus) {
-                recommendationsStatus.textContent = '✅ Рекомендации сохранены';
-                recommendationsStatus.className = 'recommendations-status status-confirmed';
-            }
-            
-            console.log('Recommendations confirmed and saved:', notes);
-            
+
         } catch (error) {
             console.error('Ошибка при сохранении рекомендаций:', error);
-            alert('Ошибка при сохранении рекомендаций');
+            alert('Ошибка при сохранении рекомендаций: ' + error.message);
+
+            // Восстанавливаем кнопку
             if (confirmRecommendationsBtn) {
                 confirmRecommendationsBtn.disabled = false;
-                confirmRecommendationsBtn.textContent = '✅ Сохранить рекомендации';
+                confirmRecommendationsBtn.textContent = 'Сохранить рекомендации';
+            }
+            if (recommendationsStatus) {
+                recommendationsStatus.textContent = 'Ошибка при сохранении';
             }
         }
     }
@@ -352,7 +439,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function renderAnswersHistory(answers) {
         console.log('Rendering answers history:', answers);
         if (!answersList) return;
-        
+
         answersList.innerHTML = '';
 
         if (Object.keys(answers).length === 0) {
@@ -377,7 +464,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     async function completeConsultation() {
         console.log('Completing consultation');
-        
+
         // Получаем рекомендации (могут быть пустыми)
         const notes = sessionStorage.getItem(`consultation_${consultationId}_notes`) || '';
         const diagnosisText = document.getElementById('previewDiagnosisText').textContent;
@@ -402,7 +489,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Очищаем временные данные
                 sessionStorage.removeItem(`consultation_${consultationId}_notes`);
                 sessionStorage.removeItem(`consultation_${consultationId}_notes_confirmed`);
-                
+
                 alert('Консультация успешно завершена!');
                 // Перенаправляем на страницу результатов
                 window.location.href = `/consultation/result?consultation_id=${consultationId}`;
@@ -420,7 +507,7 @@ document.addEventListener('DOMContentLoaded', function () {
             // Очищаем временные данные
             sessionStorage.removeItem(`consultation_${consultationId}_notes`);
             sessionStorage.removeItem(`consultation_${consultationId}_notes_confirmed`);
-            
+
             // Здесь можно добавить API для отмены консультации
             window.location.href = '/consultation';
         }
@@ -432,7 +519,7 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 // Обработка отмены консультации
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const btnCancel = document.getElementById('btnCancel');
     if (btnCancel) {
         btnCancel.addEventListener('click', async function () {
@@ -492,7 +579,7 @@ window.addEventListener('beforeunload', function (e) {
 });
 
 // Обработка сохранения как черновика
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const btnSaveDraft = document.getElementById('btnSaveDraft');
     if (btnSaveDraft) {
         btnSaveDraft.addEventListener('click', async function () {

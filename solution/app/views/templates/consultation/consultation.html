@@ -135,27 +135,26 @@
             margin-right: 0.5rem;
         }
 
-        /* Основная кнопка завершения - скрыта по умолчанию */
-        .main-complete-btn {
-            margin-left: auto;
-            display: none;
-            /* Скрыта по умолчанию */
-        }
-
-        /* Стили для секции подтверждения рекомендаций */
-        .recommendations-confirmed {
+        /* Стили для секции завершения консультации */
+        .consultation-completed-section {
             background: #f8fff9;
             border: 1px solid #d4edda;
             border-radius: 8px;
-            padding: 1rem;
-            margin-top: 1rem;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
             text-align: center;
         }
 
-        .recommendations-confirmed p {
-            margin: 0;
+        .consultation-completed-section h4 {
             color: #155724;
-            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+
+        .completion-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
         }
     </style>
 </head>
@@ -317,7 +316,7 @@
                         placeholder="Опишите рекомендации по лечению, назначения, дальнейшие обследования, режим и другие указания для пациента..."
                         rows="6"></textarea>
                     <div class="form-text">
-                        Вы можете оставить поле пустым, если рекомендации не требуются
+                        Поставьте прочерк, если рекомендации не требуются
                     </div>
                 </div>
 
@@ -334,6 +333,24 @@
                 <div class="recommendations-confirmed" id="recommendationsConfirmed" style="display: none;">
                     <p>✅ Рекомендации успешно сохранены</p>
                 </div>
+            </div>
+        </div>
+
+        <!-- Секция завершения консультации -->
+        <div class="consultation-completed-section" id="consultationCompletedSection" style="display: none;">
+            <h4>✅ Консультация завершена</h4>
+            <p class="text-muted">Диагностическая консультация успешно завершена. Статус консультации автоматически установлен как "Завершена".</p>
+            <div class="completion-actions">
+                <a href="{{ url_for('consultation_result', consultation_id=consultation.id if consultation else '') }}" 
+                   class="btn btn-primary btn-sm" id="viewResultsBtn">
+                    Просмотреть результаты
+                </a>
+                <a href="{{ url_for('patient_list') }}" class="btn btn-secondary btn-sm">
+                    Вернуться к списку пациентов
+                </a>
+                <button class="btn btn-success btn-sm" id="exportPdfBtn">
+                    📄 Экспорт в PDF
+                </button>
             </div>
         </div>
 
@@ -375,13 +392,8 @@
                 <button class="btn btn-warning btn-sm" id="btnSaveDraft">
                     Сохранить черновик
                 </button>
-                <!-- Кнопка завершения теперь появляется только при диагнозе -->
-                <button class="btn btn-primary btn-sm main-complete-btn" id="btnCompleteConsultation"
-                    style="display: none;">
-                    Завершить консультацию
-                </button>
                 <button class="btn btn-danger btn-sm" id="btnCancel">
-                    Отменить
+                    Отменить консультацию
                 </button>
             </div>
         </div>
@@ -391,14 +403,7 @@
         <input type="hidden" id="patientId" value="{{ patient.id if patient else '' }}">
         {% endif %}
 
-        <!-- Keyboard shortcuts hint -->
-        {% if patient %}
-        <div class="keyboard-hint text-muted text-sm text-center">
-            Подсказка: используйте клавиши
-            <span class="keyboard-shortcut">Y</span> для "Да" и
-            <span class="keyboard-shortcut">N</span> для "Нет"
-        </div>
-        {% endif %}
+        
     </main>
 
     <script src="{{ url_for('static', filename='js/consultation.js') }}"></script>
