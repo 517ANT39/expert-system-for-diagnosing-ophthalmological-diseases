@@ -266,6 +266,7 @@
                                     </a>
                                     {% endif %}
 
+
                                     <button class="btn btn-sm btn-secondary"
                                         onclick="exportConsultation({{ consultation.id }})">
                                         📄 PDF
@@ -282,8 +283,8 @@
                                 {% endif %}
                             </div>
                             <div class="consultation-diagnosis">
-                                <strong>Диагноз:</strong>
-                                {{ consultation.final_diagnosis or 'Диагноз не установлен' }}
+                                <strong>Вероятностый диагноз:</strong>
+                                {{ consultation.final_diagnosis or 'не установлен' }}
                             </div>
                             <div class="consultation-status">
                                 <strong>Статус:</strong>
@@ -494,6 +495,71 @@
             alert(`Экспорт консультации #${consultationId} в PDF будет реализован позже`);
         }
     </script>
+    <script>
+    function cancelConsultation(consultationId) {
+        if (confirm('Вы уверены, что хотите отменить эту консультацию? Все данные будут удалены.')) {
+            fetch(`/consultation/${consultationId}/cancel`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Консультация отменена');
+                        location.reload();
+                    } else {
+                        alert('Ошибка при отмене консультации');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Ошибка при отмене консультации');
+                });
+        }
+    }
+
+    function exportConsultation(consultationId) {
+        showToast('Генерация PDF документа...', 'info');
+        window.open(`/consultation/${consultationId}/export-pdf`, '_blank');
+    }
+
+    function showToast(message, type = 'info') {
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.textContent = message;
+        toast.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: ${type === 'success' ? '#4CAF50' : type === 'error' ? '#f44336' : '#2196F3'};
+            color: white;
+            padding: 12px 20px;
+            border-radius: 4px;
+            z-index: 1000;
+        `;
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+            toast.remove();
+        }, 3000);
+    }
+
+    // Загрузка имени пользователя
+    document.addEventListener('DOMContentLoaded', function () {
+        fetch('/api/profile')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('userName').textContent = data.doctor.last_name + ' ' + data.doctor.first_name;
+                }
+            })
+            .catch(error => {
+                console.error('Error loading profile:', error);
+            });
+    });
+</script>
 
 </body>
 
