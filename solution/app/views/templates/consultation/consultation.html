@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/consultation.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/forms.css') }}">
     <style>
         /* Единый стиль для кнопок */
         .btn-sm {
@@ -15,18 +16,18 @@
             font-size: 0.875rem;
             line-height: 1.5;
         }
-        
+
         .consultation-actions {
             display: flex;
             gap: 8px;
             align-items: center;
         }
-        
+
         /* Стили для списка пациентов */
         .patient-selection-card {
             margin-bottom: 1.5rem;
         }
-        
+
         .patient-list-container {
             max-height: 350px;
             overflow-y: auto;
@@ -34,7 +35,7 @@
             border-radius: 8px;
             padding: 0.5rem;
         }
-        
+
         .patient-item {
             display: flex;
             justify-content: space-between;
@@ -43,63 +44,118 @@
             border-bottom: 1px solid #f0f0f0;
             transition: background-color 0.2s;
         }
-        
+
         .patient-item:last-child {
             border-bottom: none;
         }
-        
+
         .patient-item:hover {
             background-color: #f8f9fa;
         }
-        
+
         .patient-info {
             flex: 1;
         }
-        
+
         .patient-name {
             font-weight: 600;
             margin-bottom: 0.25rem;
         }
-        
+
         .patient-meta {
             font-size: 0.875rem;
             color: #6c757d;
         }
-        
+
         .patient-actions {
             display: flex;
             gap: 0.5rem;
         }
-        
+
         .empty-patient-list {
             text-align: center;
             padding: 2rem;
             color: #6c757d;
         }
-        
+
         .patient-count {
             font-size: 0.875rem;
             color: #6c757d;
             margin-bottom: 0.75rem;
         }
-        
+
         /* Стили для скроллбара */
         .patient-list-container::-webkit-scrollbar {
             width: 6px;
         }
-        
+
         .patient-list-container::-webkit-scrollbar-track {
             background: #f1f1f1;
             border-radius: 10px;
         }
-        
+
         .patient-list-container::-webkit-scrollbar-thumb {
             background: #c1c1c1;
             border-radius: 10px;
         }
-        
+
         .patient-list-container::-webkit-scrollbar-thumb:hover {
             background: #a8a8a8;
+        }
+
+        /* Стили для формы рекомендаций в едином стиле */
+        .doctor-recommendations-card {
+            margin-top: 1.5rem;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .recommendations-status {
+            font-size: 0.875rem;
+            color: #6c757d;
+            margin-right: auto;
+            display: flex;
+            align-items: center;
+        }
+
+        .status-confirmed {
+            color: #28a745;
+            font-weight: 600;
+        }
+
+        .status-confirmed::before {
+            content: "✅";
+            margin-right: 0.5rem;
+        }
+
+        /* Основная кнопка завершения - скрыта по умолчанию */
+        .main-complete-btn {
+            margin-left: auto;
+            display: none;
+            /* Скрыта по умолчанию */
+        }
+
+        /* Стили для секции подтверждения рекомендаций */
+        .recommendations-confirmed {
+            background: #f8fff9;
+            border: 1px solid #d4edda;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+            text-align: center;
+        }
+
+        .recommendations-confirmed p {
+            margin: 0;
+            color: #155724;
+            font-weight: 500;
         }
     </style>
 </head>
@@ -145,22 +201,6 @@
                     </div>
                 </div>
             </div>
-            <!--<div class="card-content">
-                <div class="progress-bar-container">
-                    <div class="progress-labels">
-                        <span class="text-sm text-muted">Начало</span>
-                        <span class="text-sm text-muted">Завершено</span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progressFill"
-                            style="width: {{ progress.progress_percent if progress else 0 }}%"></div>
-                    </div>
-                    <div class="progress-text text-muted" id="progressText">
-                        {{ "%.0f"|format(progress.progress_percent) if progress else 0 }}% завершено
-                        ({{ progress.questions_answered if progress else 0 }} вопросов)
-                    </div>
-                </div>
-            </div>-->
         </div>
 
         <!-- Patient Selection (если пациент не выбран) -->
@@ -172,11 +212,11 @@
             <div class="card-content">
                 <div class="patient-selection">
                     <p class="text-muted">Пожалуйста, выберите пациента для начала консультации:</p>
-                    
+
                     <div class="patient-count">
                         Всего пациентов: {{ patients|length }}
                     </div>
-                    
+
                     {% if patients %}
                     <div class="patient-list-container">
                         <div class="patient-list" id="patientList">
@@ -184,7 +224,8 @@
                             <div class="patient-item">
                                 <div class="patient-info">
                                     <div class="patient-name">
-                                        {{ patient_item.last_name }} {{ patient_item.first_name }} {{ patient_item.middle_name or '' }}
+                                        {{ patient_item.last_name }} {{ patient_item.first_name }} {{
+                                        patient_item.middle_name or '' }}
                                     </div>
                                     <div class="patient-meta">
                                         {% if patient_item.birthday %}
@@ -196,7 +237,8 @@
                                     </div>
                                 </div>
                                 <div class="patient-actions">
-                                    <a href="/consultation?patient_id={{ patient_item.id }}" class="btn btn-primary btn-sm">
+                                    <a href="/consultation?patient_id={{ patient_item.id }}"
+                                        class="btn btn-primary btn-sm">
                                         Начать консультацию
                                     </a>
                                 </div>
@@ -254,11 +296,43 @@
             <div class="card-content">
                 <div class="diagnosis-preview-content">
                     <h4 id="previewDiagnosisText"></h4>
-                    <p class="text-muted">Для завершения консультации и получения полных рекомендаций нажмите "Завершить
-                        консультацию"</p>
-                    <button class="btn btn-primary btn-sm" id="btnCompleteConsultation">
-                        Завершить консультацию
+                    <p class="text-muted">Система определила вероятностный диагноз. Вы можете добавить рекомендации для
+                        пациента (необязательно).</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Форма рекомендаций врача (отдельная карточка) -->
+        <div class="card doctor-recommendations-card" id="doctorRecommendationsCard" style="display: none;">
+            <div class="card-header">
+                <h3>Рекомендации врача</h3>
+            </div>
+            <div class="card-content">
+                <div class="form-group">
+                    <label for="doctorNotes" class="form-label">
+                        Рекомендации по лечению и дальнейшим действиям
+                        <span class="text-muted">(необязательно)</span>
+                    </label>
+                    <textarea id="doctorNotes" class="form-control"
+                        placeholder="Опишите рекомендации по лечению, назначения, дальнейшие обследования, режим и другие указания для пациента..."
+                        rows="6"></textarea>
+                    <div class="form-text">
+                        Вы можете оставить поле пустым, если рекомендации не требуются
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <div class="recommendations-status" id="recommendationsStatus">
+                        Рекомендации можно добавить по желанию
+                    </div>
+                    <button type="button" class="btn btn-success btn-sm" id="confirmRecommendationsBtn">
+                        Сохранить рекомендации
                     </button>
+                </div>
+
+                <!-- Секция подтверждения сохранения -->
+                <div class="recommendations-confirmed" id="recommendationsConfirmed" style="display: none;">
+                    <p>✅ Рекомендации успешно сохранены</p>
                 </div>
             </div>
         </div>
@@ -300,6 +374,11 @@
             <div class="consultation-actions">
                 <button class="btn btn-warning btn-sm" id="btnSaveDraft">
                     Сохранить черновик
+                </button>
+                <!-- Кнопка завершения теперь появляется только при диагнозе -->
+                <button class="btn btn-primary btn-sm main-complete-btn" id="btnCompleteConsultation"
+                    style="display: none;">
+                    Завершить консультацию
                 </button>
                 <button class="btn btn-danger btn-sm" id="btnCancel">
                     Отменить

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8">
     <style>
@@ -10,61 +11,82 @@
             margin: 0;
             padding: 20px;
         }
+
         .header {
             text-align: center;
             border-bottom: 2px solid #333;
             padding-bottom: 20px;
             margin-bottom: 30px;
         }
+
         .header h1 {
             color: #2c3e50;
             margin: 0;
         }
+
         .section {
             margin-bottom: 25px;
             page-break-inside: avoid;
         }
+
         .section h2 {
             color: #2c3e50;
             border-bottom: 1px solid #ddd;
             padding-bottom: 5px;
             margin-bottom: 15px;
         }
-        .patient-info, .doctor-info {
+
+        .patient-info,
+        .doctor-info {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 10px;
         }
+
         .diagnosis {
             background: #f8f9fa;
             padding: 15px;
             border-left: 4px solid #3498db;
             margin: 15px 0;
         }
+
+        .recommendations {
+            background: #f8f9fa;
+            padding: 15px;
+            border-left: 4px solid #3498db;
+            margin: 15px 0;
+        }
+
         .symptoms-list {
             list-style: none;
             padding: 0;
         }
+
         .symptoms-list li {
             margin-bottom: 5px;
             padding: 5px;
             border-radius: 3px;
         }
+
         .evidence-positive {
             background: #d4edda;
             border-left: 3px solid #28a745;
         }
+
         .evidence-negative {
             background: #f8d7da;
             border-left: 3px solid #dc3545;
         }
+
         .recommendations ul {
             margin: 10px 0;
             padding-left: 20px;
         }
+
         .recommendation-category {
             margin-bottom: 15px;
         }
+
         .footer {
             margin-top: 50px;
             text-align: right;
@@ -73,6 +95,7 @@
             font-size: 0.9em;
             color: #666;
         }
+
         .status-badge {
             display: inline-block;
             padding: 3px 8px;
@@ -80,12 +103,29 @@
             font-size: 0.8em;
             font-weight: bold;
         }
-        .status-completed { background: #d4edda; color: #155724; }
-        .status-active { background: #d1ecf1; color: #0c5460; }
-        .status-draft { background: #fff3cd; color: #856404; }
-        .status-canceled { background: #f8d7da; color: #721c24; }
+
+        .status-completed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-active {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status-draft {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-canceled {
+            background: #f8d7da;
+            color: #721c24;
+        }
     </style>
 </head>
+
 <body>
     <div class="header">
         <h1>ОфтальмоЭксперт</h1>
@@ -100,7 +140,7 @@
             <div><strong>Дата рождения:</strong> {{ patient.birth_date }}</div>
             <div><strong>Пол:</strong> {% if patient.sex == 'M' %}Мужской{% else %}Женский{% endif %}</div>
             <div><strong>Дата консультации:</strong> {{ consultation.consultation_date.strftime('%d.%m.%Y') }}</div>
-            <div><strong>Статус консультации:</strong> 
+            <div><strong>Статус консультации:</strong>
                 <span class="status-badge status-{{ consultation.status }}">
                     {% if consultation.status == 'completed' %}Завершена
                     {% elif consultation.status == 'active' %}Активна
@@ -139,51 +179,17 @@
     </div>
     {% endif %}
 
-    {% if diagnosis_result.recommendations %}
-    <div class="section recommendations">
-        <h2>Рекомендации</h2>
-        
-        {% if diagnosis_result.recommendations.medication %}
-        <div class="recommendation-category">
-            <h4>Медикаментозное лечение</h4>
-            <ul>
-                {% for med in diagnosis_result.recommendations.medication %}
-                <li>{{ med }}</li>
-                {% endfor %}
-            </ul>
-        </div>
-        {% endif %}
-
-        {% if diagnosis_result.recommendations.general %}
-        <div class="recommendation-category">
-            <h4>Общие рекомендации</h4>
-            <ul>
-                {% for rec in diagnosis_result.recommendations.general %}
-                <li>{{ rec }}</li>
-                {% endfor %}
-            </ul>
-        </div>
-        {% endif %}
-
-        {% if diagnosis_result.recommendations.follow_up %}
-        <div class="recommendation-category">
-            <h4>Наблюдение</h4>
-            <ul>
-                {% for followup in diagnosis_result.recommendations.follow_up %}
-                <li>{{ followup }}</li>
-                {% endfor %}
-            </ul>
-        </div>
-        {% endif %}
-    </div>
-    {% endif %}
-
     {% if consultation.notes %}
     <div class="section">
-        <h2>Примечания врача</h2>
-        <p>{{ consultation.notes }}</p>
+
+        <h2>Рекомендации врача</h2>
+        <div class="recommendations">
+            <p>{{ consultation.notes }}</p>
+        </div>
+
     </div>
     {% endif %}
 
 </body>
+
 </html>

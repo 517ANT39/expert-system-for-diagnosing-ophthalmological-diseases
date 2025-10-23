@@ -164,9 +164,9 @@ class ConsultationService:
         
         # ВАЖНО: Устанавливаем статус 'completed' при завершении
         consultation_data = {
-            'status': 'completed',  # Исправлено: должно быть 'completed'
+            'status': 'completed',
             'final_diagnosis': final_diagnosis,
-            'notes': notes
+            'notes': notes  # Сохраняем рекомендации врача
         }
         
         if 'completed_at' not in diagnosis_data:

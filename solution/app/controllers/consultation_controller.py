@@ -43,23 +43,33 @@ def consultation_controller(app):
     def consultation():
         """Страница начала консультации"""
         patient_id = request.args.get('patient_id')
-        
-        if not patient_id:
-            # Если пациент не указан, показываем страницу выбора пациента
-            try:
-                db_session = get_db_session()
-                from ..services.patient_service import PatientService
-                patient_service = PatientService(db_session)
-                patients = patient_service.get_all_patients()
-                db_session.close()
-                
-                return render_template('consultation/consultation.html', patients=patients)
-            except Exception as e:
-                print(f"Ошибка при загрузке пациентов: {str(e)}")
-                return render_template('consultation/consultation.html', patients=[])
+        db_session = None
         
         try:
             db_session = get_db_session()
+            
+            if not patient_id:
+                # Если пациент не указан, показываем страницу выбора пациента
+                from ..services.patient_service import PatientService
+                patient_service = PatientService(db_session)
+                patients = patient_service.get_all_patients()
+                
+                # Подготавливаем данные пациентов для шаблона
+                patients_data = []
+                for patient in patients:
+                    patient_data = {
+                        'id': patient.id,
+                        'last_name': patient.last_name,
+                        'first_name': patient.first_name,
+                        'middle_name': patient.middle_name,
+                        'birthday': patient.birthday,
+                        'age': _calculate_age(patient.birthday) if patient.birthday else None
+                    }
+                    patients_data.append(patient_data)
+                
+                return render_template('consultation/consultation.html', patients=patients_data)
+            
+            # Если пациент указан
             from ..services.consultation_service import ConsultationService
             from ..services.patient_service import PatientService
             
@@ -69,28 +79,40 @@ def consultation_controller(app):
             # Получаем данные пациента
             patient = patient_service.get_patient(int(patient_id))
             if not patient:
-                db_session.close()
                 return "Пациент не найден", 404
+            
+            # Подготавливаем данные пациента для шаблона
+            patient_data = {
+                'id': patient.id,
+                'last_name': patient.last_name,
+                'first_name': patient.first_name,
+                'middle_name': patient.middle_name,
+                'birthday': patient.birthday,
+                'age': _calculate_age(patient.birthday) if patient.birthday else None
+            }
             
             # Начинаем новую консультацию
             doctor_id = session.get('doctor_id')
             consultation = consultation_service.start_consultation(int(patient_id), doctor_id)
             
-            # Получаем прогресс консультации
-            progress = consultation_service.get_consultation_progress(consultation.id)
-            
-            db_session.close()
+            # Подготавливаем данные консультации для шаблона
+            consultation_data = {
+                'id': consultation.id,
+                'sub_graph_find_diagnosis': consultation.sub_graph_find_diagnosis
+            }
             
             return render_template('consultation/consultation.html', 
-                                 patient=patient,
-                                 consultation=consultation,
-                                 progress=progress)
+                                 patient=patient_data,
+                                 consultation=consultation_data)
             
         except Exception as e:
             print(f"Ошибка при начале консультации: {str(e)}")
             import traceback
             traceback.print_exc()
-            return render_template('consultation/consultation.html')
+            return render_template('consultation/consultation.html', patients=[])
+        finally:
+            if db_session:
+                db_session.close()
 
     # HTML маршрут для результатов консультации
     @app.route('/consultation/result')
@@ -102,6 +124,7 @@ def consultation_controller(app):
         if not consultation_id:
             return "Консультация не указана", 400
         
+        db_session = None
         try:
             db_session = get_db_session()
             from ..services.consultation_service import ConsultationService
@@ -111,7 +134,6 @@ def consultation_controller(app):
             # Получаем результаты консультации
             result = consultation_service.get_consultation_result(int(consultation_id))
             if not result:
-                db_session.close()
                 return "Консультация не найдена", 404
             
             # Форматируем данные для шаблона
@@ -123,7 +145,7 @@ def consultation_controller(app):
             patient_data = {
                 'name': f"{patient.last_name} {patient.first_name} {patient.middle_name or ''}".strip(),
                 'birth_date': patient.birthday.strftime('%d.%m.%Y') if patient.birthday else 'Не указана',
-                'gender': 'Мужской' if patient.sex == 'M' else 'Женский',
+                'sex': patient.sex,
                 'age': _calculate_age(patient.birthday) if patient.birthday else None
             }
             
@@ -141,8 +163,6 @@ def consultation_controller(app):
                 'notes': consultation_data.notes or ''
             }
             
-            db_session.close()
-            
             return render_template('consultation/consultation-result.html',
                                 consultation=consultation_data,
                                 patient=patient_data,
@@ -155,15 +175,18 @@ def consultation_controller(app):
             import traceback
             traceback.print_exc()
             return "Ошибка при загрузке страницы", 500
+        finally:
+            if db_session:
+                db_session.close()
 
-    # API маршрут для сохранения ответа
+    # Остальные API маршруты остаются без изменений...
     @app.route('/api/consultation/save-answer', methods=['POST'])
     @login_required
     def api_save_answer():
         db_session = None
         try:
             db_session = get_db_session()
-            consultation_service = ConsultationService(db_session)  # Будет использовать единственный diagnosis_service
+            consultation_service = ConsultationService(db_session)
             
             data = request.get_json()
             print(f"Save answer request: {data}")
@@ -190,7 +213,7 @@ def consultation_controller(app):
                 'success': True,
                 'message': 'Ответ сохранен',
                 'progress': progress,
-                'next_question': next_question  # Используем next_question из сервиса
+                'next_question': next_question
             }
             
             # Если достигли диагноза
@@ -268,6 +291,8 @@ def consultation_controller(app):
         finally:
             if db_session:
                 db_session.close()
+
+    # Остальные API маршруты...
 
     # API маршрут для получения данных консультации
     @app.route('/api/consultation/<int:consultation_id>')

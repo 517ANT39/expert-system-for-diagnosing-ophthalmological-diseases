@@ -81,7 +81,6 @@
                     <div class="detail-item">
                         <strong>Дата консультации:</strong> {{ consultation_info.date }}
                     </div>
-                    <!-- ДОБАВЬТЕ ЭТОТ БЛОК -->
                     <div class="detail-item">
                         <strong>Статус:</strong>
                         {% if consultation.status == 'completed' %}
@@ -152,43 +151,26 @@
             </div>
         </div>
 
-        <!-- Recommendations -->
-        <div class="card recommendations-card">
+        <!-- Doctor's Recommendations -->
+        <div class="card doctor-recommendations-card">
             <div class="card-header">
-                <h3>Рекомендации</h3>
+                <h3>Рекомендации врача</h3>
             </div>
             <div class="card-content">
-                <div class="recommendations-content">
-                    {% if diagnosis_result.recommendations.medication %}
-                    <div class="recommendation-category">
-                        <h4>Медикаментозное лечение</h4>
-                        <ul>
-                            {% for med in diagnosis_result.recommendations.medication %}
-                            <li>{{ med }}</li>
-                            {% endfor %}
-                        </ul>
+                <div class="doctor-recommendations-content">
+                    {% if consultation.notes %}
+                    <div class="recommendation-text">
+                        <p>{{ consultation.notes }}</p>
                     </div>
-                    {% endif %}
-
-                    {% if diagnosis_result.recommendations.general %}
-                    <div class="recommendation-category">
-                        <h4>Общие рекомендации</h4>
-                        <ul>
-                            {% for rec in diagnosis_result.recommendations.general %}
-                            <li>{{ rec }}</li>
-                            {% endfor %}
-                        </ul>
+                    <div class="recommendation-meta">
+                        <small class="text-muted">
+                            Рекомендации составлены: {{ consultation.doctor.last_name }} {{
+                            consultation.doctor.first_name }} {{ consultation.doctor.middle_name or '' }}
+                        </small>
                     </div>
-                    {% endif %}
-
-                    {% if diagnosis_result.recommendations.follow_up %}
-                    <div class="recommendation-category">
-                        <h4>Наблюдение</h4>
-                        <ul>
-                            {% for followup in diagnosis_result.recommendations.follow_up %}
-                            <li>{{ followup }}</li>
-                            {% endfor %}
-                        </ul>
+                    {% else %}
+                    <div class="empty-state">
+                        <p class="text-muted">Рекомендации врача отсутствуют</p>
                     </div>
                     {% endif %}
                 </div>
