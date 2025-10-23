@@ -12,29 +12,24 @@ def get_diagnosis_service():
     global _diagnosis_service_instance
     if _diagnosis_service_instance is None:
         _diagnosis_service_instance = DiagnosisService()
-        print("🎯 DIAGNOSIS SERVICE SINGLETON CREATED")
     return _diagnosis_service_instance
 
 class ConsultationService:
     def __init__(self, db_session):
         self.consultation_repository = ConsultationRepository(db_session)
         self.diagnosis_service = get_diagnosis_service()
-        print("🎯 CONSULTATION SERVICE INITIALIZED - READY FOR USE!")
 
     def start_consultation(self, patient_id: int, doctor_id: int):
         """Начало новой консультации"""
-        print(f"🚀 START_CONSULTATION: patient={patient_id}, doctor={doctor_id}")
         
         # Проверяем активную консультацию
         active_consultation = self.consultation_repository.get_active_consultation(patient_id, doctor_id)
         
         if active_consultation:
-            print(f"📋 Using existing consultation: {active_consultation.id}")
             return active_consultation
         
         # Получаем первый вопрос
         first_question = self.diagnosis_service.get_initial_question()
-        print(f"❓ First question from diagnosis service: {first_question}")
         
         if not first_question:
             raise ValueError("Не удалось загрузить базу знаний")
@@ -53,14 +48,10 @@ class ConsultationService:
         }
         
         consultation = self.consultation_repository.create_consultation(consultation_data)
-        print(f"✅ CREATED consultation: {consultation.id}")
         return consultation
 
     def save_consultation_answer(self, consultation_id: int, answer: str):
         """Сохранение ответа на вопрос и переход к следующему"""
-        print(f"\n" + "="*50)
-        print(f"🎯 SAVE_ANSWER CALLED: consultation={consultation_id}, answer='{answer}'")
-        print(f"="*50)
         
         # Получаем консультацию
         consultation = self.consultation_repository.get_consultation_by_id(consultation_id)
@@ -70,12 +61,9 @@ class ConsultationService:
         diagnosis_data = consultation.sub_graph_find_diagnosis or {}
         current_path = diagnosis_data.get('current_path', [])
         
-        print(f"📍 Current path from DB: {current_path}")
-        print(f"📝 Current diagnosis_data: {diagnosis_data}")
         
         # Получаем текущий вопрос для сохранения
         current_question = self.diagnosis_service.get_question_by_path(current_path)
-        print(f"💬 Current question: {current_question}")
         
         if not current_question:
             raise ValueError("Текущий вопрос не найден")
@@ -93,12 +81,9 @@ class ConsultationService:
             'timestamp': datetime.utcnow().isoformat()
         }
         
-        print(f"📝 Saved answer {question_number}: '{answer}' for question: '{current_question['text']}'")
         
         # Получаем следующий вопрос
-        print(f"🔍 Getting next question for path {current_path} with answer '{answer}'")
         next_question = self.diagnosis_service.get_next_question(current_path, answer)
-        print(f"🔍 Next question result: {next_question}")
         
         if not next_question:
             raise ValueError("Не удалось получить следующий вопрос")
@@ -108,32 +93,21 @@ class ConsultationService:
         updated_diagnosis_data['current_path'] = next_question['path']
         updated_diagnosis_data['current_question'] = next_question['text']
         
-        print(f"🔄 Updated path: {updated_diagnosis_data['current_path']}")
-        print(f"🔄 Updated question: {updated_diagnosis_data['current_question']}")
-        print(f"🎯 Is final: {next_question['is_final']}")
-        
         # Если достигли конечного диагноза
         if next_question['is_final']:
             diagnosis = self.diagnosis_service.get_diagnosis(next_question['path'])
             updated_diagnosis_data['final_diagnosis_candidate'] = diagnosis
             updated_diagnosis_data['completed_at'] = datetime.utcnow().isoformat()
-            print(f"🎉 FINAL DIAGNOSIS REACHED: {diagnosis}")
         
         # Обновляем консультацию в БД
         consultation_data = {
             'sub_graph_find_diagnosis': updated_diagnosis_data
         }
         
-        print(f"💾 Saving to DB: {consultation_data}")
         updated_consultation = self.consultation_repository.update_consultation(consultation_id, consultation_data)
         
         # ПРОВЕРКА: Получаем обновленную консультацию из БД
         verification_consultation = self.consultation_repository.get_consultation_by_id(consultation_id)
-        print(f"✅ VERIFICATION - Path in DB: {verification_consultation.sub_graph_find_diagnosis.get('current_path', [])}")
-        print(f"✅ VERIFICATION - Question in DB: {verification_consultation.sub_graph_find_diagnosis.get('current_question', '')}")
-        
-        print(f"✅ ANSWER SAVED SUCCESSFULLY")
-        print(f"="*50)
         
         return updated_consultation
 
@@ -146,9 +120,7 @@ class ConsultationService:
         diagnosis_data = consultation.sub_graph_find_diagnosis or {}
         current_path = diagnosis_data.get('current_path', [])
         
-        print(f"🔍 get_current_question: consultation_id={consultation_id}, path_from_db={current_path}")
         question = self.diagnosis_service.get_question_by_path(current_path)
-        print(f"🔍 get_current_question result: {question}")
         return question
 
     def get_consultation_progress(self, consultation_id: int):
@@ -162,7 +134,7 @@ class ConsultationService:
         current_path = diagnosis_data.get('current_path', [])
         
         total_questions = len(answers)
-        progress = min((total_questions / 15) * 100, 100)
+        progress = min((total_questions / 24) * 100, 100)
         
         # Получаем актуальный текущий вопрос через diagnosis_service
         current_question_obj = self.diagnosis_service.get_question_by_path(current_path)
@@ -177,7 +149,6 @@ class ConsultationService:
             'is_completed': is_completed
         }
         
-        print(f"📊 get_consultation_progress: path={current_path}, result={result}")
         return result
 
     def complete_consultation(self, consultation_id: int, final_diagnosis: str = None, notes: str = None):

@@ -34,30 +34,23 @@ class ConsultationRepository:
             if not consultation:
                 return None
             
-            print(f"🔄 REPOSITORY: Updating consultation {consultation_id} with data: {consultation_data}")
             
             for key, value in consultation_data.items():
                 if hasattr(consultation, key):
                     old_value = getattr(consultation, key)
                     setattr(consultation, key, value)
-                    print(f"🔄 REPOSITORY: Set {key} = {value} (was: {old_value})")
             
             self.db_session.commit()
             self.db_session.refresh(consultation)
-            
-            print(f"✅ REPOSITORY: Successfully updated consultation {consultation_id}")
-            print(f"✅ REPOSITORY: New sub_graph_find_diagnosis: {consultation.sub_graph_find_diagnosis}")
             
             return consultation
             
         except Exception as e:
             self.db_session.rollback()
-            print(f"❌ REPOSITORY: Error updating consultation: {e}")
             raise e
                 
         except Exception as e:
             self.db_session.rollback()
-            print(f"❌ REPOSITORY: Error updating consultation: {e}")
             raise e
 
     def update_consultation_status(self, consultation_id: int, status: str):

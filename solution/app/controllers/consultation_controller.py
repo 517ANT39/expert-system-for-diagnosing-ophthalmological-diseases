@@ -166,7 +166,7 @@ def consultation_controller(app):
             consultation_service = ConsultationService(db_session)  # Будет использовать единственный diagnosis_service
             
             data = request.get_json()
-            print(f"📨 Save answer request: {data}")
+            print(f"Save answer request: {data}")
             
             if not data or 'consultation_id' not in data or 'answer' not in data:
                 return jsonify({
@@ -184,8 +184,7 @@ def consultation_controller(app):
             progress = consultation_service.get_consultation_progress(data['consultation_id'])
             next_question = consultation_service.get_current_question(data['consultation_id'])
             
-            print(f"📊 Progress after save: {progress}")
-            print(f"❓ Next question after save: {next_question}")
+            print(f"Next question after save: {next_question}")
             
             response_data = {
                 'success': True,
@@ -198,18 +197,18 @@ def consultation_controller(app):
             if next_question and next_question.get('is_final'):
                 diagnosis_data = consultation.sub_graph_find_diagnosis or {}
                 response_data['diagnosis_candidate'] = diagnosis_data.get('final_diagnosis_candidate')
-                print(f"🎯 Diagnosis candidate: {response_data['diagnosis_candidate']}")
+                print(f"Diagnosis candidate: {response_data['diagnosis_candidate']}")
             
             return jsonify(response_data), 200
             
         except ValueError as e:
-            print(f"❌ ValueError: {str(e)}")
+            print(f"ValueError: {str(e)}")
             return jsonify({
                 'success': False,
                 'message': str(e)
             }), 400
         except Exception as e:
-            print(f"❌ Exception: {str(e)}")
+            print(f"Exception: {str(e)}")
             import traceback
             traceback.print_exc()
             return jsonify({
