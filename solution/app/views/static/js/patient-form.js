@@ -439,23 +439,3 @@ document.addEventListener('DOMContentLoaded', () => {
     new PatientForm();
 });
 
-// Handle beforeunload to warn about unsaved changes
-window.addEventListener('beforeunload', (e) => {
-    const form = document.getElementById('patientForm');
-    if (form) {
-        const formData = new FormData(form);
-        let hasData = false;
-        
-        for (let value of formData.values()) {
-            if (value) {
-                hasData = true;
-                break;
-            }
-        }
-        
-        if (hasData) {
-            e.preventDefault();
-            e.returnValue = 'У вас есть несохраненные изменения. Вы уверены, что хотите уйти?';
-        }
-    }
-});
