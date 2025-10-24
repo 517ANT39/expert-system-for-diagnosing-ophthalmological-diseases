@@ -440,17 +440,6 @@
     font-weight: 500;
 }
 
-.evidence-positive {
-    background: #D1FAE5;
-    color: var(--success-color);
-    border: 1px solid #A7F3D0;
-}
-
-.evidence-negative {
-    background: #FEF3C7;
-    color: #D97706;
-    border: 1px solid #FCD34D;
-}
 
 .reasoning-text {
     color: var(--text-secondary);

@@ -133,17 +133,22 @@
         <!-- Explanation -->
         <div class="card explanation-card">
             <div class="card-header">
-                <h3>Объяснение диагноза</h3>
+                <div class="answers-header">
+                    <h3>Объяснение диагноза</h3>
+
+                </div>
             </div>
             <div class="card-content">
-                <div class="explanation-content">
+                <div class="answers-list" id="explanationList">
                     <p class="text-muted">
                         Диагноз основан на следующих выявленных симптомах:
                     </p>
                     <ul class="symptoms-evidence">
                         {% for symptom in diagnosis_result.symptoms_evidence %}
                         <li class="evidence-{{ 'positive' if symptom.present else 'negative' }}">
-                            {{ symptom.name }}<br>{{ '✅ Да' if symptom.present else '❌ Нет' }}
+                            <span class="answer-icon">{{ '✅' if symptom.present else '❌' }}</span>
+                            <span class="answer-text">{{ symptom.name }} - {{ 'Да' if symptom.present else 'Нет'
+                                }}</span>
                         </li>
                         {% endfor %}
                     </ul>
