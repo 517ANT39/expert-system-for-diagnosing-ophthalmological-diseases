@@ -349,33 +349,39 @@ h3 {
 }
 
 .hero-content {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--spacing-2xl);
+    
+    
     align-items: center;
-    margin-top: var(--spacing-xl);
+    
     position: relative;
+}
+
+.hero-text {
+    margin: 13% 0;
+    text-align: center;
 }
 
 .hero-text h1 {
     color: white;
-    font-size: 3rem;
+    font-size: 3.7rem;
     margin-bottom: var(--spacing-lg);
     line-height: 1.2;
     font-weight: 700;
 }
 
 .hero-description {
-    font-size: var(--font-size-lg);
+    /*font-size: var(--font-size-lg);*/
+    font-size: 1.5rem;
     color: rgba(255, 255, 255, 0.9);
     margin-bottom: var(--spacing-2xl);
     line-height: 1.6;
 }
 
 .hero-actions {
-    display: flex;
+    /*display: flex;
     gap: var(--spacing-md);
-    flex-wrap: wrap;
+    flex-wrap: wrap;*/
+    text-align: center;
 }
 
 .medical-illustration {
@@ -596,7 +602,6 @@ h3 {
 .footer {
     background: var(--text-primary);
     color: white;
-    padding: var(--spacing-2xl) 0 var(--spacing-xl);
 }
 
 .footer-content {
@@ -639,7 +644,7 @@ h3 {
 
 .footer-bottom {
     border-top: 1px solid rgba(255, 255, 255, 0.1);
-    padding-top: var(--spacing-lg);
+    padding: var(--spacing-lg) 0;
     text-align: center;
     color: rgba(255, 255, 255, 0.7);
 }

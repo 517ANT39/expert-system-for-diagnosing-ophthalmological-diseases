@@ -42,7 +42,9 @@
                         Интеллектуальная платформа для начинающих врачей-офтальмологов и терапевтов. 
                         Оказывайте качественную помощь даже в условиях ограниченного диагностического оборудования.
                     </p>
-                    <div class="hero-actions">
+                    
+                </div>
+                <div class="hero-actions">
                         {% if logged_in %}
                             <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg">Перейти в панель управления</a>
                             <a href="{{ url_for('consultation') }}" class="btn btn-secondary btn-lg">Новая консультация</a>
@@ -51,8 +53,6 @@
                             <a href="#features" class="btn btn-secondary btn-lg">Узнать больше</a>
                         {% endif %}
                     </div>
-                </div>
-                
             </div>
         </div>
     </header>
@@ -108,23 +108,7 @@
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
-            <div class="footer-content">
-                <div class="footer-logo">
-                    <div class="logo">
-                        <span class="logo-icon">👁️</span>
-                        <span class="logo-text">ОфтальмоЭксперт</span>
-                    </div>
-                    <p class="text-muted">Экспертная система поддержки врачебных решений</p>
-                </div>
-                <div class="footer-links">
-                    <div class="footer-column">
-                        <h4>Система</h4>
-                        <a href="{{ url_for('login') }}">Вход</a>
-                        <a href="#features">Возможности</a>
-                    </div>
-                    
-                </div>
-            </div>
+            
             <div class="footer-bottom">
                 <p>&copy; 2025 ОфтальмоЭксперт. Все права защищены.</p>
             </div>
