@@ -409,7 +409,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     recommendationsConfirmed.style.display = 'block';
                 }
                 if (recommendationsStatus) {
-                    recommendationsStatus.textContent = '✅ Рекомендации сохранены';
+                    recommendationsStatus.textContent = 'Рекомендации сохранены';
                     recommendationsStatus.className = 'recommendations-status status-confirmed';
                 }
 
