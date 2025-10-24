@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify, session, redirect, url_for, render_template
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from ..services.auth_service import AuthService
+from services.auth_service import AuthService
 import os
 
 # Настройка базы данных

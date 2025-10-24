@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
-from ..models.database_models import Doctor
+from models.database_models import Doctor
 import bcrypt
 
 class UserRepository:

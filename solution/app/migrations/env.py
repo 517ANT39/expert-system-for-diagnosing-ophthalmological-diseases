@@ -4,10 +4,11 @@ from logging.config import fileConfig
 from sqlalchemy import create_engine
 from alembic import context
 
-# Добавляем путь к проекту
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'solution'))
+# Добавляем текущую директорию в путь Python
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
-from solution.app.models.database_models import Base
+# Правильный импорт моделей
+from models.database_models import Base
 
 config = context.config
 

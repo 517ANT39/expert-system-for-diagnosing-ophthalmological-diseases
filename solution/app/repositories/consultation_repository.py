@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session, joinedload
-from ..models.database_models import Consultation, Patient, Doctor
+from models.database_models import Consultation, Patient, Doctor
 
 class ConsultationRepository:
     def __init__(self, db_session: Session):

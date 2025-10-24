@@ -12,8 +12,8 @@ project_root = os.path.join(current_dir, '..', '..', '..')
 sys.path.insert(0, project_root)
 
 # Абсолютные импорты
-from solution.app.services.patient_service import PatientService
-from solution.app.models.database_models import Consultation, Patient
+from services.patient_service import PatientService
+from models.database_models import Consultation, Patient
 
 def get_db_session():
     """Создание сессии БД"""

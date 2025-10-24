@@ -10,8 +10,8 @@ echo "Database is ready!"
 
 # Запуск миграций
 echo "Running database migrations..."
-alembic upgrade head
+python -m alembic upgrade head
 
 # Запуск приложения
 echo "Starting application..."
-exec python solution/app/app.py
+exec python app.py

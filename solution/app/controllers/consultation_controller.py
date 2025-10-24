@@ -1,5 +1,5 @@
 from flask import request, jsonify, session, render_template
-from ..services.consultation_service import ConsultationService, get_diagnosis_service
+from services.consultation_service import ConsultationService, get_diagnosis_service
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import os
@@ -50,7 +50,7 @@ def consultation_controller(app):
             
             if not patient_id:
                 # Если пациент не указан, показываем страницу выбора пациента
-                from ..services.patient_service import PatientService
+                from services.patient_service import PatientService
                 patient_service = PatientService(db_session)
                 patients = patient_service.get_all_patients()
                 
@@ -70,8 +70,8 @@ def consultation_controller(app):
                 return render_template('consultation/consultation.html', patients=patients_data)
             
             # Если пациент указан
-            from ..services.consultation_service import ConsultationService
-            from ..services.patient_service import PatientService
+            from services.consultation_service import ConsultationService
+            from services.patient_service import PatientService
             
             consultation_service = ConsultationService(db_session)
             patient_service = PatientService(db_session)
@@ -127,7 +127,7 @@ def consultation_controller(app):
         db_session = None
         try:
             db_session = get_db_session()
-            from ..services.consultation_service import ConsultationService
+            from services.consultation_service import ConsultationService
             
             consultation_service = ConsultationService(db_session)
             
@@ -250,7 +250,7 @@ def consultation_controller(app):
         db_session = None
         try:
             db_session = get_db_session()
-            from ..services.consultation_service import ConsultationService
+            from services.consultation_service import ConsultationService
             
             consultation_service = ConsultationService(db_session)
             
@@ -302,7 +302,7 @@ def consultation_controller(app):
         db_session = None
         try:
             db_session = get_db_session()
-            from ..services.consultation_service import ConsultationService
+            from services.consultation_service import ConsultationService
             
             consultation_service = ConsultationService(db_session)
             
@@ -354,7 +354,7 @@ def consultation_controller(app):
         db_session = None
         try:
             db_session = get_db_session()
-            from ..services.consultation_service import ConsultationService
+            from services.consultation_service import ConsultationService
             
             consultation_service = ConsultationService(db_session)
             
@@ -399,7 +399,7 @@ def consultation_controller(app):
         db_session = None
         try:
             db_session = get_db_session()
-            from ..services.consultation_service import ConsultationService
+            from services.consultation_service import ConsultationService
             
             consultation_service = ConsultationService(db_session)
             

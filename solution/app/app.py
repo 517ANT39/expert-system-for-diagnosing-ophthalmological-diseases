@@ -8,18 +8,13 @@ from flask import make_response
 from weasyprint import HTML
 import tempfile
 
-# Добавляем путь к корню проекта в sys.path
-current_dir = os.path.dirname(os.path.abspath(__file__))
-project_root = os.path.join(current_dir, '..', '..')
-sys.path.insert(0, project_root)
-
-# Абсолютные импорты с полным путем
-from solution.app.models.database_models import Doctor, Consultation, Patient
-from solution.app.controllers.patient_controller import patient_controller
-from solution.app.services.auth_service import AuthService
-from solution.app.services.patient_service import PatientService
-from solution.app.controllers.consultation_controller import consultation_controller
-from solution.app.controllers.patient_controller import get_db_session, _calculate_age
+# Правильные импорты для контейнера
+from models.database_models import Doctor, Consultation, Patient
+from controllers.patient_controller import patient_controller
+from services.auth_service import AuthService
+from services.patient_service import PatientService
+from controllers.consultation_controller import consultation_controller
+from controllers.patient_controller import get_db_session, _calculate_age
 
 # В Docker рабочая директория /app, поэтому пути другие
 base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -191,11 +186,6 @@ def registration():
 # Регистрируем контроллер пациентов
 patient_controller(app)
 
-#@app.route('/dashboard')
-#@login_required
-#def dashboard():
-    #return render_template('dashboard.html')
-
 @app.route('/profile')
 @login_required
 def profile():
@@ -336,100 +326,6 @@ def logout():
     session.clear()
     return redirect(url_for('index'))  # После выхода - на главную страницу
 
-# Защищенные маршруты (требуют авторизации)
-#@app.route('/consultation')
-#@login_required
-#def consultation():
-   # return render_template('consultation/consultation.html')
-"""
-@app.route('/consultation/result')
-@login_required
-def consultation_result():
-    return render_template('consultation/consultation-result.html')
-
-@app.route('/consultation/history')
-@login_required
-def consultation_history():
-    return render_template('consultation/consultation-history.html')"""
-
-"""
-# Пациенты (требуют авторизации)
-@app.route('/patient')
-@login_required
-def patient_list():
-    return render_template('patient/patients.html')
-
-@app.route('/patients')
-@login_required
-def patient_list():
-    #Страница списка пациентов
-    try:
-        db_session = get_db_session()
-        patient_service = PatientService(db_session)
-        
-        # Получаем всех пациентов напрямую из таблицы patients
-        patients = patient_service.get_all_patients()
-        
-        # Добавляем возраст для отображения
-        for patient in patients:
-            if patient.birthday:
-                patient.age = _calculate_age(patient.birthday)
-            else:
-                patient.age = None
-        
-        db_session.close()
-        
-        return render_template('patient.html', patients=patients)
-        
-    except Exception as e:
-        print(f"Ошибка при загрузке списка пациентов: {str(e)}")
-        # В случае ошибки показываем пустой список
-        return render_template('patient.html', patients=[])
-    
-@app.route('/api/patients/search')
-@login_required
-def api_search_patients():
-    #Поиск пациентов через API
-    db_session = None
-    try:
-        db_session = get_db_session()
-        patient_service = PatientService(db_session)
-        
-        search_term = request.args.get('term', '')
-        patients = patient_service.search_patients(search_term)
-        
-        # Форматируем ответ
-        patients_data = []
-        for patient in patients:
-            patients_data.append({
-                'id': patient.id,
-                'last_name': patient.last_name,
-                'first_name': patient.first_name,
-                'middle_name': patient.middle_name,
-                'birthday': patient.birthday.isoformat() if patient.birthday else None,
-                'sex': patient.sex.value,
-                'phone': patient.phone,
-                'email': patient.email,
-                'age': _calculate_age(patient.birthday) if patient.birthday else None,
-                'registered_at': patient.registered_at.isoformat() if patient.registered_at else None
-            })
-        
-        return jsonify({
-            'success': True,
-            'patients': patients_data,
-            'total': len(patients_data)
-        }), 200
-        
-    except Exception as e:
-        return jsonify({
-            'success': False,
-            'message': f'Ошибка при поиске пациентов: {str(e)}'
-        }), 500
-    finally:
-        if db_session:
-            db_session.close()
-            """
-
 @app.route('/patient/new')
 @login_required
 def patient_new():
@@ -447,8 +343,6 @@ def diagnosis_questions():
 @login_required
 def diagnosis_result():
     return render_template('diagnosis/result.html')
-
-# ... существующий код ...
 
 @app.route('/dashboard')
 @login_required
@@ -569,8 +463,8 @@ def debug_consultation(consultation_id):
     """Диагностический маршрут для проверки консультации"""
     try:
         db_session = get_db_session()
-        from solution.app.services.consultation_service import ConsultationService
-        from solution.app.services.diagnosis_service import DiagnosisService
+        from services.consultation_service import ConsultationService
+        from services.diagnosis_service import DiagnosisService
         
         consultation_service = ConsultationService(db_session)
         diagnosis_service = DiagnosisService()
@@ -598,8 +492,8 @@ def debug_consultation(consultation_id):
 def debug_services():
     """Проверка версий сервисов"""
     import importlib
-    import solution.app.services.consultation_service as cs
-    import solution.app.services.diagnosis_service as ds
+    import services.consultation_service as cs
+    import services.diagnosis_service as ds
     
     return jsonify({
         'consultation_service_file': cs.__file__,

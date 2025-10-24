@@ -1,8 +1,8 @@
 import os
 import json
 from datetime import datetime
-from ..repositories.consultation_repository import ConsultationRepository
-from ..services.diagnosis_service import DiagnosisService
+from repositories.consultation_repository import ConsultationRepository
+from services.diagnosis_service import DiagnosisService
 
 # Создаем единственный экземпляр DiagnosisService
 _diagnosis_service_instance = None

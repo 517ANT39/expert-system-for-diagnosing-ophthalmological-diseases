@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from datetime import datetime
 
 # Относительные импорты внутри пакета app
-from ..models.database_models import Patient, Consultation, Doctor
+from models.database_models import Patient, Consultation, Doctor
 
 class PatientRepository:
     def __init__(self, db_session: Session):

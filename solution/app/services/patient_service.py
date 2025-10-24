@@ -1,6 +1,6 @@
 # Относительные импорты внутри пакета app
-from ..repositories.patient_repository import PatientRepository
-from ..models.database_models import SexEnum
+from repositories.patient_repository import PatientRepository
+from models.database_models import SexEnum
 from datetime import datetime
 import re
 
