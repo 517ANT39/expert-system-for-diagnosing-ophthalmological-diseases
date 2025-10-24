@@ -1,38 +1,10 @@
 from flask import request, jsonify, session, render_template
 from services.consultation_service import ConsultationService, get_diagnosis_service
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from utils.database import get_db_session, login_required, _calculate_age
 import os
 
 # Предварительная инициализация сервиса
 _diagnosis_service = get_diagnosis_service()
-
-def get_db_session():
-    """Создание сессии БД"""
-    database_url = os.getenv("DATABASE_URL", "postgresql://admin:password@db:5432/ophthalmology_db")
-    engine = create_engine(database_url)
-    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-    return SessionLocal()
-
-def login_required(f):
-    """Декоратор для проверки авторизации"""
-    from functools import wraps
-    
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if not session.get('logged_in'):
-            return jsonify({
-                'success': False,
-                'message': 'Требуется авторизация'
-            }), 401
-        return f(*args, **kwargs)
-    return decorated_function
-
-def _calculate_age(birthday):
-    """Расчет возраста по дате рождения"""
-    from datetime import date
-    today = date.today()
-    return today.year - birthday.year - ((today.month, today.day) < (birthday.month, birthday.day))
 
 def consultation_controller(app):
     """Регистрация маршрутов для работы с консультациями"""
@@ -157,6 +129,7 @@ def consultation_controller(app):
             }
             
             # Подготавливаем данные консультации
+            from datetime import datetime
             consultation_info = {
                 'date': consultation_data.consultation_date.strftime('%d.%m.%Y %H:%M') if consultation_data.consultation_date else datetime.now().strftime('%d.%m.%Y %H:%M'),
                 'final_diagnosis': consultation_data.final_diagnosis or diagnosis_result['primary_diagnosis'],
@@ -292,8 +265,6 @@ def consultation_controller(app):
             if db_session:
                 db_session.close()
 
-    # Остальные API маршруты...
-
     # API маршрут для получения данных консультации
     @app.route('/api/consultation/<int:consultation_id>')
     @login_required
@@ -346,7 +317,7 @@ def consultation_controller(app):
             if db_session:
                 db_session.close()
 
-        # API маршрут для отмены консультации
+    # API маршрут для отмены консультации
     @app.route('/api/consultation/cancel', methods=['POST'])
     @login_required
     def api_cancel_consultation():

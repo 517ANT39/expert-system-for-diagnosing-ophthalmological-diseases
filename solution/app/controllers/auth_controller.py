@@ -1,22 +1,8 @@
-from flask import Blueprint, request, jsonify, session, redirect, url_for, render_template
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from flask import Blueprint, request, jsonify, session, render_template
+from utils.database import get_db_session, login_required
 from services.auth_service import AuthService
-import os
-
-# Настройка базы данных
-database_url = os.getenv("DATABASE_URL", "postgresql://admin:password@db:5432/ophthalmology_db")
-engine = create_engine(database_url)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 auth_bp = Blueprint('auth', __name__)
-
-def get_db_session():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 @auth_bp.route('/registration', methods=['GET'])
 def registration_page():
@@ -29,7 +15,7 @@ def login_page():
 @auth_bp.route('/api/register', methods=['POST'])
 def register():
     try:
-        db_session = SessionLocal()
+        db_session = get_db_session()
         auth_service = AuthService(db_session)
         
         data = request.get_json()
@@ -65,7 +51,7 @@ def register():
 @auth_bp.route('/api/login', methods=['POST'])
 def login():
     try:
-        db_session = SessionLocal()
+        db_session = get_db_session()
         auth_service = AuthService(db_session)
         
         data = request.get_json()
@@ -105,15 +91,10 @@ def logout():
     }), 200
 
 @auth_bp.route('/api/profile', methods=['GET'])
+@login_required
 def get_profile():
-    if not session.get('logged_in'):
-        return jsonify({
-            'success': False,
-            'message': 'Не авторизован'
-        }), 401
-    
     try:
-        db_session = SessionLocal()
+        db_session = get_db_session()
         auth_service = AuthService(db_session)
         
         doctor = auth_service.get_doctor_profile(session['doctor_id'])

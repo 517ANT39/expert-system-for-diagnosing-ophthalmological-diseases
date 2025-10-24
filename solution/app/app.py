@@ -1,20 +1,17 @@
-from flask import Flask, render_template, session, redirect, url_for, request, jsonify
+from flask import Flask, render_template, session, redirect, url_for, request, jsonify, make_response
 import os
 import sys
 from datetime import datetime
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from flask import make_response
 from weasyprint import HTML
-import tempfile
 
-# Правильные импорты для контейнера
+# Импорты из utils
+from utils.database import get_db_session, login_required, _calculate_age
+
+# Импорты моделей и контроллеров
 from models.database_models import Doctor, Consultation, Patient
 from controllers.patient_controller import patient_controller
 from services.auth_service import AuthService
-from services.patient_service import PatientService
 from controllers.consultation_controller import consultation_controller
-from controllers.patient_controller import get_db_session, _calculate_age
 
 # В Docker рабочая директория /app, поэтому пути другие
 base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -33,29 +30,15 @@ app = Flask(__name__,
 app.secret_key = os.getenv('SECRET_KEY', 'dev-secret-key')
 app.config['SESSION_TYPE'] = 'filesystem'
 
-# Настройка базы данных
-database_url = os.getenv("DATABASE_URL", "postgresql://admin:password@db:5432/ophthalmology_db")
-engine = create_engine(database_url)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
+# Регистрируем контроллеры
 consultation_controller(app)
-
-def login_required(f):
-    """Декоратор для проверки авторизации"""
-    from functools import wraps
-    
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if not session.get('logged_in'):
-            return redirect(url_for('login'))
-        return f(*args, **kwargs)
-    return decorated_function
+patient_controller(app)
 
 # API маршруты для аутентификации
 @app.route('/api/register', methods=['POST'])
 def api_register():
     try:
-        db_session = SessionLocal()
+        db_session = get_db_session()
         auth_service = AuthService(db_session)
         
         data = request.get_json()
@@ -91,7 +74,7 @@ def api_register():
 @app.route('/api/login', methods=['POST'])
 def api_login():
     try:
-        db_session = SessionLocal()
+        db_session = get_db_session()
         auth_service = AuthService(db_session)
         
         data = request.get_json()
@@ -135,7 +118,7 @@ def api_logout():
 @login_required
 def api_profile():
     try:
-        db_session = SessionLocal()
+        db_session = get_db_session()
         auth_service = AuthService(db_session)
         
         doctor = auth_service.get_doctor_profile(session['doctor_id'])
@@ -183,9 +166,6 @@ def registration():
         return redirect(url_for('dashboard'))
     return render_template('registration.html')
 
-# Регистрируем контроллер пациентов
-patient_controller(app)
-
 @app.route('/profile')
 @login_required
 def profile():
@@ -201,7 +181,7 @@ def edit_profile():
 @login_required
 def api_profile_update():
     try:
-        db_session = SessionLocal()
+        db_session = get_db_session()
         auth_service = AuthService(db_session)
         
         data = request.get_json()
@@ -263,7 +243,7 @@ def api_profile_update():
 @login_required
 def api_change_password():
     try:
-        db_session = SessionLocal()
+        db_session = get_db_session()
         auth_service = AuthService(db_session)
         
         data = request.get_json()
@@ -333,17 +313,6 @@ def patient_new():
     today = datetime.now().strftime('%Y-%m-%d')
     return render_template('patient/patient-new.html', today=today)
 
-# Диагностика (требуют авторизации)
-@app.route('/diagnosis/questions')
-@login_required
-def diagnosis_questions():
-    return render_template('diagnosis/questions.html')
-
-@app.route('/diagnosis/result')
-@login_required
-def diagnosis_result():
-    return render_template('diagnosis/result.html')
-
 @app.route('/dashboard')
 @login_required
 def dashboard():
@@ -375,7 +344,7 @@ def dashboard():
 def export_consultation_pdf(consultation_id):
     try:
         # Используем существующую сессию базы данных
-        db_session = SessionLocal()
+        db_session = get_db_session()
         
         # Получаем данные консультации
         consultation = db_session.query(Consultation).filter_by(id=consultation_id).first()
@@ -439,93 +408,6 @@ def export_consultation_pdf(consultation_id):
 def health():
     return "OK"
 
-# Debug route
-@app.route('/debug')
-def debug():
-    return f"""
-    <h1>Debug Information</h1>
-    <p>Base dir: {base_dir}</p>
-    <p>Template folder: {template_dir}</p>
-    <p>Static folder: {static_dir}</p>
-    <p>Templates exist: {os.path.exists(template_dir)}</p>
-    <p>Static exists: {os.path.exists(static_dir)}</p>
-    <p>CSS exists: {os.path.exists(os.path.join(static_dir, 'css', 'main.css'))}</p>
-    <p>Index.html exists: {os.path.exists(os.path.join(template_dir, 'index.html'))}</p>
-    <p>Patient-new.html exists: {os.path.exists(os.path.join(template_dir, 'patient-new.html'))}</p>
-    <p>User logged in: {session.get('logged_in', False)}</p>
-    <p>User ID: {session.get('doctor_id')}</p>
-    <p>User name: {session.get('doctor_name')}</p>
-    """
-
-@app.route('/debug/consultation/<int:consultation_id>')
-@login_required
-def debug_consultation(consultation_id):
-    """Диагностический маршрут для проверки консультации"""
-    try:
-        db_session = get_db_session()
-        from services.consultation_service import ConsultationService
-        from services.diagnosis_service import DiagnosisService
-        
-        consultation_service = ConsultationService(db_session)
-        diagnosis_service = DiagnosisService()
-        
-        consultation = consultation_service.consultation_repository.get_consultation_by_id(consultation_id)
-        
-        result = {
-            'consultation': {
-                'id': consultation.id,
-                'status': consultation.status,
-                'sub_graph_find_diagnosis': consultation.sub_graph_find_diagnosis
-            },
-            'knowledge_graph_loaded': bool(diagnosis_service.knowledge_graph),
-            'initial_question': diagnosis_service.get_initial_question(),
-            'current_question': consultation_service.get_current_question(consultation_id)
-        }
-        
-        db_session.close()
-        return jsonify(result)
-        
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-    
-@app.route('/debug/services')
-def debug_services():
-    """Проверка версий сервисов"""
-    import importlib
-    import services.consultation_service as cs
-    import services.diagnosis_service as ds
-    
-    return jsonify({
-        'consultation_service_file': cs.__file__,
-        'diagnosis_service_file': ds.__file__,
-        'consultation_service_reload': importlib.reload(cs).__file__,
-        'diagnosis_service_reload': importlib.reload(ds).__file__
-    })
-
-@app.route('/debug/db/consultation/<int:consultation_id>')
-@login_required
-def debug_db_consultation(consultation_id):
-    """Проверка данных консультации в БД"""
-    try:
-        db_session = get_db_session()
-        consultation = db_session.query(Consultation).filter(Consultation.id == consultation_id).first()
-        
-        if consultation:
-            result = {
-                'id': consultation.id,
-                'status': consultation.status,
-                'sub_graph_find_diagnosis': consultation.sub_graph_find_diagnosis,
-                'raw_data': str(consultation.sub_graph_find_diagnosis)  # Для отладки
-            }
-        else:
-            result = {'error': 'Consultation not found'}
-        
-        db_session.close()
-        return jsonify(result)
-        
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
 if __name__ == '__main__':
     print("=== Starting Flask Application ===")
     print(f"Base directory: {base_dir}")
@@ -534,7 +416,5 @@ if __name__ == '__main__':
     print(f"Templates exist: {os.path.exists(template_dir)}")
     print(f"Static exists: {os.path.exists(static_dir)}")
     print(f"CSS exists: {os.path.exists(os.path.join(static_dir, 'css', 'main.css'))}")
-    print(f"Index.html exists: {os.path.exists(os.path.join(template_dir, 'index.html'))}")
-    print(f"Patient-new.html exists: {os.path.exists(os.path.join(template_dir, 'patient-new.html'))}")
     app.run(host='0.0.0.0', port=5000, debug=True)
     #app.run(host='0.0.0.0', port=5000, debug=False) при сдаче изменить на False

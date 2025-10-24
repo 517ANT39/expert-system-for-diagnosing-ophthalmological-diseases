@@ -1,46 +1,8 @@
 from flask import request, jsonify, session, render_template
-from functools import wraps
-import os
-import sys
-from datetime import datetime
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, joinedload
-
-# Добавляем путь к корню проекта в sys.path
-current_dir = os.path.dirname(os.path.abspath(__file__))
-project_root = os.path.join(current_dir, '..', '..', '..')
-sys.path.insert(0, project_root)
-
-# Абсолютные импорты
-from services.patient_service import PatientService
+from utils.database import get_db_session, login_required, _calculate_age
+from sqlalchemy.orm import joinedload
 from models.database_models import Consultation, Patient
-
-def get_db_session():
-    """Создание сессии БД"""
-    database_url = os.getenv("DATABASE_URL", "postgresql://admin:password@db:5432/ophthalmology_db")
-    engine = create_engine(database_url)
-    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-    return SessionLocal()
-
-def login_required(f):
-    """Декоратор для проверки авторизации"""
-    from functools import wraps
-    
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if not session.get('logged_in'):
-            return jsonify({
-                'success': False,
-                'message': 'Требуется авторизация'
-            }), 401
-        return f(*args, **kwargs)
-    return decorated_function
-
-def _calculate_age(birthdate):
-    """Расчет возраста по дате рождения"""
-    from datetime import date
-    today = date.today()
-    return today.year - birthdate.year - ((today.month, today.day) < (birthdate.month, birthdate.day))
+from services.patient_service import PatientService
 
 def patient_controller(app):
     """Регистрация маршрутов для работы с пациентами"""
@@ -94,9 +56,9 @@ def patient_controller(app):
             else:
                 patient.age = None
             
-            # Получаем консультации пациента - ИСПРАВЛЕННЫЙ ЗАПРОС
+            # Получаем консультации пациента
             consultations = db_session.query(Consultation).options(
-                joinedload(Consultation.doctor)  # ИСПРАВЛЕНО: используем joinedload напрямую
+                joinedload(Consultation.doctor)
             ).filter(
                 Consultation.patient_id == patient_id
             ).order_by(
@@ -113,7 +75,6 @@ def patient_controller(app):
             print(f"Ошибка при загрузке истории пациента: {str(e)}")
             if db_session:
                 db_session.close()
-            # В случае ошибки возвращаем ошибку 500
             return "Ошибка при загрузке страницы", 500
     
     # API маршрут для поиска пациентов
@@ -160,7 +121,7 @@ def patient_controller(app):
             if db_session:
                 db_session.close()
     
-    # Остальные API маршруты остаются без изменений
+    # Остальные API маршруты...
     @app.route('/api/patients', methods=['POST'])
     @login_required
     def api_create_patient():
