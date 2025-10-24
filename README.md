@@ -15,17 +15,20 @@ https://www.docker.com/products/docker-desktop/
 #### 2. Получение исходного кода
 ```git clone https://github.com/517ANT39/expert-system-for-diagnosing-ophthalmological-diseases.git```
 
-#### 3. Настройка переменных окружения
+#### 3. Переход в рабочую директорию проекта
+```cd expert-system-for-diagnosing-ophthalmological-diseases/solution/app```
+
+#### 4. Настройка переменных окружения
 ```cp env/db.env.example env/db.env```<br>
 ```cp env/web.env.example env/web.env```
 
-#### 4. Запуск системы и в контейнерах Docker
+#### 5. Запуск системы и в контейнерах Docker
 ```docker-compose up --build```
 
-#### 5. Проверка работоспособности (доступ к web-интерфейсу)
+#### 6. Проверка работоспособности (доступ к web-интерфейсу)
 http://localhost:5000
 
-#### 6. Остановка системы
+#### 7. Остановка системы
 ```docker-compose down```<br>
 
 ***Примечание**: Для полной очистки системы с удалением образов используйте ```docker-compose down --rmi all```
