@@ -142,8 +142,8 @@ env.bak/
 venv.bak/
 
 # Ignore all files in env folder except .example files
-env/**/*
-!env/*.example
+*.env
+!*.env.example
 
 # Spyder project settings
 .spyderproject
