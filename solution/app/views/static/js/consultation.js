@@ -320,7 +320,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         if (confirmRecommendationsBtn) {
             confirmRecommendationsBtn.disabled = false;
-            confirmRecommendationsBtn.textContent = 'Сохранить рекомендации';
+            confirmRecommendationsBtn.textContent = 'Завершить консультацию';
             confirmRecommendationsBtn.style.display = 'block';
         }
         if (recommendationsStatus) {
@@ -411,7 +411,7 @@ document.addEventListener('DOMContentLoaded', function () {
             // Восстанавливаем кнопку
             if (confirmRecommendationsBtn) {
                 confirmRecommendationsBtn.disabled = false;
-                confirmRecommendationsBtn.textContent = 'Сохранить рекомендации';
+                confirmRecommendationsBtn.textContent = 'Завершить консультацию';
             }
             if (recommendationsStatus) {
                 recommendationsStatus.textContent = 'Ошибка при сохранении';
