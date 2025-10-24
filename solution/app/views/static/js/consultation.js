@@ -168,6 +168,8 @@ document.addEventListener('DOMContentLoaded', function () {
         // Если достигли диагноза, показываем превью и блокируем кнопки
         if (data.next_question && data.next_question.is_final) {
             const diagnosis = data.diagnosis_candidate || data.next_question.text;
+
+            // Сначала показываем все элементы
             showDiagnosisPreview(diagnosis);
 
             // Блокируем кнопки ответов
@@ -183,6 +185,17 @@ document.addEventListener('DOMContentLoaded', function () {
             // ПОКАЗЫВАЕМ карточку рекомендаций
             showRecommendationsCard();
 
+            // Добавляем небольшую задержку для гарантии отрисовки DOM
+            setTimeout(() => {
+                // Прокручиваем к блоку с диагнозом
+                if (diagnosisPreview) {
+                    diagnosisPreview.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            }, 100);
+
             // Автоматически завершаем консультацию (только статус, без рекомендаций)
             completeConsultationAutomatically(diagnosis);
 
@@ -195,6 +208,16 @@ document.addEventListener('DOMContentLoaded', function () {
             });
             // ПОКАЗЫВАЕМ карточку рекомендаций
             showRecommendationsCard();
+
+            // Прокручиваем к диагнозу для промежуточных диагнозов тоже
+            setTimeout(() => {
+                if (diagnosisPreview) {
+                    diagnosisPreview.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            }, 100);
         } else {
             hideDiagnosisPreview();
             hideRecommendationsCard();

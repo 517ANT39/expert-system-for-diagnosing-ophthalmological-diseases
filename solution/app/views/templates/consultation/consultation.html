@@ -287,6 +287,35 @@
             </div>
         </div>
 
+        <!-- Collected Answers -->
+        <div class="card answers-card">
+            <div class="card-header">
+                <div class="answers-header">
+                    <h3>История вопросов и ответов</h3>
+                    <button class="btn btn-sm btn-secondary" id="toggleAnswers">
+                        Свернуть
+                    </button>
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="answers-list" id="answersList">
+                    {% if consultation and consultation.sub_graph_find_diagnosis and
+                    consultation.sub_graph_find_diagnosis.answers %}
+                    {% for key, qa in consultation.sub_graph_find_diagnosis.answers.items() %}
+                    <div class="answer-item answer-{{ qa.answer }}">
+                        <span class="answer-icon">{{ '✅' if qa.answer == 'yes' else '❌' }}</span>
+                        <span class="answer-text">{{ qa.question }} - {{ 'Да' if qa.answer == 'yes' else 'Нет' }}</span>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="empty-state">
+                        <p class="text-muted">Ответы пока отсутствуют</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
         <!-- Diagnosis Preview (показывается при достижении диагноза) -->
         <div class="card diagnosis-preview-card" id="diagnosisPreview" style="display: none;">
             <div class="card-header">
@@ -300,6 +329,8 @@
                 </div>
             </div>
         </div>
+
+        
 
         <!-- Форма рекомендаций врача (отдельная карточка) -->
         <div class="card doctor-recommendations-card" id="doctorRecommendationsCard" style="display: none;">
@@ -352,40 +383,11 @@
             </div>
         </div>
 
-        <!-- Collected Answers -->
-        <div class="card answers-card">
-            <div class="card-header">
-                <div class="answers-header">
-                    <h3>История вопросов и ответов</h3>
-                    <button class="btn btn-sm btn-secondary" id="toggleAnswers">
-                        Свернуть
-                    </button>
-                </div>
-            </div>
-            <div class="card-content">
-                <div class="answers-list" id="answersList">
-                    {% if consultation and consultation.sub_graph_find_diagnosis and
-                    consultation.sub_graph_find_diagnosis.answers %}
-                    {% for key, qa in consultation.sub_graph_find_diagnosis.answers.items() %}
-                    <div class="answer-item answer-{{ qa.answer }}">
-                        <span class="answer-icon">{{ '✅' if qa.answer == 'yes' else '❌' }}</span>
-                        <span class="answer-text">{{ qa.question }} - {{ 'Да' if qa.answer == 'yes' else 'Нет' }}</span>
-                    </div>
-                    {% endfor %}
-                    {% else %}
-                    <div class="empty-state">
-                        <p class="text-muted">Ответы пока отсутствуют</p>
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
+        
 
         <!-- Navigation -->
         <div class="consultation-navigation">
-            <button class="btn btn-secondary btn-sm" id="btnBack" disabled>
-                ← Назад
-            </button>
+            
             <div class="consultation-actions">
                 <button class="btn btn-warning btn-sm" id="btnSaveDraft">
                     Сохранить черновик
