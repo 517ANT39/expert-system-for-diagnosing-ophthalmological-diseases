@@ -6,26 +6,14 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8080:5000"
-    environment:
-      - FLASK_APP=app.py
-      - FLASK_ENV=development
+      - "8080:8080"
     env_file:
       - ./env/web.env
-    volumes:
-      - .:/app
-      - ../statistics:/app/statistics
     depends_on:
       db:
         condition: service_healthy
     networks:
       - app-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
 
   db:
     image: postgres:13
