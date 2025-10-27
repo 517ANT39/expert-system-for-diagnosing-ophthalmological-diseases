@@ -26,7 +26,7 @@ https://www.docker.com/products/docker-desktop/
 ```docker-compose up --build```
 
 #### 6. Проверка работоспособности (доступ к web-интерфейсу)
-http://localhost:5000
+http://localhost:8080
 
 #### 7. Остановка системы
 ```docker-compose down```<br>
