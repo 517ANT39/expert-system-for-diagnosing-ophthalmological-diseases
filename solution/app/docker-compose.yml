@@ -16,9 +16,16 @@ services:
       - .:/app
       - ../statistics:/app/statistics
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks:
       - app-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   db:
     image: postgres:13
@@ -28,6 +35,12 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d ophthalmology_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
 volumes:
   postgres_data:
@@ -35,3 +48,4 @@ volumes:
 networks:
   app-network:
     driver: bridge
+    
