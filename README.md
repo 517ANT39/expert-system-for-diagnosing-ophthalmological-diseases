@@ -1,6 +1,4 @@
-# expert-system-for-diagnosing-ophthalmological-diseases
-
-## Интеллектуальная информационная платформа поддержки принятия врачебных решений в области офтальмологии.
+# Интеллектуальная информационная платформа поддержки принятия врачебных решений в области офтальмологии.
 
 ### Установка и запуск системы:
 
@@ -22,8 +20,9 @@ https://www.docker.com/products/docker-desktop/
 ```cp env/db.env.example env/db.env```<br>
 ```cp env/web.env.example env/web.env```
 
-#### 5. Запуск системы и в контейнерах Docker
-```docker-compose up --build```
+#### 5. Сборка и запуск системы
+```docker-compose build --no-cache``` <br>
+```docker-compose up -d```
 
 #### 6. Проверка работоспособности (доступ к web-интерфейсу)
 http://localhost:8080
