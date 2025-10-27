@@ -2,6 +2,7 @@ from flask import request, jsonify, session, render_template
 from services.consultation_service import ConsultationService, get_diagnosis_service
 from utils.database import get_db_session, login_required, _calculate_age
 from utils.consultation_helpers import prepare_consultation_data
+from models.database_models import Consultation
 import os
 
 # Предварительная инициализация сервиса
@@ -409,6 +410,51 @@ def consultation_controller(app):
             return jsonify({
                 'success': False,
                 'message': f'Ошибка при сохранении черновика: {str(e)}'
+            }), 500
+        finally:
+            if db_session:
+                db_session.close()
+
+    # API маршрут для получения консультаций текущего врача
+    @app.route('/api/consultations/my')
+    @login_required
+    def api_get_my_consultations():
+        """Получение консультаций текущего врача"""
+        db_session = None
+        try:
+            db_session = get_db_session()
+            from services.consultation_service import ConsultationService
+            
+            consultation_service = ConsultationService(db_session)
+            doctor_id = session.get('doctor_id')
+            
+            # Получаем консультации врача
+            consultations = db_session.query(Consultation)\
+                .options(joinedload(Consultation.patient))\
+                .filter(Consultation.doctor_id == doctor_id)\
+                .order_by(Consultation.consultation_date.desc())\
+                .all()
+            
+            consultations_data = []
+            for consultation in consultations:
+                consultations_data.append({
+                    'id': consultation.id,
+                    'patient_name': f"{consultation.patient.last_name} {consultation.patient.first_name} {consultation.patient.middle_name or ''}".strip() if consultation.patient else 'Неизвестный пациент',
+                    'final_diagnosis': consultation.final_diagnosis,
+                    'status': consultation.status,
+                    'consultation_date': consultation.consultation_date.isoformat() if consultation.consultation_date else None,
+                    'patient_id': consultation.patient_id
+                })
+            
+            return jsonify({
+                'success': True,
+                'consultations': consultations_data
+            }), 200
+            
+        except Exception as e:
+            return jsonify({
+                'success': False,
+                'message': f'Ошибка при получении консультаций: {str(e)}'
             }), 500
         finally:
             if db_session:
