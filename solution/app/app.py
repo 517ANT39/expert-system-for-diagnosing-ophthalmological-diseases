@@ -6,6 +6,7 @@ from weasyprint import HTML
 
 # Импорты из utils
 from utils.database import get_db_session, login_required, _calculate_age
+from utils.consultation_helpers import prepare_consultation_data
 
 # Импорты моделей и контроллеров
 from models.database_models import Doctor, Consultation, Patient
@@ -355,15 +356,12 @@ def export_consultation_pdf(consultation_id):
         patient = consultation.patient
         doctor = consultation.doctor
         
-        # Получаем данные диагностики
-        diagnosis_data = consultation.sub_graph_find_diagnosis or {}
+        # Используем единую функцию для подготовки данных
+        diagnosis_result = prepare_consultation_data(consultation)
         
-        # Формируем данные для PDF
-        diagnosis_result = {
-            'primary_diagnosis': consultation.final_diagnosis or diagnosis_data.get('primary_diagnosis', 'Диагноз не указан'),
-            'symptoms_evidence': diagnosis_data.get('symptoms_evidence', []),
-            'recommendations': diagnosis_data.get('recommendations', {})
-        }
+        print("=== PDF DIAGNOSIS RESULT ===")
+        print(f"diagnosis_result: {diagnosis_result}")
+        print(f"symptoms_evidence count: {len(diagnosis_result['symptoms_evidence'])}")
         
         # Рассчитываем возраст пациента
         birth_date = patient.birthday

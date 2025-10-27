@@ -1,6 +1,7 @@
 from flask import request, jsonify, session, render_template
 from services.consultation_service import ConsultationService, get_diagnosis_service
 from utils.database import get_db_session, login_required, _calculate_age
+from utils.consultation_helpers import prepare_consultation_data
 import os
 
 # Предварительная инициализация сервиса
@@ -110,7 +111,13 @@ def consultation_controller(app):
             
             # Форматируем данные для шаблона
             consultation_data = result['consultation']
-            diagnosis_result = result['diagnosis_result']
+            
+            # Используем единую функцию для подготовки данных
+            diagnosis_result = prepare_consultation_data(consultation_data)
+            
+            print("=== HTML DIAGNOSIS RESULT ===")
+            print(f"diagnosis_result: {diagnosis_result}")
+            print(f"symptoms_evidence count: {len(diagnosis_result['symptoms_evidence'])}")
             
             # Подготавливаем данные пациента
             patient = consultation_data.patient

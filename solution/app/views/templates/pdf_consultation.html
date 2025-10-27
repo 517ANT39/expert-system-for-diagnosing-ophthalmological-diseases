@@ -140,7 +140,7 @@
             <div><strong>Дата рождения:</strong> {{ patient.birth_date }}</div>
             <div><strong>Пол:</strong> {% if patient.sex == 'M' %}Мужской{% else %}Женский{% endif %}</div>
             <div><strong>Дата консультации:</strong> {{ consultation.consultation_date.strftime('%d.%m.%Y') }}</div>
-            
+
         </div>
     </div>
 
@@ -170,6 +170,11 @@
             {% endfor %}
         </ul>
     </div>
+    {% else %}
+    <div class="section">
+        <h2>Объяснение диагноза</h2>
+        <p>Информация о симптомах отсутствует</p>
+    </div>
     {% endif %}
 
     {% if consultation.notes %}
@@ -177,7 +182,7 @@
 
         <h2>Рекомендации врача</h2>
         <div class="recommendations">
-            <p>{{ consultation.notes }}</p>
+            <pre>{{ consultation.notes }}</pre>
         </div>
 
     </div>

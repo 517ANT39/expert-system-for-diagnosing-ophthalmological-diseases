@@ -50,16 +50,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // Обработчики клавиатуры
-    document.addEventListener('keydown', function (e) {
-        if (e.key.toLowerCase() === 'y') {
-            console.log('Keyboard Y pressed');
-            saveAnswer('yes');
-        } else if (e.key.toLowerCase() === 'n') {
-            console.log('Keyboard N pressed');
-            saveAnswer('no');
-        }
-    });
+    
 
     // Отмена консультации
     if (btnCancel) {
