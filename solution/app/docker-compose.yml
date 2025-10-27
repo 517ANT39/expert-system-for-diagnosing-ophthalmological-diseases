@@ -9,6 +9,8 @@ services:
       - "8080:8080"
     env_file:
       - ./env/web.env
+    volumes:
+      - ../statistics:/app/statistics
     depends_on:
       db:
         condition: service_healthy
