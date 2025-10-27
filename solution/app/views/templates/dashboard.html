@@ -280,52 +280,7 @@
             </div>
         </div>
 
-        <!-- Recent Consultations -->
-        <div class="card">
-            <div class="card-header">
-                <h2>Последние консультации</h2>
-            </div>
-            <div class="card-content">
-                <div class="table-responsive">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Дата</th>
-                                <th>Пациент</th>
-                                <th>Симптомы</th>
-                                <th>Диагноз</th>
-                                <th>Статус</th>
-                                <th>Действия</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>20.01.2024</td>
-                                <td>Петров Иван Сергеевич</td>
-                                <td>Боль, покраснение</td>
-                                <td>Острый конъюнктивит</td>
-                                <td><span class="status-badge status-completed">Завершена</span></td>
-                                <td>
-                                    <a href="{{ url_for('consultation_result') }}"
-                                        class="btn btn-sm btn-secondary">Просмотр</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>19.01.2024</td>
-                                <td>Сидорова Мария Петровна</td>
-                                <td>Ухудшение зрения</td>
-                                <td>Миопия</td>
-                                <td><span class="status-badge status-completed">Завершена</span></td>
-                                <td>
-                                    <a href="{{ url_for('consultation_result') }}"
-                                        class="btn btn-sm btn-secondary">Просмотр</a>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+
     </main>
 
     <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
