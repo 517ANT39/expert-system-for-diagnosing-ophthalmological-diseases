@@ -1,13 +1,9 @@
 from flask import request, jsonify, session, render_template
-from services.consultation_service import ConsultationService, get_diagnosis_service
+from services.consultation_service import ConsultationService
 from utils.database import get_db_session, login_required, _calculate_age
 from utils.consultation_helpers import prepare_consultation_data
 from models.database_models import Consultation
 from sqlalchemy.orm import joinedload
-import os
-
-# Предварительная инициализация сервиса
-_diagnosis_service = get_diagnosis_service()
 
 def _get_consultation_service():
     """Вспомогательная функция для получения сервиса консультаций"""
@@ -308,39 +304,5 @@ def consultation_controller(app):
             return _json_response(False, str(e), status_code=400)
         except Exception as e:
             return _json_response(False, f'Ошибка при сохранении черновика: {str(e)}', status_code=500)
-        finally:
-            db_session.close()
-
-    @app.route('/api/consultations/my')
-    @login_required
-    def api_get_my_consultations():
-        """Получение консультаций текущего врача"""
-        consultation_service, db_session = _get_consultation_service()
-        try:
-            doctor_id = session.get('doctor_id')
-            
-            consultations = db_session.query(Consultation)\
-                .options(joinedload(Consultation.patient))\
-                .filter(Consultation.doctor_id == doctor_id)\
-                .order_by(Consultation.consultation_date.desc())\
-                .all()
-            
-            consultations_data = []
-            for consultation in consultations:
-                consultations_data.append({
-                    'id': consultation.id,
-                    'patient_name': f"{consultation.patient.last_name} {consultation.patient.first_name} {consultation.patient.middle_name or ''}".strip() if consultation.patient else 'Неизвестный пациент',
-                    'final_diagnosis': consultation.final_diagnosis,
-                    'status': consultation.status,
-                    'consultation_date': consultation.consultation_date.isoformat() if consultation.consultation_date else None,
-                    'patient_id': consultation.patient_id
-                })
-            
-            return _json_response(True, 'Консультации получены', {
-                'consultations': consultations_data
-            })
-            
-        except Exception as e:
-            return _json_response(False, f'Ошибка при получении консультаций: {str(e)}', status_code=500)
         finally:
             db_session.close()
