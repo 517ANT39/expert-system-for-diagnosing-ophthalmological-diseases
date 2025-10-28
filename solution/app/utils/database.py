@@ -4,9 +4,13 @@ from sqlalchemy.orm import sessionmaker
 from functools import wraps
 from flask import session, jsonify
 
+def get_database_url():
+    """Получение URL базы данных из переменных окружения"""
+    return os.getenv("DATABASE_URL", "postgresql://admin:password@db:5432/ophthalmology_db")
+
 def get_db_session():
     """Создание сессии БД"""
-    database_url = os.getenv("DATABASE_URL", "postgresql://admin:password@db:5432/ophthalmology_db")
+    database_url = get_database_url()
     engine = create_engine(database_url)
     SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
     return SessionLocal()

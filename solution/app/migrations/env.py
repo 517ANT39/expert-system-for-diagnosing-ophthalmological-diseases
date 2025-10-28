@@ -7,7 +7,8 @@ from alembic import context
 # Добавляем текущую директорию в путь Python
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
-# Правильный импорт моделей
+# Импортируем функцию получения URL БД из общего модуля
+from utils.database import get_database_url
 from models.database_models import Base
 
 config = context.config
@@ -17,11 +18,8 @@ if config.config_file_name is not None:
 
 target_metadata = Base.metadata
 
-def get_url():
-    return os.getenv("DATABASE_URL", "postgresql://admin:password@db:5432/ophthalmology_db")
-
 def run_migrations_offline() -> None:
-    url = get_url()
+    url = get_database_url()
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -33,7 +31,7 @@ def run_migrations_offline() -> None:
         context.run_migrations()
 
 def run_migrations_online() -> None:
-    connectable = create_engine(get_url())
+    connectable = create_engine(get_database_url())
 
     with connectable.connect() as connection:
         context.configure(
