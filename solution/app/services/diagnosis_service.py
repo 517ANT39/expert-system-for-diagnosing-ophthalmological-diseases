@@ -89,7 +89,6 @@ class DiagnosisService:
             else:
                 return None
         
-        
         # Переходим по ответу
         if answer in current_node and current_node[answer] is not None:
             next_node = current_node[answer]
@@ -104,7 +103,6 @@ class DiagnosisService:
                 'has_no': 'no' in next_node and next_node['no'] is not None,
                 'path': new_path
             }
-            
             
             return result
         
