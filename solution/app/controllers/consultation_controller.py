@@ -2,7 +2,7 @@ from flask import request, session, render_template
 from services.consultation_service import ConsultationService
 from utils.database import get_db_session, login_required
 from utils.consultation_helpers import prepare_consultation_data
-from solution.app.utils.controller_helpers import json_response, prepare_consultation_patient_data, prepare_consultation_result_data
+from utils.controller_helpers import json_response, prepare_consultation_patient_data, prepare_consultation_result_data
 from models.database_models import Consultation
 from sqlalchemy.orm import joinedload
 

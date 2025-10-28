@@ -3,7 +3,7 @@ from utils.database import get_db_session, login_required, _calculate_age
 from sqlalchemy.orm import joinedload
 from models.database_models import Consultation, Patient
 from services.patient_service import PatientService
-from solution.app.utils.controller_helpers import json_response, prepare_patient_data
+from utils.controller_helpers import json_response, prepare_patient_data
 
 def _get_patient_service():
     """Вспомогательная функция для получения сервиса пациентов"""
