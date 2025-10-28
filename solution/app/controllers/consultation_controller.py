@@ -1,7 +1,8 @@
-from flask import request, jsonify, session, render_template
+from flask import request, session, render_template
 from services.consultation_service import ConsultationService
-from utils.database import get_db_session, login_required, _calculate_age
+from utils.database import get_db_session, login_required
 from utils.consultation_helpers import prepare_consultation_data
+from solution.app.utils.controller_helpers import json_response, prepare_consultation_patient_data, prepare_consultation_result_data
 from models.database_models import Consultation
 from sqlalchemy.orm import joinedload
 
@@ -9,49 +10,6 @@ def _get_consultation_service():
     """Вспомогательная функция для получения сервиса консультаций"""
     db_session = get_db_session()
     return ConsultationService(db_session), db_session
-
-def _json_response(success, message, data=None, status_code=200):
-    """Универсальный метод для JSON ответов"""
-    response = {'success': success, 'message': message}
-    if data:
-        response.update(data)
-    return jsonify(response), status_code
-
-def _prepare_patient_data(patient):
-    """Подготовка данных пациента для шаблона"""
-    return {
-        'id': patient.id,
-        'last_name': patient.last_name,
-        'first_name': patient.first_name,
-        'middle_name': patient.middle_name,
-        'birthday': patient.birthday,
-        'age': _calculate_age(patient.birthday) if patient.birthday else None
-    }
-
-def _prepare_consultation_result_data(consultation_data, diagnosis_result):
-    """Подготовка данных для страницы результатов консультации"""
-    patient = consultation_data.patient
-    doctor = consultation_data.doctor
-    
-    from datetime import datetime
-    return {
-        'patient': {
-            'name': f"{patient.last_name} {patient.first_name} {patient.middle_name or ''}".strip(),
-            'birth_date': patient.birthday.strftime('%d.%m.%Y') if patient.birthday else 'Не указана',
-            'sex': patient.sex,
-            'age': _calculate_age(patient.birthday) if patient.birthday else None
-        },
-        'doctor': {
-            'name': f"{doctor.last_name} {doctor.first_name} {doctor.middle_name or ''}".strip(),
-            'qualification': "Врач-офтальмолог"
-        },
-        'consultation_info': {
-            'date': consultation_data.consultation_date.strftime('%d.%m.%Y %H:%M') if consultation_data.consultation_date else datetime.now().strftime('%d.%m.%Y %H:%M'),
-            'final_diagnosis': consultation_data.final_diagnosis or diagnosis_result['primary_diagnosis'],
-            'notes': consultation_data.notes or ''
-        },
-        'diagnosis_result': diagnosis_result
-    }
 
 def consultation_controller(app):
     """Регистрация маршрутов для работы с консультациями"""
@@ -71,7 +29,7 @@ def consultation_controller(app):
                 from services.patient_service import PatientService
                 patient_service = PatientService(db_session)
                 patients = patient_service.get_all_patients()
-                patients_data = [_prepare_patient_data(patient) for patient in patients]
+                patients_data = [prepare_consultation_patient_data(patient) for patient in patients]
                 return render_template('consultation/consultation.html', patients=patients_data)
             
             # Начинаем консультацию с указанным пациентом
@@ -92,7 +50,7 @@ def consultation_controller(app):
             }
             
             return render_template('consultation/consultation.html', 
-                                 patient=_prepare_patient_data(patient),
+                                 patient=prepare_consultation_patient_data(patient),
                                  consultation=consultation_data)
             
         except Exception as e:
@@ -124,7 +82,7 @@ def consultation_controller(app):
             consultation_data = result['consultation']
             diagnosis_result = prepare_consultation_data(consultation_data)
             
-            template_data = _prepare_consultation_result_data(consultation_data, diagnosis_result)
+            template_data = prepare_consultation_result_data(consultation_data, diagnosis_result)
             
             return render_template('consultation/consultation-result.html',
                                 consultation=consultation_data,
@@ -148,7 +106,7 @@ def consultation_controller(app):
             print(f"Save answer request: {data}")
             
             if not data or 'consultation_id' not in data or 'answer' not in data:
-                return _json_response(False, 'Отсутствуют обязательные данные', status_code=400)
+                return json_response(False, 'Отсутствуют обязательные данные', status_code=400)
             
             consultation = consultation_service.save_consultation_answer(
                 data['consultation_id'],
@@ -170,19 +128,20 @@ def consultation_controller(app):
                 response_data['diagnosis_candidate'] = diagnosis_data.get('final_diagnosis_candidate')
                 print(f"Diagnosis candidate: {response_data['diagnosis_candidate']}")
             
-            return _json_response(True, 'Ответ сохранен', response_data)
+            return json_response(True, 'Ответ сохранен', response_data)
             
         except ValueError as e:
             print(f"ValueError: {str(e)}")
-            return _json_response(False, str(e), status_code=400)
+            return json_response(False, str(e), status_code=400)
         except Exception as e:
             print(f"Exception: {str(e)}")
             import traceback
             traceback.print_exc()
-            return _json_response(False, f'Ошибка при сохранении ответа: {str(e)}', status_code=500)
+            return json_response(False, f'Ошибка при сохранении ответа: {str(e)}', status_code=500)
         finally:
             db_session.close()
 
+    # Остальные методы остаются аналогичными с заменой _json_response на json_response
     @app.route('/api/consultation/complete', methods=['POST'])
     @login_required
     def api_complete_consultation():
@@ -192,7 +151,7 @@ def consultation_controller(app):
             data = request.get_json()
             
             if not data or 'consultation_id' not in data:
-                return _json_response(False, 'ID консультации обязателен', status_code=400)
+                return json_response(False, 'ID консультации обязателен', status_code=400)
             
             consultation = consultation_service.complete_consultation(
                 data['consultation_id'],
@@ -200,7 +159,7 @@ def consultation_controller(app):
                 data.get('notes')
             )
             
-            return _json_response(True, 'Консультация завершена', {
+            return json_response(True, 'Консультация завершена', {
                 'consultation': {
                     'id': consultation.id,
                     'final_diagnosis': consultation.final_diagnosis,
@@ -209,9 +168,9 @@ def consultation_controller(app):
             })
             
         except ValueError as e:
-            return _json_response(False, str(e), status_code=400)
+            return json_response(False, str(e), status_code=400)
         except Exception as e:
-            return _json_response(False, f'Ошибка при завершении консультации: {str(e)}', status_code=500)
+            return json_response(False, f'Ошибка при завершении консультации: {str(e)}', status_code=500)
         finally:
             db_session.close()
 
@@ -224,12 +183,12 @@ def consultation_controller(app):
             consultation = consultation_service.consultation_repository.get_consultation_by_id(consultation_id)
             
             if not consultation:
-                return _json_response(False, 'Консультация не найдена', status_code=404)
+                return json_response(False, 'Консультация не найдена', status_code=404)
             
             progress = consultation_service.get_consultation_progress(consultation_id)
             current_question = consultation_service.get_current_question(consultation_id)
             
-            return _json_response(True, 'Данные консультации получены', {
+            return json_response(True, 'Данные консультации получены', {
                 'consultation': {
                     'id': consultation.id,
                     'patient_id': consultation.patient_id,
@@ -249,7 +208,7 @@ def consultation_controller(app):
             })
             
         except Exception as e:
-            return _json_response(False, f'Ошибка при получении данных консультации: {str(e)}', status_code=500)
+            return json_response(False, f'Ошибка при получении данных консультации: {str(e)}', status_code=500)
         finally:
             db_session.close()
 
@@ -262,11 +221,11 @@ def consultation_controller(app):
             data = request.get_json()
             
             if not data or 'consultation_id' not in data:
-                return _json_response(False, 'ID консультации обязателен', status_code=400)
+                return json_response(False, 'ID консультации обязателен', status_code=400)
             
             consultation = consultation_service.cancel_consultation(data['consultation_id'])
             
-            return _json_response(True, 'Консультация отменена', {
+            return json_response(True, 'Консультация отменена', {
                 'consultation': {
                     'id': consultation.id,
                     'status': consultation.status
@@ -274,9 +233,9 @@ def consultation_controller(app):
             })
             
         except ValueError as e:
-            return _json_response(False, str(e), status_code=400)
+            return json_response(False, str(e), status_code=400)
         except Exception as e:
-            return _json_response(False, f'Ошибка при отмене консультации: {str(e)}', status_code=500)
+            return json_response(False, f'Ошибка при отмене консультации: {str(e)}', status_code=500)
         finally:
             db_session.close()
 
@@ -289,11 +248,11 @@ def consultation_controller(app):
             data = request.get_json()
             
             if not data or 'consultation_id' not in data:
-                return _json_response(False, 'ID консультации обязателен', status_code=400)
+                return json_response(False, 'ID консультации обязателен', status_code=400)
             
             consultation = consultation_service.save_as_draft(data['consultation_id'])
             
-            return _json_response(True, 'Консультация сохранена как черновик', {
+            return json_response(True, 'Консультация сохранена как черновик', {
                 'consultation': {
                     'id': consultation.id,
                     'status': consultation.status
@@ -301,8 +260,8 @@ def consultation_controller(app):
             })
             
         except ValueError as e:
-            return _json_response(False, str(e), status_code=400)
+            return json_response(False, str(e), status_code=400)
         except Exception as e:
-            return _json_response(False, f'Ошибка при сохранении черновика: {str(e)}', status_code=500)
+            return json_response(False, f'Ошибка при сохранении черновика: {str(e)}', status_code=500)
         finally:
             db_session.close()
