@@ -19,55 +19,28 @@ class ConsultationService:
         self.consultation_repository = ConsultationRepository(db_session)
         self.diagnosis_service = get_diagnosis_service()
 
-    def start_consultation(self, patient_id: int, doctor_id: int):
-        """Начало новой консультации"""
-        
-        # Проверяем активную консультацию
-        active_consultation = self.consultation_repository.get_active_consultation(patient_id, doctor_id)
-        
-        if active_consultation:
-            return active_consultation
-        
-        # Получаем первый вопрос
-        first_question = self.diagnosis_service.get_initial_question()
-        
-        if not first_question:
-            raise ValueError("Не удалось загрузить базу знаний")
-        
-        # Создаем консультацию
-        consultation_data = {
-            'patient_id': patient_id,
-            'doctor_id': doctor_id,
-            'status': 'active',
-            'sub_graph_find_diagnosis': {
-                'current_path': [],
-                'current_question': first_question['text'],
-                'answers': {},
-                'started_at': datetime.utcnow().isoformat()
-            }
-        }
-        
-        consultation = self.consultation_repository.create_consultation(consultation_data)
-        return consultation
-
-    def save_consultation_answer(self, consultation_id: int, answer: str):
-        """Сохранение ответа на вопрос и переход к следующему"""
-        
-        # Получаем консультацию
+    def _get_consultation_or_raise(self, consultation_id: int):
+        """Получение консультации или выброс исключения если не найдена"""
         consultation = self.consultation_repository.get_consultation_by_id(consultation_id)
         if not consultation:
             raise ValueError("Консультация не найдена")
-        
-        diagnosis_data = consultation.sub_graph_find_diagnosis or {}
-        current_path = diagnosis_data.get('current_path', [])
-        
-        
-        # Получаем текущий вопрос для сохранения
-        current_question = self.diagnosis_service.get_question_by_path(current_path)
-        
-        if not current_question:
-            raise ValueError("Текущий вопрос не найден")
-        
+        return consultation
+
+    def _get_diagnosis_data(self, consultation):
+        """Получение данных диагноза из консультации"""
+        return consultation.sub_graph_find_diagnosis or {}
+
+    def _create_initial_diagnosis_data(self, first_question: dict):
+        """Создание начальных данных диагноза"""
+        return {
+            'current_path': [],
+            'current_question': first_question['text'],
+            'answers': {},
+            'started_at': datetime.utcnow().isoformat()
+        }
+
+    def _update_diagnosis_after_answer(self, diagnosis_data: dict, current_question: dict, answer: str, next_question: dict):
+        """Обновление данных диагноза после ответа"""
         # Сохраняем ответ в историю
         question_number = len(diagnosis_data.get('answers', {})) + 1
         question_key = f"q{question_number}"
@@ -81,14 +54,7 @@ class ConsultationService:
             'timestamp': datetime.utcnow().isoformat()
         }
         
-        
-        # Получаем следующий вопрос
-        next_question = self.diagnosis_service.get_next_question(current_path, answer)
-        
-        if not next_question:
-            raise ValueError("Не удалось получить следующий вопрос")
-        
-        # ВАЖНО: Создаем КОПИЮ diagnosis_data для обновления
+        # Обновляем путь и вопрос
         updated_diagnosis_data = diagnosis_data.copy()
         updated_diagnosis_data['current_path'] = next_question['path']
         updated_diagnosis_data['current_question'] = next_question['text']
@@ -99,17 +65,57 @@ class ConsultationService:
             updated_diagnosis_data['final_diagnosis_candidate'] = diagnosis
             updated_diagnosis_data['completed_at'] = datetime.utcnow().isoformat()
         
+        return updated_diagnosis_data
+
+    def start_consultation(self, patient_id: int, doctor_id: int):
+        """Начало новой консультации"""
+        # Проверяем активную консультацию
+        active_consultation = self.consultation_repository.get_active_consultation(patient_id, doctor_id)
+        if active_consultation:
+            return active_consultation
+        
+        # Получаем первый вопрос
+        first_question = self.diagnosis_service.get_initial_question()
+        if not first_question:
+            raise ValueError("Не удалось загрузить базу знаний")
+        
+        # Создаем консультацию
+        consultation_data = {
+            'patient_id': patient_id,
+            'doctor_id': doctor_id,
+            'status': 'active',
+            'sub_graph_find_diagnosis': self._create_initial_diagnosis_data(first_question)
+        }
+        
+        return self.consultation_repository.create_consultation(consultation_data)
+
+    def save_consultation_answer(self, consultation_id: int, answer: str):
+        """Сохранение ответа на вопрос и переход к следующему"""
+        consultation = self._get_consultation_or_raise(consultation_id)
+        diagnosis_data = self._get_diagnosis_data(consultation)
+        current_path = diagnosis_data.get('current_path', [])
+        
+        # Получаем текущий вопрос для сохранения
+        current_question = self.diagnosis_service.get_question_by_path(current_path)
+        if not current_question:
+            raise ValueError("Текущий вопрос не найден")
+        
+        # Получаем следующий вопрос
+        next_question = self.diagnosis_service.get_next_question(current_path, answer)
+        if not next_question:
+            raise ValueError("Не удалось получить следующий вопрос")
+        
+        # Обновляем данные диагноза
+        updated_diagnosis_data = self._update_diagnosis_after_answer(
+            diagnosis_data, current_question, answer, next_question
+        )
+        
         # Обновляем консультацию в БД
         consultation_data = {
             'sub_graph_find_diagnosis': updated_diagnosis_data
         }
         
-        updated_consultation = self.consultation_repository.update_consultation(consultation_id, consultation_data)
-        
-        # ПРОВЕРКА: Получаем обновленную консультацию из БД
-        verification_consultation = self.consultation_repository.get_consultation_by_id(consultation_id)
-        
-        return updated_consultation
+        return self.consultation_repository.update_consultation(consultation_id, consultation_data)
 
     def get_current_question(self, consultation_id: int):
         """Получение текущего вопроса консультации"""
@@ -117,11 +123,10 @@ class ConsultationService:
         if not consultation:
             return None
         
-        diagnosis_data = consultation.sub_graph_find_diagnosis or {}
+        diagnosis_data = self._get_diagnosis_data(consultation)
         current_path = diagnosis_data.get('current_path', [])
         
-        question = self.diagnosis_service.get_question_by_path(current_path)
-        return question
+        return self.diagnosis_service.get_question_by_path(current_path)
 
     def get_consultation_progress(self, consultation_id: int):
         """Получение прогресса консультации"""
@@ -129,44 +134,35 @@ class ConsultationService:
         if not consultation:
             return None
         
-        diagnosis_data = consultation.sub_graph_find_diagnosis or {}
+        diagnosis_data = self._get_diagnosis_data(consultation)
         answers = diagnosis_data.get('answers', {})
         current_path = diagnosis_data.get('current_path', [])
         
         total_questions = len(answers)
-        progress = min((total_questions / 24) * 100, 100)
         
-        # Получаем актуальный текущий вопрос через diagnosis_service
+        # Получаем актуальный текущий вопрос
         current_question_obj = self.diagnosis_service.get_question_by_path(current_path)
         current_question = current_question_obj['text'] if current_question_obj else diagnosis_data.get('current_question', '')
         
-        is_completed = consultation.status == 'completed'
-        
-        result = {
+        return {
             'current_question': current_question,
-            'progress_percent': progress,
             'questions_answered': total_questions,
-            'is_completed': is_completed
+            'is_completed': consultation.status == 'completed'
         }
-        
-        return result
 
     def complete_consultation(self, consultation_id: int, final_diagnosis: str = None, notes: str = None):
         """Завершение консультации"""
-        consultation = self.consultation_repository.get_consultation_by_id(consultation_id)
-        if not consultation:
-            raise ValueError("Консультация не найдена")
-        
-        diagnosis_data = consultation.sub_graph_find_diagnosis or {}
+        consultation = self._get_consultation_or_raise(consultation_id)
+        diagnosis_data = self._get_diagnosis_data(consultation)
         
         if not final_diagnosis and 'final_diagnosis_candidate' in diagnosis_data:
             final_diagnosis = diagnosis_data['final_diagnosis_candidate']
         
-        # ВАЖНО: Устанавливаем статус 'completed' при завершении
+        # Обновляем данные консультации
         consultation_data = {
             'status': 'completed',
             'final_diagnosis': final_diagnosis,
-            'notes': notes  # Сохраняем рекомендации врача
+            'notes': notes
         }
         
         if 'completed_at' not in diagnosis_data:
@@ -178,28 +174,16 @@ class ConsultationService:
 
     def cancel_consultation(self, consultation_id: int):
         """Отмена консультации"""
-        consultation = self.consultation_repository.get_consultation_by_id(consultation_id)
-        if not consultation:
-            raise ValueError("Консультация не найдена")
-        
-        consultation_data = {
-            'status': 'canceled'
-        }
-        
-        return self.consultation_repository.update_consultation(consultation_id, consultation_data)
+        self._get_consultation_or_raise(consultation_id)
+        return self.consultation_repository.update_consultation_status(consultation_id, 'canceled')
 
     def save_as_draft(self, consultation_id: int):
         """Сохранение консультации как черновика"""
-        consultation = self.consultation_repository.get_consultation_by_id(consultation_id)
-        if not consultation:
-            raise ValueError("Консультация не найдена")
+        consultation = self._get_consultation_or_raise(consultation_id)
         
         # Если консультация активна, но не завершена - сохраняем как черновик
         if consultation.status == 'active':
-            consultation_data = {
-                'status': 'draft'
-            }
-            return self.consultation_repository.update_consultation(consultation_id, consultation_data)
+            return self.consultation_repository.update_consultation_status(consultation_id, 'draft')
         
         return consultation
 
@@ -209,7 +193,7 @@ class ConsultationService:
         if not consultation:
             return None
         
-        diagnosis_data = consultation.sub_graph_find_diagnosis or {}
+        diagnosis_data = self._get_diagnosis_data(consultation)
         current_path = diagnosis_data.get('current_path', [])
         
         # Получаем диагноз из графа
@@ -226,12 +210,6 @@ class ConsultationService:
                 'timestamp': qa.get('timestamp')
             })
         
-        # Генерируем рекомендации на основе диагноза
-        recommendations = self._generate_recommendations(final_diagnosis)
-        
-        # Формируем объяснение диагноза
-        explanation = self._generate_explanation(qa_history, final_diagnosis)
-        
         # Формируем список симптомов для отображения
         symptoms_evidence = []
         for qa in qa_history:
@@ -244,21 +222,11 @@ class ConsultationService:
             'consultation': consultation,
             'diagnosis_result': {
                 'primary_diagnosis': final_diagnosis,
-                'confidence': self._calculate_confidence(qa_history),
-                'explanation': explanation,
+                'explanation': self._generate_explanation(qa_history, final_diagnosis),
                 'qa_history': qa_history,
-                'recommendations': recommendations,
                 'symptoms_evidence': symptoms_evidence
             }
         }
-
-    def _calculate_confidence(self, qa_history: list) -> int:
-        """Расчет уверенности в диагнозе"""
-        if not qa_history:
-            return 0
-        
-        total_questions = len(qa_history)
-        return min(80 + (total_questions * 2), 95)
 
     def _generate_explanation(self, qa_history: list, diagnosis: str) -> str:
         """Генерация объяснения диагноза"""
@@ -273,29 +241,3 @@ class ConsultationService:
             return f"Диагноз '{diagnosis}' основан на наличии следующих симптомов: {symptoms_text}."
         else:
             return f"Диагноз '{diagnosis}' основан на отсутствии характерных симптомов других заболеваний."
-
-    def _generate_recommendations(self, diagnosis: str) -> dict:
-        """Генерация рекомендаций по диагнозу"""
-        recommendations_db = {
-            "Ирит": {
-                'medication': ["Атропин 1%", "Дексаметазон 0.1%"],
-                'general': ["Постельный режим", "Защита от света"]
-            },
-            "Бактериальный конъюнктивит": {
-                'medication': ["Ципрофлоксацин 0.3%", "Тетрациклин 1%"],
-                'general': ["Гигиена рук", "Исключение линз"]
-            },
-            "Катаракта": {
-                'medication': ["Тауфон 4%"],
-                'general': ["Солнцезащитные очки", "Контроль заболеваний"]
-            }
-        }
-        
-        for key, value in recommendations_db.items():
-            if key.lower() in diagnosis.lower():
-                return value
-        
-        return {
-            'medication': ["Симптоматическое лечение"],
-            'general': ["Наблюдение у офтальмолога"]
-        }
