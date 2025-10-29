@@ -165,7 +165,7 @@
         <ul class="symptoms-list">
             {% for symptom in diagnosis_result.symptoms_evidence %}
             <li class="evidence-{{ 'positive' if symptom.present else 'negative' }}">
-                {{ symptom.name }}: {{ 'Присутствует' if symptom.present else 'Отсутствует' }}
+                {{ symptom.name }} {{ 'Да' if symptom.present else 'Нет' }}
             </li>
             {% endfor %}
         </ul>
