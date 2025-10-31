@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Консультация - ОфтальмоЭксперт</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/consultation.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/forms.css') }}">
+    <style>
+        /* Единый стиль для кнопок */
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+
+        .consultation-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        /* Стили для списка пациентов */
+        .patient-selection-card {
+            margin-bottom: 1.5rem;
+        }
+
+        .patient-list-container {
+            max-height: 350px;
+            overflow-y: auto;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 0.5rem;
+        }
+
+        .patient-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background-color 0.2s;
+        }
+
+        .patient-item:last-child {
+            border-bottom: none;
+        }
+
+        .patient-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .patient-info {
+            flex: 1;
+        }
+
+        .patient-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .patient-meta {
+            font-size: 0.875rem;
+            color: #6c757d;
+        }
+
+        .patient-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .empty-patient-list {
+            text-align: center;
+            padding: 2rem;
+            color: #6c757d;
+        }
+
+        .patient-count {
+            font-size: 0.875rem;
+            color: #6c757d;
+            margin-bottom: 0.75rem;
+        }
+
+        /* Стили для скроллбара */
+        .patient-list-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .patient-list-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .patient-list-container::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 10px;
+        }
+
+        .patient-list-container::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        /* Стили для формы рекомендаций в едином стиле */
+        .doctor-recommendations-card {
+            margin-top: 1.5rem;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .recommendations-status {
+            font-size: 0.875rem;
+            color: #6c757d;
+            margin-right: auto;
+            display: flex;
+            align-items: center;
+        }
+
+        .status-confirmed {
+            color: #28a745;
+            font-weight: 600;
+        }
+
+        .status-confirmed::before {
+            content: "✅";
+            margin-right: 0.5rem;
+        }
+
+        /* Стили для секции завершения консультации */
+        .consultation-completed-section {
+            background: #f8fff9;
+            border: 1px solid #d4edda;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            text-align: center;
+        }
+
+        .consultation-completed-section h4 {
+            color: #155724;
+            margin-bottom: 1rem;
+        }
+
+        .completion-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+
+<body class="dashboard-page">
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-content">
+                <a href="{{ url_for('dashboard') }}" class="logo logo-link">
+                    <span class="logo-icon">👁️</span>
+                    <span class="logo-text">ОфтальмоЭксперт</span>
+                </a>
+                <div class="nav-links">
+                    <a href="{{ url_for('dashboard') }}" class="nav-link">Главная</a>
+                    <a href="{{ url_for('patient_list') }}" class="nav-link">Пациенты</a>
+                    <a href="{{ url_for('consultation') }}" class="nav-link active">Консультации</a>
+                    <div class="user-menu">
+                        <a href="{{ url_for('profile') }}" class="user-name" id="userName">Загрузка...</a>
+                        <a href="{{ url_for('logout') }}" class="btn btn-sm btn-secondary">Выйти</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container main-content">
+        <!-- Progress Section -->
+        <div class="card consultation-progress-card">
+            <div class="card-header">
+                <div class="consultation-progress-header">
+                    <h2>Диагностическая консультация</h2>
+                    <div class="patient-info">
+                        <strong>Пациент:</strong>
+                        <span id="patientName">
+                            {% if patient %}
+                            {{ patient.last_name }} {{ patient.first_name }} {{ patient.middle_name or '' }}
+                            {% else %}
+                            Выберите пациента
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Patient Selection (если пациент не выбран) -->
+        {% if not patient %}
+        <div class="card patient-selection-card">
+            <div class="card-header">
+                <h3>Выбор пациента</h3>
+            </div>
+            <div class="card-content">
+                <div class="patient-selection">
+                    <p class="text-muted">Пожалуйста, выберите пациента для начала консультации:</p>
+
+                    <div class="patient-count">
+                        Всего пациентов: {{ patients|length }}
+                    </div>
+
+                    {% if patients %}
+                    <div class="patient-list-container">
+                        <div class="patient-list" id="patientList">
+                            {% for patient_item in patients %}
+                            <div class="patient-item">
+                                <div class="patient-info">
+                                    <div class="patient-name">
+                                        {{ patient_item.last_name }} {{ patient_item.first_name }} {{
+                                        patient_item.middle_name or '' }}
+                                    </div>
+                                    <div class="patient-meta">
+                                        {% if patient_item.birthday %}
+                                        Дата рождения: {{ patient_item.birthday.strftime('%d.%m.%Y') }}
+                                        {% endif %}
+                                        {% if patient_item.age %}
+                                        ({{ patient_item.age }} лет)
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="patient-actions">
+                                    <a href="/consultation?patient_id={{ patient_item.id }}"
+                                        class="btn btn-primary btn-sm">
+                                        Начать консультацию
+                                    </a>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="empty-patient-list">
+                        <p>Нет доступных пациентов</p>
+                        <a href="{{ url_for('patient_list') }}" class="btn btn-primary btn-sm">Добавить пациента</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <!-- Current Question -->
+        <div class="card question-card" id="questionView">
+            <div class="card-header">
+                <div class="question-header">
+                    <h2>Текущий вопрос</h2>
+                    <!--<div class="question-number" id="questionNumber">
+                        Вопрос {{ progress.questions_answered + 1 if progress else 1 }}
+                    </div>-->
+                </div>
+            </div>
+
+            <div class="card-content">
+                <div class="question-content">
+                    <div class="question-text" id="questionText">
+                        {{ consultation.sub_graph_find_diagnosis.current_question if consultation and
+                        consultation.sub_graph_find_diagnosis else "Загрузка вопроса..." }}
+                    </div>
+
+                    <div class="answer-buttons">
+                        <button class="btn-answer btn-yes" data-answer="yes">
+                            <span class="answer-icon">✅</span>
+                            <span class="answer-text">ДА</span>
+                        </button>
+                        <button class="btn-answer btn-no" data-answer="no">
+                            <span class="answer-icon">❌</span>
+                            <span class="answer-text">НЕТ</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Collected Answers -->
+        <div class="card explanation-card">
+            <div class="card-header">
+                <div class="answers-header">
+                    <h3>История вопросов и ответов</h3>
+                    <button class="btn btn-sm btn-secondary" id="toggleAnswers">
+                        Свернуть
+                    </button>
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="answers-list" id="answersList">
+                    {% if consultation and consultation.sub_graph_find_diagnosis and
+                    consultation.sub_graph_find_diagnosis.answers %}
+                    {% for key, qa in consultation.sub_graph_find_diagnosis.answers.items() %}
+                    <div class="answer-item answer-{{ qa.answer }}">
+                        <span class="answer-icon">{{ '✅' if qa.answer == 'yes' else '❌' }}</span>
+                        <span class="answer-text">{{ qa.question }} - {{ 'Да' if qa.answer == 'yes' else 'Нет' }}</span>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="empty-state">
+                        <p class="text-muted">Ответы пока отсутствуют</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Diagnosis Preview (показывается при достижении диагноза) -->
+        <div class="card diagnosis-preview-card" id="diagnosisPreview" style="display: none;">
+            <div class="card-header">
+                <h3>Вероятностный диагноз</h3>
+            </div>
+            <div class="card-content">
+                <div class="diagnosis-preview-content">
+                    <h4 id="previewDiagnosisText"></h4>
+                    <p class="text-muted">Система определила вероятностный диагноз. Вы можете добавить рекомендации для
+                        пациента (необязательно).</p>
+                </div>
+            </div>
+        </div>
+
+        
+
+        <!-- Форма рекомендаций врача (отдельная карточка) -->
+        <div class="card doctor-recommendations-card" id="doctorRecommendationsCard" style="display: none;">
+            <div class="card-header">
+                <h3>Рекомендации врача</h3>
+            </div>
+            <div class="card-content">
+                <div class="form-group">
+                    <label for="doctorNotes" class="form-label">
+                        Рекомендации по лечению и дальнейшим действиям
+                        <span class="text-muted">(необязательно)</span>
+                    </label>
+                    <textarea id="doctorNotes" class="form-control"
+                        placeholder="Опишите рекомендации по лечению, назначения, дальнейшие обследования, режим и другие указания для пациента..."
+                        rows="6"></textarea>
+                    
+                </div>
+
+                <div class="form-actions">
+                    <div class="recommendations-status" id="recommendationsStatus">
+                        Рекомендации можно добавить по желанию
+                    </div>
+                    <button type="button" class="btn btn-success btn-sm" id="confirmRecommendationsBtn">
+                        Завершить консультацию
+                    </button>
+                </div>
+
+                
+            </div>
+        </div>
+
+        <!-- Секция завершения консультации -->
+        <div class="consultation-completed-section" id="consultationCompletedSection" style="display: none;">
+            <h4>✅ Консультация завершена</h4>
+            <p class="text-muted">Диагностическая консультация успешно завершена. Статус консультации автоматически установлен как "Завершена".</p>
+            <div class="completion-actions">
+                <a href="{{ url_for('consultation_result', consultation_id=consultation.id if consultation else '') }}" 
+                   class="btn btn-primary btn-sm" id="viewResultsBtn">
+                    Просмотреть результаты
+                </a>
+                <a href="{{ url_for('patient_list') }}" class="btn btn-secondary btn-sm">
+                    Вернуться к списку пациентов
+                </a>
+                <button class="btn btn-success btn-sm" id="exportPdfBtn">
+                    📄 Экспорт в PDF
+                </button>
+            </div>
+        </div>
+
+        
+
+        <!-- Navigation -->
+        <div class="consultation-navigation">
+            
+            <div class="consultation-actions">
+                <button class="btn btn-warning btn-sm" id="btnSaveDraft">
+                    Сохранить черновик
+                </button>
+                <button class="btn btn-danger btn-sm" id="btnCancel">
+                    Отменить консультацию
+                </button>
+            </div>
+        </div>
+
+        <!-- Consultation Info (скрыто) -->
+        <input type="hidden" id="consultationId" value="{{ consultation.id if consultation else '' }}">
+        <input type="hidden" id="patientId" value="{{ patient.id if patient else '' }}">
+        {% endif %}
+
+        
+    </main>
+
+    <script src="{{ url_for('static', filename='js/consultation.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+</body>
+
+</html>

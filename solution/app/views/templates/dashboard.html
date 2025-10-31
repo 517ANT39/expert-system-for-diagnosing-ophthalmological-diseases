@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панель управления - ОфтальмоЭксперт</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <style>
+        /* Стили для ограниченной высоты таблицы с прокруткой */
+        .table-container {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+        }
+        
+        .table-container table {
+            margin-bottom: 0;
+        }
+        
+        .table-container thead th {
+            position: sticky;
+            top: 0;
+            background: #f8f9fa;
+            z-index: 10;
+        }
+        
+        /* Уменьшаем размер кнопок */
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+        
+        /* Убираем лишние отступы в ячейках */
+        .compact-table td {
+            padding: 0.5rem;
+        }
+        
+        /* Компактные кнопки действий */
+        .action-buttons {
+            display: flex;
+            gap: 4px;
+            flex-wrap: nowrap;
+        }
+        
+        /* Единый стиль для кнопок в action-card */
+        .action-card .btn {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.875rem;
+        }
+
+        /* Стили для карточек пациентов */
+        .patient-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .patient-header {
+            display: flex;
+            justify-content: between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .patient-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 0;
+        }
+
+        .patient-contact {
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 4px;
+        }
+
+        .patient-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-label {
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 2px;
+        }
+
+        .detail-value {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .card-actions {
+            border-top: 1px solid #f0f0f0;
+            padding-top: 12px;
+            margin-top: 12px;
+        }
+
+        .action-buttons-card {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 480px) {
+            .action-buttons-card {
+                flex-direction: column;
+            }
+            
+            .action-buttons-card .btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body class="dashboard-page">
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-content">
+                <a href="{{ url_for('index') }}" class="logo logo-link">
+                    <span class="logo-icon">👁️</span>
+                    <span class="logo-text">ОфтальмоЭксперт</span>
+                </a>
+                <div class="nav-links">
+                    <a href="{{ url_for('dashboard') }}" class="nav-link active">Главная</a>
+                    <a href="{{ url_for('patient_list') }}" class="nav-link">Пациенты</a>
+                    <a href="{{ url_for('consultation') }}" class="nav-link">Консультации</a>
+                    <div class="user-menu">
+                        <a href="{{ url_for('profile') }}" class="user-name" id="userName">Загрузка...</a>
+                        <a href="{{ url_for('logout') }}" class="btn btn-sm btn-secondary">Выйти</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container main-content">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="header-content">
+                <h1>Панель управления</h1>
+                <p class="text-muted" id="welcomeMessage">Добро пожаловать</p>
+            </div>
+            
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="grid grid-2">
+            <div class="action-card">
+                <div class="action-content">
+                    <h3>Новый пациент</h3>
+                    <p class="text-muted">Добавить нового пациента в систему</p>
+                    <a href="{{ url_for('patient_new') }}" class="btn btn-secondary btn-sm">
+                        Добавить пациента
+                    </a>
+                </div>
+            </div>
+
+            <div class="action-card">
+                <div class="action-content">
+                    <h3>Новая консультация</h3>
+                    <p class="text-muted">Начать диагностику </p>
+                    <a href="{{ url_for('consultation') }}" class="btn btn-secondary btn-sm">
+                        Начать консультацию
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Patients -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-header-content">
+                    <h2>Последние пациенты</h2>
+                    <a href="{{ url_for('patient_list') }}" class="btn btn-sm btn-secondary">
+                        Все пациенты →
+                    </a>
+                </div>
+            </div>
+            <div class="card-content">
+                {% if patients %}
+                <div id="recentPatientsList">
+                    {% for patient in patients[-3:]|reverse %}
+                    <div class="patient-card">
+                        <div class="patient-header">
+                            <div>
+                                <h3 class="patient-name">
+                                    {{ patient.last_name }} {{ patient.first_name }} {{ patient.middle_name or '' }}
+                                </h3>
+                                
+                            </div>
+                        </div>
+                        
+                        <div class="patient-details">
+                            <div class="detail-item">
+                                <span class="detail-label">Возраст</span>
+                                <span class="detail-value">
+                                    {% if patient.age %}
+                                        {{ patient.age }}
+                                        {% set age = patient.age %}
+                                        {% if age % 10 == 1 and age % 100 != 11 %}
+                                            год
+                                        {% elif age % 10 >= 2 and age % 10 <= 4 and (age % 100 < 10 or age % 100 >= 20) %}
+                                            года
+                                        {% else %}
+                                            лет
+                                        {% endif %}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </span>
+                            </div>
+                            
+                            <div class="detail-item">
+                                <span class="detail-label">Пол</span>
+                                <span class="detail-value">{{ 'Мужской' if patient.sex == 'M' else 'Женский' }}</span>
+                            </div>
+                            
+                            <div class="detail-item">
+                                <span class="detail-label">Телефон</span>
+                                <span class="detail-value">{{ patient.phone or '-' }}</span>
+                            </div>
+                            
+                            <div class="detail-item">
+                                <span class="detail-label">Email</span>
+                                <span class="detail-value">{{ patient.email or '-' }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="card-actions">
+                            <div class="action-buttons-card">
+                                <a href="{{ url_for('patient_history', patient_id=patient.id) }}" 
+                                   class="btn btn-sm btn-secondary">
+                                    История консультаций
+                                </a>
+                                <a href="{{ url_for('consultation', patient_id=patient.id) }}" 
+                                   class="btn btn-sm btn-primary">
+                                    Новая консультация
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                {% if patients|length > 3 %}
+                <div class="text-center mt-3">
+                    <small class="text-muted">Показано 3 из {{ patients|length }} пациентов</small>
+                </div>
+                {% endif %}
+                {% else %}
+                <div class="empty-state">
+                    <h3>Список пациентов пуст</h3>
+                    <p class="text-muted">В системе пока нет пациентов. Добавьте первого пациента, чтобы начать работу.</p>
+                    <a href="{{ url_for('patient_new') }}" class="btn btn-primary btn-sm">
+                        Добавить пациента
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+
+    </main>
+
+    <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+</body>
+
+</html>

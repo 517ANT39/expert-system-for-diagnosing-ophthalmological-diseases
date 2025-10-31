@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Редактирование профиля - ОфтальмоЭксперт</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
+</head>
+
+<body class="dashboard-page">
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-content">
+                <a href="{{ url_for('dashboard') }}" class="logo logo-link">
+                    <span class="logo-icon">👁️</span>
+                    <span class="logo-text">ОфтальмоЭксперт</span>
+                </a>
+                <div class="nav-links">
+                    <a href="{{ url_for('dashboard') }}" class="nav-link">Главная</a>
+                    <a href="{{ url_for('patient_list') }}" class="nav-link">Пациенты</a>
+                    <a href="{{ url_for('consultation') }}" class="nav-link">Консультации</a>
+                    <div class="user-menu">
+                        <a href="{{ url_for('profile') }}" class="user-name" id="userName">Загрузка...</a>
+                        <a href="{{ url_for('logout') }}" class="btn btn-sm btn-secondary">Выйти</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container main-content">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="header-content">
+                <h1>Редактирование профиля</h1>
+                <p class="text-muted">Обновите вашу личную информацию</p>
+            </div>
+            <div class="header-actions">
+                <a href="{{ url_for('profile') }}" class="btn btn-secondary">
+                    ← Назад к профилю
+                </a>
+            </div>
+        </div>
+
+        <!-- Edit Form -->
+        <div class="card">
+            <div class="card-header">
+                <h2>Личная информация</h2>
+            </div>
+            <div class="card-content">
+                <form class="profile-form" id="profileForm">
+                    <div class="grid grid-2">
+                        <div class="form-group">
+                            <label for="lastName" class="form-label">Фамилия врача *</label>
+                            <input type="text" id="lastName" class="form-control" placeholder="Введите фамилию" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="firstName" class="form-label">Имя врача *</label>
+                            <input type="text" id="firstName" class="form-control" placeholder="Введите имя" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="middleName" class="form-label">Отчество врача</label>
+                            <input type="text" id="middleName" class="form-control" placeholder="Введите отчество">
+                        </div>
+                        <div class="form-group">
+                            <label for="email" class="form-label">Email *</label>
+                            <input type="email" id="email" class="form-control" placeholder="email@example.com" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone" class="form-label">Телефон</label>
+                        <input type="tel" id="phone" class="form-control" placeholder="+7 (XXX) XXX-XX-XX">
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="window.location.href='{{ url_for("profile") }}'">
+                            Отмена
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            💾 Сохранить изменения
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Change Password Section -->
+        <div class="card" style="display:none">
+            <div class="card-header">
+                <h2>Смена пароля</h2>
+            </div>
+            <div class="card-content">
+                <form class="password-form" id="passwordForm">
+                    <div class="grid grid-2">
+                        <div class="form-group">
+                            <label for="currentPassword" class="form-label">Текущий пароль *</label>
+                            <input type="password" id="currentPassword" class="form-control" placeholder="Введите текущий пароль" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="newPassword" class="form-label">Новый пароль *</label>
+                            <input type="password" id="newPassword" class="form-control" placeholder="Введите новый пароль" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmPassword" class="form-label">Подтверждение пароля *</label>
+                        <input type="password" id="confirmPassword" class="form-control" placeholder="Повторите новый пароль" required>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            🔐 Сменить пароль
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+    <script>
+        // Функция для загрузки данных профиля в форму
+        async function loadProfileDataToForm() {
+            try {
+                const response = await fetch('/api/profile');
+                const result = await response.json();
+
+                if (result.success) {
+                    const doctor = result.doctor;
+                    
+                    // Заполняем форму данными из профиля
+                    document.getElementById('lastName').value = doctor.last_name || '';
+                    document.getElementById('firstName').value = doctor.first_name || '';
+                    document.getElementById('middleName').value = doctor.middle_name || '';
+                    document.getElementById('email').value = doctor.email || '';
+                    document.getElementById('phone').value = doctor.phone || '';
+                } else {
+                    console.error('Ошибка загрузки профиля:', result.message);
+                    alert('Ошибка загрузки данных профиля');
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки профиля:', error);
+                alert('Ошибка загрузки данных профиля');
+            }
+        }
+
+        // Обработка формы редактирования профиля
+        document.getElementById('profileForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            
+            const formData = {
+                last_name: document.getElementById('lastName').value,
+                first_name: document.getElementById('firstName').value,
+                middle_name: document.getElementById('middleName').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value
+            };
+
+            try {
+                const response = await fetch('/api/profile/update', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert('Изменения успешно сохранены!');
+                    window.location.href = "{{ url_for('profile') }}";
+                } else {
+                    alert('Ошибка сохранения: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Ошибка сохранения:', error);
+                alert('Ошибка сохранения данных');
+            }
+        });
+
+        // Обработка формы смены пароля
+        document.getElementById('passwordForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (newPassword !== confirmPassword) {
+                alert('Новый пароль и подтверждение не совпадают');
+                return;
+            }
+
+            if (newPassword.length < 6) {
+                alert('Новый пароль должен содержать минимум 6 символов');
+                return;
+            }
+
+            const formData = {
+                current_password: currentPassword,
+                new_password: newPassword
+            };
+
+            try {
+                const response = await fetch('/api/profile/change-password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert('Пароль успешно изменен!');
+                    // Очищаем форму пароля
+                    document.getElementById('passwordForm').reset();
+                } else {
+                    alert('Ошибка смены пароля: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Ошибка смены пароля:', error);
+                alert('Ошибка смены пароля');
+            }
+        });
+
+        // Загружаем данные профиля при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProfileDataToForm();
+        });
+    </script>
+</body>
+
+</html>

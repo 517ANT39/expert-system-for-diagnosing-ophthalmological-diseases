@@ -134,15 +134,16 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-!example.env
 .env
 .envrc
 .venv
-env/
 venv/
-ENV/
 env.bak/
 venv.bak/
+
+# Ignore all files in env folder except .example files
+*.env
+!*.env.example
 
 # Spyder project settings
 .spyderproject

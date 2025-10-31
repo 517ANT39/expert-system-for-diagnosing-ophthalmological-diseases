@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход - ОфтальмоЭксперт</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+</head>
+<body class="login-page">
+    <!-- Hero Section -->
+    <header class="hero">
+        <nav class="navbar">
+            <div class="container">
+                <div class="navbar-content">
+                    <a href="{{ url_for('index') }}" class="logo logo-link">
+                        <span class="logo-icon">👁️</span>
+                        <span class="logo-text">ОфтальмоЭксперт</span>
+                    </a>
+                    <div class="nav-links">
+                        <a href="{{ url_for('registration') }}" class="btn btn-primary">Регистрация</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Login Section -->
+    <section class="login-section">
+        <div class="container">
+            <div class="login-container">
+                <div class="login-card">
+                    <div class="login-header">
+                        <h2>Вход в систему</h2>
+                        <p class="text-muted">Войдите в систему для начала работы</p>
+                    </div>
+                    
+                    <form class="login-form">
+                        <div class="form-group">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" id="email" class="form-control" placeholder="Введите ваш email" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="password" class="form-label">Пароль</label>
+                            <input type="password" id="password" class="form-control" placeholder="Введите ваш пароль" required>
+                        </div>
+                        
+                        <!--<div class="form-options">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="remember">
+                                <span class="checkmark"></span>
+                                Запомнить меня
+                            </label>
+                            <a href="#" class="forgot-password">Забыли пароль?</a>
+                        </div>-->
+                        
+                        <button type="submit" class="btn btn-primary btn-lg w-100">
+                            Войти в систему
+                        </button>
+                    </form>
+
+                    <div class="register-section">
+                        <p class="text-center text-muted">
+                            Еще нет аккаунта? 
+                            <a href="{{ url_for('registration') }}" class="register-link">Зарегистрироваться</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <div class="logo">
+                        <span class="logo-icon">👁️</span>
+                        <span class="logo-text">ОфтальмоЭксперт</span>
+                    </div>
+                    <p class="text-muted">Экспертная система поддержки врачебных решений</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h4>Система</h4>
+                        <a href="{{ url_for('login') }}">Вход</a>
+                        <a href="{{ url_for('registration') }}">Регистрация</a>
+                        <a href="{{ url_for('index') }}">Главная</a>
+                    </div>
+                    
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 ОфтальмоЭксперт. Все права защищены.</p>
+            </div>
+        </div>
+    </footer>
+    <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+</body>
+</html>

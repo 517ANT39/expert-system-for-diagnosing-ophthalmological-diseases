@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Результаты консультации - ОфтальмоЭксперт</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/consultation.css') }}">
+    <style>
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+        
+        .export-btn-disabled {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            opacity: 0.6;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+
+<body class="dashboard-page">
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-content">
+                <a href="{{ url_for('dashboard') }}" class="logo logo-link">
+                    <span class="logo-icon">👁️</span>
+                    <span class="logo-text">ОфтальмоЭксперт</span>
+                </a>
+                <div class="nav-links">
+                    <a href="{{ url_for('dashboard') }}" class="nav-link">Главная</a>
+                    <a href="{{ url_for('patient_list') }}" class="nav-link">Пациенты</a>
+                    <a href="{{ url_for('consultation') }}" class="nav-link active">Консультации</a>
+                    <div class="user-menu">
+                        <a href="{{ url_for('profile') }}" class="user-name" id="userName">Загрузка...</a>
+                        <a href="{{ url_for('logout') }}" class="btn btn-sm btn-secondary">Выйти</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container main-content">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="header-content">
+                <h1>Результаты диагностики</h1>
+                <p class="text-muted">Консультация от {{ consultation_info.date }}</p>
+            </div>
+            <div class="header-actions">
+                {% if consultation.status == 'completed' %}
+                <button class="btn btn-primary btn-sm" onclick="exportToPDF()"
+                    data-consultation-id="{{ consultation_info.id }}">
+                    Экспорт в PDF
+                </button>
+                {% else %}
+                <span class="export-btn-disabled" title="Экспорт доступен только для завершенных консультаций">
+                    Экспорт в PDF
+                </span>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Patient Info -->
+        <div class="card patient-info-card">
+            <div class="card-header">
+                <h3>Информация о пациенте</h3>
+            </div>
+            <div class="card-content">
+                <div class="patient-details">
+                    <div class="detail-item">
+                        <strong>ФИО:</strong> {{ patient.name }}
+                    </div>
+                    <div class="detail-item">
+                        <strong>Дата рождения:</strong> {{ patient.birth_date }}
+                        {% if patient.age %}
+                        ({{ patient.age }} лет)
+                        {% endif %}
+                    </div>
+                    <div class="detail-item">
+                        <strong>Пол:</strong> {% if patient.sex == 'M' %}
+                        Мужской
+                        {% else %}
+                        Женский
+                        {% endif %}
+                    </div>
+                    <div class="detail-item">
+                        <strong>Дата консультации:</strong> {{ consultation_info.date }}
+                    </div>
+                    <div class="detail-item">
+                        <strong>Статус:</strong>
+                        {% if consultation.status == 'completed' %}
+                        <span class="status-badge status-completed">Завершена</span>
+                        {% elif consultation.status == 'active' %}
+                        <span class="status-badge status-active">Активна</span>
+                        {% elif consultation.status == 'draft' %}
+                        <span class="status-badge status-draft">Черновик</span>
+                        {% else %}
+                        <span class="status-badge status-canceled">Отменена</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Doctor Info -->
+        <div class="card doctor-info-card">
+            <div class="card-header">
+                <h3>Врач-консультант</h3>
+            </div>
+            <div class="card-content">
+                <div class="doctor-details">
+                    <div class="detail-item">
+                        <strong>ФИО врача:</strong> {{ doctor.name }}
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Diagnosis Result -->
+        <div class="card diagnosis-card">
+            <div class="card-header">
+                <div class="diagnosis-header">
+                    <h2>Вероятностный диагноз</h2>
+
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="primary-diagnosis">
+                    <h3>{{ diagnosis_result.primary_diagnosis }}</h3>
+                    <!--<p class="diagnosis-description">
+                        {{ diagnosis_result.explanation }}
+                    </p>-->
+                </div>
+            </div>
+        </div>
+
+        <!-- Explanation -->
+        <div class="card explanation-card">
+            <div class="card-header">
+                <div class="answers-header">
+                    <h3>Объяснение диагноза</h3>
+
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="answers-list" id="explanationList">
+                    <p class="text-muted">
+                        Диагноз основан на следующих выявленных симптомах:
+                    </p>
+                    <ul class="symptoms-evidence">
+                        {% for symptom in diagnosis_result.symptoms_evidence %}
+                        <li class="evidence-{{ 'positive' if symptom.present else 'negative' }}">
+                            <span class="answer-icon">{{ '✅' if symptom.present else '❌' }}</span>
+                            <span class="answer-text">{{ symptom.name }} - {{ 'Да' if symptom.present else 'Нет'
+                                }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Doctor's Recommendations -->
+        <div class="card doctor-recommendations-card">
+            <div class="card-header">
+                <h3>Рекомендации врача</h3>
+            </div>
+            <div class="card-content">
+                <div class="doctor-recommendations-content">
+                    {% if consultation.notes %}
+                    <div class="recommendation-text">
+                        <pre>{{ consultation.notes }}</pre>
+                    </div>
+                    <div class="recommendation-meta">
+                        <small class="text-muted">
+                            Рекомендации составлены: {{ consultation.doctor.last_name }} {{
+                            consultation.doctor.first_name }} {{ consultation.doctor.middle_name or '' }}
+                        </small>
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <p class="text-muted">Рекомендации врача отсутствуют</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="form-actions" style="margin-top: 20px;">
+            <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-sm">
+                ← Назад в панель управления
+            </a>
+            <a href="{{ url_for('consultation') }}" class="btn btn-secondary btn-sm">
+                Новая консультация
+            </a>
+        </div>
+
+    </main>
+
+    <script>
+        function exportToPDF() {
+            // Пробуем разные способы получить consultation_id
+            let consultationId;
+
+            // Способ 1: из data-attribute кнопки
+            const button = document.querySelector('.header-actions button');
+            if (button) {
+                consultationId = button.getAttribute('data-consultation-id');
+            }
+
+            // Способ 2: из URL параметров
+            if (!consultationId) {
+                const urlParams = new URLSearchParams(window.location.search);
+                consultationId = urlParams.get('consultation_id');
+            }
+
+            if (!consultationId) {
+                showToast('Ошибка: ID консультации не найден', 'error');
+                return;
+            }
+
+            // Дополнительная проверка статуса перед экспортом
+            fetch(`/api/consultation/${consultationId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.consultation.status === 'completed') {
+                        showToast('Генерация PDF документа...', 'info');
+                        window.open(`/consultation/${consultationId}/export-pdf`, '_blank');
+                    } else {
+                        showToast('Экспорт доступен только для завершенных консультаций', 'warning');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('Ошибка при проверке статуса консультации', 'error');
+                });
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = message;
+            toast.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: ${type === 'success' ? '#4CAF50' : type === 'error' ? '#f44336' : '#2196F3'};
+            color: white;
+            padding: 12px 20px;
+            border-radius: 4px;
+            z-index: 1000;
+        `;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // Загрузка имени пользователя
+        document.addEventListener('DOMContentLoaded', function () {
+            fetch('/api/profile')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('userName').textContent = data.doctor.last_name + ' ' + data.doctor.first_name;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading profile:', error);
+                });
+        });
+    </script>
+
+    <!-- ПОДКЛЮЧАЕМ СКРИПТ ПОСЛЕ ВСЕХ ОСНОВНЫХ ФУНКЦИЙ -->
+    <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+</body>
+
+</html>
